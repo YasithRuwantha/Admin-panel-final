@@ -26,6 +26,7 @@
     <a href="<?php echo site_url('project/list'); ?>" class="<?php echo (uri_string() == 'project/list') ? 'active' : ''; ?>">List Projects</a>
     <a href="#">Add Invoice</a>
     <a href="#">List Invoice</a>
+    <a href="<?php echo site_url('invoice/add_invoice'); ?>" class="<?php echo (uri_string() == 'invoice/add_invoice') ? 'active' : ''; ?>">Add Invoice</a>
     <a href="#">Add Quotation</a>
     <a href="#">List Quotation</a>
     <a href="#">Add Expenses</a>
