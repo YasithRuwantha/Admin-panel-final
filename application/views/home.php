@@ -15,19 +15,7 @@
 </head>
 <body>
 <div class="d-flex">
-    <div class="sidebar position-fixed" style="width:220px;">
-        <h4 class="text-center mb-4">Admin Panel</h4>
-        <a href="<?php echo site_url('home'); ?>" class="active">Home</a>
-        <a href="#">Add Projects</a>
-        <a href="#">List Projects</a>
-        <a href="#">Add Invoice</a>
-        <a href="#">List Invoice</a>
-        <a href="#">Add Quotation</a>
-        <a href="#">List Quotation</a>
-        <a href="#">Add Expenses</a>
-        <a href="#">List Expenses</a>
-        <a href="<?php echo site_url('auth/logout'); ?>">Logout</a>
-    </div>
+    <?php $this->load->view('sidebar'); ?>
     <div class="main-content flex-grow-1">
         <h2>Welcome to the Admin Panel</h2>
         <p>Select an option from the sidebar to get started.</p>
