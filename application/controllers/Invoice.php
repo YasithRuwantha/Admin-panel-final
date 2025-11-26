@@ -1,4 +1,5 @@
 
+
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -17,24 +18,61 @@ class Invoice extends CI_Controller {
 
     public function add_invoice() {
         if ($this->input->post()) {
-            $data = [
+            $items = [];
+            $descriptions = $this->input->post('description');
+            $amounts = $this->input->post('amount');
+            for ($i = 0; $i < count($descriptions); $i++) {
+                if (!empty($descriptions[$i]) && !empty($amounts[$i])) {
+                    $items[] = [
+                        'description' => $descriptions[$i],
+                        'amount'      => (float)$amounts[$i]
+                    ];
+                }
+            }
+            $invoice_data = [
                 'name'        => $this->input->post('name'),
                 'invoice_no'  => $this->input->post('invoice_no'),
                 'address'     => $this->input->post('address'),
                 'invoice_date'=> $this->input->post('invoice_date'),
                 'project_code'=> $this->input->post('project_code'),
-                'description' => json_encode($this->input->post('description')),
-                'amount'      => json_encode($this->input->post('amount')),
+                // 'description' will be set in the model
+                // 'amount' will be set after items are added
             ];
-            $this->Invoice_model->add_invoice($data);
+            $this->Invoice_model->add_invoice_with_items($invoice_data, $items);
             redirect('invoice/list');
         } else {
-            $this->load->view('add_invoice');
+            // Get current invoice numbers for dropdown
+            $invoice_numbers = array_map(function($inv) { return $inv['invoice_no']; }, $this->Invoice_model->get_all_invoices());
+            $this->load->view('add_invoice', ['invoice_numbers' => $invoice_numbers]);
         }
     }
 
 	    public function list() {
         $invoices = $this->Invoice_model->get_all_invoices();
+        $this->load->model('Payment_model');
+        // For each invoice, fetch its items and payments
+        foreach ($invoices as &$invoice) {
+            $invoice['items'] = $this->Invoice_model->get_invoice_items($invoice['id']);
+            $invoice['payments'] = $this->Payment_model->get_payments_by_invoice($invoice['id']);
+        }
         $this->load->view('list_invoice', ['invoices' => $invoices]);
+    }
+
+	    public function receive_payment() {
+        $this->load->model('Payment_model');
+        if ($this->input->post()) {
+            $data = [
+                'invoice_id'     => $this->input->post('invoice_id'),
+                'payment_amount' => $this->input->post('payment_amount'),
+                'payment_date'   => $this->input->post('payment_date'),
+                'payment_mode'   => $this->input->post('payment_mode'),
+                'reference_no'   => $this->input->post('reference_no'),
+                'remarks'        => $this->input->post('remarks'),
+                'created_at'     => date('Y-m-d H:i:s'),
+                'updated_at'     => date('Y-m-d H:i:s'),
+            ];
+            $this->Payment_model->add_payment($data);
+            redirect('invoice/list');
+        }
     }
 }
