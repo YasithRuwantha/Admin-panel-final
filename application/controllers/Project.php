@@ -17,9 +17,15 @@ class Project extends CI_Controller {
 
     public function add() {
         if ($this->input->post()) {
+            $project_code = $this->input->post('project_code');
+            if ($this->Project_model->project_code_exists($project_code)) {
+                $this->session->set_flashdata('error', 'Project code already exists.');
+                redirect('project/add');
+                return;
+            }
             $data = [
                 'name' => $this->input->post('name'),
-                'project_code' => $this->input->post('project_code'),
+                'project_code' => $project_code,
                 'client' => $this->input->post('client'),
                 'address' => $this->input->post('address'),
                 'paysheet_value' => $this->input->post('paysheet_value'),
