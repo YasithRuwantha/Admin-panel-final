@@ -28,7 +28,7 @@
     <a href="<?php echo site_url('invoice/list'); ?>" class="<?php echo (uri_string() == 'invoice/list') ? 'active' : ''; ?>">List Invoice</a>
     <a href="<?php echo site_url('quote/add'); ?>" class="<?php echo (uri_string() == 'quote/add') ? 'active' : ''; ?>">Add Quotation</a>
     <a href="<?php echo site_url('quote/list'); ?>" class="<?php echo (uri_string() == 'quote/list') ? 'active' : ''; ?>">List Quotation</a>
-    <a href="#">List Expenses</a>
     <a href="<?php echo site_url('expense/add'); ?>" class="<?php echo (uri_string() == 'expense/add') ? 'active' : ''; ?>">Add Expenses</a>
+    <a href="<?php echo site_url('expense/list_expenses'); ?>" class="<?php echo (uri_string() == 'expense/list_expenses') ? 'active' : ''; ?>">List Expenses</a>
     <a href="<?php echo site_url('auth/logout'); ?>">Logout</a>
 </div>

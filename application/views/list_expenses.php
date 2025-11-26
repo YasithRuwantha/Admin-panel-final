@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List Expenses</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="d-flex">
+    <?php $this->load->view('sidebar'); ?>
+    <div class="container mt-5" style="margin-left:220px;">
+        <h2>List Expenses</h2>
+        <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Project Name</th>
+                    <th>Project Code</th>
+                    <th>Expense Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Paid To</th>
+                    <th>Paid By</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Remark</th>
+                    <th>Document</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($expenses)): ?>
+                    <?php foreach ($expenses as $expense): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($expense['id']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['project_name']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['project_code']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['expense_date']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['category']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['description']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['paid_to']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['paid_by']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['amount']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['payment_method']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['status']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['remark']); ?></td>
+                            <td>
+                                <?php if (!empty($expense['document_path'])): ?>
+                                    <?php 
+                                    $docs = json_decode($expense['document_path'], true);
+                                    if (is_array($docs)) {
+                                        foreach ($docs as $doc) {
+                                            $ext = strtolower(pathinfo($doc, PATHINFO_EXTENSION));
+                                            if (in_array($ext, ['jpg','jpeg','png'])) {
+                                                echo '<a href="' . base_url(htmlspecialchars($doc)) . '" target="_blank"><img src="' . base_url(htmlspecialchars($doc)) . '" style="max-width:40px;max-height:40px;margin-right:5px;" alt="Document"></a><br>';
+                                            } else {
+                                                echo '<a href="' . base_url(htmlspecialchars($doc)) . '" target="_blank">View</a><br>';
+                                            }
+                                        }
+                                    } else {
+                                        echo '<a href="' . base_url(htmlspecialchars($expense['document_path'])) . '" target="_blank">View</a>';
+                                    }
+                                ?>
+                                <?php else: ?>
+                                    N/A
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="13" class="text-center">No expenses found.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
