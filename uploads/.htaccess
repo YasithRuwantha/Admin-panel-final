@@ -1,0 +1,8 @@
+# Allow access to uploaded files
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>
+Options -Indexes
+<FilesMatch "\.(php|php5|php7|phps)$">
+    Deny from all
+</FilesMatch>
