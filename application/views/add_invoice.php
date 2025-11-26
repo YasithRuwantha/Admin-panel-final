@@ -21,6 +21,63 @@
                     <input type="text" name="invoice_no" class="form-control" required>
                 </div>
             </div>
+        </form>
+        <!-- Receive Payment Modal -->
+        <!-- <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#paymentModal">Receive Payment</button> -->
+        <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="<?php echo site_url('invoice/receive_payment'); ?>">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="paymentModalLabel">Receive Payment</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Invoice No</label>
+                                <select name="invoice_id" class="form-control" required>
+                                    <option value="">Select Invoice No</option>
+                                    <?php if (!empty($invoice_numbers)): ?>
+                                        <?php foreach ($invoice_numbers as $inv_no): ?>
+                                            <option value="<?php echo htmlspecialchars($inv_no); ?>"><?php echo htmlspecialchars($inv_no); ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Amount</label>
+                                <input type="number" step="0.01" name="payment_amount" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Date</label>
+                                <input type="date" name="payment_date" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Mode</label>
+                                <select name="payment_mode" class="form-control" required>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Online">Online</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reference No</label>
+                                <input type="text" name="reference_no" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Remarks</label>
+                                <textarea name="remarks" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Payment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Address</label>
@@ -64,6 +121,70 @@
                 </table>
             </div>
             <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-success ms-2" onclick="showPaymentModalForAddInvoice()">Receive Payment</button>
+        </form>
+
+        <!-- Payment Modal -->
+        <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="<?php echo site_url('invoice/receive_payment'); ?>">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="paymentModalLabel">Receive Payment</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="invoice_id" id="modal_invoice_id_add">
+                            <div class="mb-3">
+                                <label class="form-label">Invoice No</label>
+                                <input type="text" class="form-control" id="modal_invoice_no_add" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Amount</label>
+                                <input type="number" step="0.01" name="payment_amount" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Date</label>
+                                <input type="date" name="payment_date" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Mode</label>
+                                <select name="payment_mode" class="form-control" required>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Online">Online</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reference No</label>
+                                <input type="text" name="reference_no" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Remarks</label>
+                                <textarea name="remarks" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Payment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+        function showPaymentModalForAddInvoice() {
+                // Try to get invoice_no from the form if available
+                var invoiceNo = document.querySelector('input[name="invoice_no"]').value;
+                document.getElementById('modal_invoice_id_add').value = '';
+                document.getElementById('modal_invoice_no_add').value = invoiceNo;
+                var modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+                modal.show();
+        }
+        </script>
         </form>
         <script>
             function updateTotal() {

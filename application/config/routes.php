@@ -1,4 +1,5 @@
 
+
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -55,5 +56,6 @@ $route['project/add'] = 'project/add';
 $route['project/list'] = 'project/list';
 $route['invoice/add_invoice'] = 'invoice/add_invoice';
 $route['invoice/list'] = 'invoice/list';
+$route['invoice/receive_payment'] = 'invoice/receive_payment';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
