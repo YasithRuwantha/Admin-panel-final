@@ -5,13 +5,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Project extends CI_Controller {
     public function __construct() {
         parent::__construct();
-        $this->load->database();
         $this->load->library(['session']);
+        $this->load->database();
         $this->load->helper(['form', 'url', 'auth']);
         require_login();
         $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         $this->output->set_header('Cache-Control: post-check=0, pre-check=0', false);
         $this->output->set_header('Pragma: no-cache');
+        $this->load->model('Project_model');
     }
 
     public function add() {
@@ -27,14 +28,14 @@ class Project extends CI_Controller {
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
-            $this->db->insert('project', $data);
+            $this->Project_model->add_project($data);
             $this->session->set_flashdata('success', 'Project added successfully');
             redirect('project/add');
         }
         $this->load->view('add_project');
     }
 	    public function list() {
-        $projects = $this->db->get('project')->result_array();
+        $projects = $this->Project_model->get_all_projects();
         $this->load->view('list_projects', ['projects' => $projects]);
     }
 }
