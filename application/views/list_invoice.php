@@ -55,7 +55,14 @@
                                     <?php echo htmlspecialchars(number_format($invoice['amount'], 2)); ?>
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
+                                    <?php if (!empty($invoice['payment'])): ?>
+                                        <span class="badge bg-success">Paid</span><br>
+                                        <small>Amount: <?php echo htmlspecialchars(number_format($invoice['payment']['payment_amount'],2)); ?></small><br>
+                                        <small>Date: <?php echo htmlspecialchars($invoice['payment']['payment_date']); ?></small><br>
+                                        <small>Mode: <?php echo htmlspecialchars($invoice['payment']['payment_mode']); ?></small>
+                                    <?php else: ?>
+                                        <button type="button" class="btn btn-success btn-sm" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

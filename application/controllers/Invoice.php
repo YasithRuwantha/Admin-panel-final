@@ -47,9 +47,12 @@ class Invoice extends CI_Controller {
 
 	    public function list() {
         $invoices = $this->Invoice_model->get_all_invoices();
-        // For each invoice, fetch its items
+        $this->load->model('Payment_model');
+        // For each invoice, fetch its items and payment info
         foreach ($invoices as &$invoice) {
             $invoice['items'] = $this->Invoice_model->get_invoice_items($invoice['id']);
+            $payment = $this->db->get_where('payments', ['invoice_id' => $invoice['id']])->row_array();
+            $invoice['payment'] = $payment;
         }
         $this->load->view('list_invoice', ['invoices' => $invoices]);
     }
