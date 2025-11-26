@@ -116,10 +116,13 @@
                             <div class="mb-3">
                                 <label class="form-label">Payment Mode</label>
                                 <select name="payment_mode" class="form-control" required>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Bank Transfer">Bank Transfer</option>
-                                    <option value="Cheque">Cheque</option>
-                                    <option value="Online">Online</option>
+                                    <?php if (!empty($payment_methods)): ?>
+                                        <?php foreach ($payment_methods as $method): ?>
+                                            <option value="<?php echo htmlspecialchars($method['config_value']); ?>">
+                                                <?php echo htmlspecialchars($method['config_value']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                             <div class="mb-3">

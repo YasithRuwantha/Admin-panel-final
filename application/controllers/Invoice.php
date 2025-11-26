@@ -17,6 +17,8 @@ class Invoice extends CI_Controller {
     }
 
     public function add_invoice() {
+        $this->load->model('Config_model');
+        $payment_methods = $this->Config_model->get_payment_methods();
         if ($this->input->post()) {
             $items = [];
             $descriptions = $this->input->post('description');
@@ -41,20 +43,22 @@ class Invoice extends CI_Controller {
             $this->Invoice_model->add_invoice_with_items($invoice_data, $items);
             redirect('invoice/list');
         } else {
-            $this->load->view('add_invoice');
+            $this->load->view('add_invoice', ['payment_methods' => $payment_methods]);
         }
     }
 
 	    public function list() {
         $invoices = $this->Invoice_model->get_all_invoices();
         $this->load->model('Payment_model');
+        $this->load->model('Config_model');
+        $payment_methods = $this->Config_model->get_payment_methods();
         // For each invoice, fetch its items and payment info
         foreach ($invoices as &$invoice) {
             $invoice['items'] = $this->Invoice_model->get_invoice_items($invoice['id']);
             $payment = $this->db->get_where('payments', ['invoice_id' => $invoice['id']])->row_array();
             $invoice['payment'] = $payment;
         }
-        $this->load->view('list_invoice', ['invoices' => $invoices]);
+        $this->load->view('list_invoice', ['invoices' => $invoices, 'payment_methods' => $payment_methods]);
     }
 
 	    public function receive_payment() {
