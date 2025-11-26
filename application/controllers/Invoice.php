@@ -17,8 +17,7 @@ class Invoice extends CI_Controller {
     }
 
     public function add_invoice() {
-        $this->load->model('Config_model');
-        $payment_methods = $this->Config_model->get_payment_methods();
+        $payment_methods = $this->Invoice_model->get_payment_methods();
         if ($this->input->post()) {
             $items = [];
             $descriptions = $this->input->post('description');
@@ -50,8 +49,7 @@ class Invoice extends CI_Controller {
 	    public function list() {
         $invoices = $this->Invoice_model->get_all_invoices();
         $this->load->model('Payment_model');
-        $this->load->model('Config_model');
-        $payment_methods = $this->Config_model->get_payment_methods();
+        $payment_methods = $this->Invoice_model->get_payment_methods();
         // For each invoice, fetch its items and payment info
         foreach ($invoices as &$invoice) {
             $invoice['items'] = $this->Invoice_model->get_invoice_items($invoice['id']);
