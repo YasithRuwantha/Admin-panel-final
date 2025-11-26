@@ -58,5 +58,6 @@ $route['invoice/add_invoice'] = 'invoice/add_invoice';
 $route['invoice/list'] = 'invoice/list';
 $route['invoice/receive_payment'] = 'invoice/receive_payment';
 $route['quote/add'] = 'quote/add';
+$route['quote/list'] = 'quote/list';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
