@@ -22,8 +22,6 @@
                         <th>Service Description</th>
                         <th>Amount</th>
                         <th>Total</th>
-                        <th>Received Payments</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,25 +53,6 @@
                                 </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;">
                                     <?php echo htmlspecialchars(number_format($invoice['amount'], 2)); ?>
-                                </td>
-                                <td style="word-break:break-word;max-width:220px;white-space:pre-line;">
-                                    <?php if (!empty($invoice['payments'])): ?>
-                                        <?php foreach ($invoice['payments'] as $payment): ?>
-                                            <div style="margin-bottom:6px;">
-                                                <span class="badge bg-success"><?php echo htmlspecialchars(number_format($payment['payment_amount'], 2)); ?></span>
-                                                <small><?php echo htmlspecialchars($payment['payment_date']); ?></small><br>
-                                                <span><?php echo htmlspecialchars($payment['payment_mode']); ?></span>
-                                                <?php if (!empty($payment['reference_no'])): ?>
-                                                    <span>Ref: <?php echo htmlspecialchars($payment['reference_no']); ?></span>
-                                                <?php endif; ?>
-                                                <?php if (!empty($payment['remarks'])): ?>
-                                                    <span>Remarks: <?php echo htmlspecialchars($payment['remarks']); ?></span>
-                                                <?php endif; ?>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <span class="text-muted">No payments</span>
-                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-success btn-sm" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>

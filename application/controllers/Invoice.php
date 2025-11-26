@@ -41,19 +41,15 @@ class Invoice extends CI_Controller {
             $this->Invoice_model->add_invoice_with_items($invoice_data, $items);
             redirect('invoice/list');
         } else {
-            // Get current invoice numbers for dropdown
-            $invoice_numbers = array_map(function($inv) { return $inv['invoice_no']; }, $this->Invoice_model->get_all_invoices());
-            $this->load->view('add_invoice', ['invoice_numbers' => $invoice_numbers]);
+            $this->load->view('add_invoice');
         }
     }
 
 	    public function list() {
         $invoices = $this->Invoice_model->get_all_invoices();
-        $this->load->model('Payment_model');
-        // For each invoice, fetch its items and payments
+        // For each invoice, fetch its items
         foreach ($invoices as &$invoice) {
             $invoice['items'] = $this->Invoice_model->get_invoice_items($invoice['id']);
-            $invoice['payments'] = $this->Payment_model->get_payments_by_invoice($invoice['id']);
         }
         $this->load->view('list_invoice', ['invoices' => $invoices]);
     }
