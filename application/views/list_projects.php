@@ -19,7 +19,7 @@
                     <th>Project Code</th>
                     <th>Client Name</th>
                     <th>Address</th>
-                    <th>Paysheet Value</th>
+                    <th>Project Value</th>
                     <th>Start Date</th>
                     <th>Status</th>
                 </tr>

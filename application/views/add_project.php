@@ -41,8 +41,8 @@
                                 <input type="text" class="form-control" id="address" name="address" placeholder="Enter address">
                             </div>
                             <div class="mb-3">
-                                <label for="paysheet_value" class="form-label">Paysheet Value</label>
-                                <input type="number" step="0.01" class="form-control" id="paysheet_value" name="paysheet_value" placeholder="Enter paysheet value">
+                                <label for="paysheet_value" class="form-label">Project Value</label>
+                                <input type="number" step="0.01" class="form-control" id="paysheet_value" name="paysheet_value" placeholder="Enter project value">
                             </div>
                             <div class="mb-3">
                                 <label for="start_date" class="form-label">Project Start Date</label>
