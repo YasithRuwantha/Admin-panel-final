@@ -18,6 +18,8 @@ class Invoice extends CI_Controller {
 
     public function add_invoice() {
         $payment_methods = $this->Invoice_model->get_payment_methods();
+        $this->load->model('Project_model');
+        $projects = $this->Project_model->get_all_projects();
         if ($this->input->post()) {
             $items = [];
             $descriptions = $this->input->post('description');
@@ -36,13 +38,17 @@ class Invoice extends CI_Controller {
                 'address'     => $this->input->post('address'),
                 'invoice_date'=> $this->input->post('invoice_date'),
                 'project_code'=> $this->input->post('project_code'),
+                'project_name' => $this->input->post('project_name'),
                 // 'description' will be set in the model
                 // 'amount' will be set after items are added
             ];
             $this->Invoice_model->add_invoice_with_items($invoice_data, $items);
             redirect('invoice/list');
         } else {
-            $this->load->view('add_invoice', ['payment_methods' => $payment_methods]);
+            $this->load->view('add_invoice', [
+                'payment_methods' => $payment_methods,
+                'projects' => $projects
+            ]);
         }
     }
 

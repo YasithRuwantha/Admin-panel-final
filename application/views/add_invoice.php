@@ -44,9 +44,24 @@
                                     <input type="date" name="invoice_date" class="form-control" required>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Project Code</label>
-                                <input type="text" name="project_code" class="form-control" required placeholder="Enter project code">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Project Name</label>
+                                    <select name="project_name" id="project_name" class="form-select" required onchange="setProjectCode()">
+                                        <option value="">Select Project</option>
+                                        <?php if (!empty($projects)): ?>
+                                            <?php foreach ($projects as $project): ?>
+                                                <option value="<?php echo htmlspecialchars($project['name']); ?>" data-code="<?php echo htmlspecialchars($project['project_code']); ?>">
+                                                    <?php echo htmlspecialchars($project['name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Project Code</label>
+                                    <input type="text" name="project_code" id="project_code" class="form-control" required readonly placeholder="Auto-filled">
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <table class="table table-bordered" id="services-table" style="background:#f8f9fa;border:2px solid #000;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-bottom:20px;">
@@ -144,6 +159,14 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                function setProjectCode() {
+                    var select = document.getElementById('project_name');
+                    var selected = select.options[select.selectedIndex];
+                    var code = selected.getAttribute('data-code') || '';
+                    document.getElementById('project_code').value = code;
+                }
+                </script>
         <script>
         function showPaymentModalForAddInvoice() {
                 // Try to get invoice_no from the form if available
