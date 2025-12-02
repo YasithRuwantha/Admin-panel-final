@@ -49,11 +49,11 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Name of the Client</label>
-                                    <input type="text" name="name" class="form-control" required placeholder="Enter client name" readonly>
+                                    <input type="text" name="name" class="form-control" required placeholder="Auto-filled" readonly>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Address</label>
-                                    <input type="text" name="address" class="form-control" required placeholder="Enter address" readonly>
+                                    <input type="text" name="address" class="form-control" required placeholder="Auto-filled" readonly>
                                 </div>
                             </div>
                             <div class="row mb-3">
