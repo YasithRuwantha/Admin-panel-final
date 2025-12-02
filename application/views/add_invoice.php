@@ -26,32 +26,15 @@
                         <form method="post">
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Name of the Client</label>
-                                    <input type="text" name="name" class="form-control" required placeholder="Enter client name">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Invoice No</label>
-                                    <input type="text" name="invoice_no" class="form-control" required placeholder="Enter invoice number">
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Address</label>
-                                    <input type="text" name="address" class="form-control" required placeholder="Enter address">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Date</label>
-                                    <input type="date" name="invoice_date" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
                                     <label class="form-label">Project Name</label>
                                     <select name="project_name" id="project_name" class="form-select" required onchange="setProjectCode()">
                                         <option value="">Select Project</option>
                                         <?php if (!empty($projects)): ?>
                                             <?php foreach ($projects as $project): ?>
-                                                <option value="<?php echo htmlspecialchars($project['name']); ?>" data-code="<?php echo htmlspecialchars($project['project_code']); ?>">
+                                                <option value="<?php echo htmlspecialchars($project['name']); ?>" 
+                                                    data-code="<?php echo htmlspecialchars($project['project_code']); ?>"
+                                                    data-client="<?php echo htmlspecialchars($project['client'] ?? ''); ?>"
+                                                    data-address="<?php echo htmlspecialchars($project['address'] ?? ''); ?>">
                                                     <?php echo htmlspecialchars($project['name']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -61,6 +44,26 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Project Code</label>
                                     <input type="text" name="project_code" id="project_code" class="form-control" required readonly placeholder="Auto-filled">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Name of the Client</label>
+                                    <input type="text" name="name" class="form-control" required placeholder="Enter client name" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" name="address" class="form-control" required placeholder="Enter address" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Invoice No</label>
+                                    <input type="text" name="invoice_no" class="form-control" required placeholder="Enter invoice number">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" name="invoice_date" class="form-control" required>
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -164,7 +167,11 @@
                     var select = document.getElementById('project_name');
                     var selected = select.options[select.selectedIndex];
                     var code = selected.getAttribute('data-code') || '';
+                    var client = selected.getAttribute('data-client') || '';
+                    var address = selected.getAttribute('data-address') || '';
                     document.getElementById('project_code').value = code;
+                    document.querySelector('input[name="name"]').value = client;
+                    document.querySelector('input[name="address"]').value = address;
                 }
                 </script>
         <script>
