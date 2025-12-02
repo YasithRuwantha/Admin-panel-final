@@ -21,7 +21,7 @@
                     <th>Address</th>
                     <th>Project Value</th>
                     <th>Start Date</th>
-                    <th>Status</th>
+                    <th>Status</th>                   
                 </tr>
             </thead>
             <tbody>
@@ -36,6 +36,9 @@
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['paysheet_value']); ?></td>
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['start_date']); ?></td>
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['status']); ?></td>
+                            <td style="word-break:break-word;max-width:120px;white-space:pre-line;">
+                                <a href="<?php echo site_url('project/edit/' . $project['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
