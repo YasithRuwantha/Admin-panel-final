@@ -3,6 +3,30 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Project extends CI_Controller {
+        public function edit($id) {
+            $project = $this->Project_model->get_project_by_id($id);
+            if (!$project) {
+                show_404();
+                return;
+            }
+            if ($this->input->post()) {
+                $data = [
+                    'name' => $this->input->post('name'),
+                    'project_code' => $this->input->post('project_code'),
+                    'client' => $this->input->post('client'),
+                    'address' => $this->input->post('address'),
+                    'paysheet_value' => $this->input->post('paysheet_value'),
+                    'start_date' => $this->input->post('start_date'),
+                    'status' => $this->input->post('status'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ];
+                $this->Project_model->update_project($id, $data);
+                $this->session->set_flashdata('success', 'Project updated successfully');
+                redirect('project/list');
+                return;
+            }
+            $this->load->view('edit_project', ['project' => $project]);
+        }
     public function __construct() {
         parent::__construct();
         $this->load->library(['session']);
