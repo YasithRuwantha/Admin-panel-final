@@ -87,8 +87,26 @@
                                 </table>
                             </div>
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn px-4 py-2" style="background:#ffc107;color:#222;"><i class="bi bi-save me-2"></i>Update</button>
+                                <button type="button" class="btn px-4 py-2" style="background:#ffc107;color:#222;" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal"><i class="bi bi-save me-2"></i>Update</button>
                             </div>
+                                <!-- Confirmation Modal -->
+                                <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmUpdateModalLabel">Confirm Update</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to update this quotation?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="button" class="btn" style="background:#ffc107;color:#222;" onclick="document.querySelector('form').submit();">Yes, Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                         </form>
                     </div>
                 </div>
