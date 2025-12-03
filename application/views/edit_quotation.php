@@ -13,7 +13,7 @@
             <div class="col-xl-8 col-lg-10 col-md-11">
                 <div class="card shadow-sm border-0" style="background:#fff; min-height:730px; width:100%; max-width:1100px; margin:auto;">
                     <div class="card-header d-flex align-items-center border-bottom" style="border-radius:0.5rem 0.5rem 0 0; background:#fff;">
-                        <i class="bi bi-file-earmark-text" style="font-size:1.5rem;margin-right:10px;color:#0d6efd;"></i>
+                        <i class="bi bi-file-earmark-text" style="font-size:1.5rem;margin-right:10px;color:#ffc107;"></i>
                         <h4 class="mb-0" style="color:#222;font-weight:600;">Edit Quotation</h4>
                     </div>
                     <div class="card-body p-4">
@@ -76,7 +76,7 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="3"><button type="button" class="btn btn-sm" id="add-row" style="background:#0d6dfc;color:#fff;"><i class="bi bi-plus-circle me-2"></i>Add Service</button></td>
+                                            <td colspan="3"><button type="button" class="btn btn-sm" id="add-row" style="background:#ffc107;color:#222;"><i class="bi bi-plus-circle me-2"></i>Add Service</button></td>
                                         </tr>
                                         <tr>
                                             <td style="font-weight:bold;">Total</td>
@@ -87,7 +87,7 @@
                                 </table>
                             </div>
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary px-4 py-2"><i class="bi bi-save me-2"></i>Update</button>
+                                <button type="submit" class="btn px-4 py-2" style="background:#ffc107;color:#222;"><i class="bi bi-save me-2"></i>Update</button>
                             </div>
                         </form>
                     </div>
