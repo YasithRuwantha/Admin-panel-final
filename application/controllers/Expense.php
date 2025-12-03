@@ -65,10 +65,13 @@ class Expense extends CI_Controller {
             $this->session->set_flashdata('success', 'Expense added successfully');
             redirect('expense/add');
         }
+        $this->load->model('Project_model');
+        $projects = $this->Project_model->get_all_projects();
         $this->load->view('add_expense', [
             'categories' => $categories,
             'payment_methods' => $payment_methods,
-            'users' => $users
+            'users' => $users,
+            'projects' => $projects
         ]);
     }
 
