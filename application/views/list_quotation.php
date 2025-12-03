@@ -22,7 +22,7 @@
                         <!-- <th>Service Description</th> -->
                         <th>Amount</th>
                         <th>Total</th>
-                        <th></th>
+                        
                     </tr>
                 </thead>
                 <tbody>
