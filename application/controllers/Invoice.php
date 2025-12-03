@@ -59,8 +59,8 @@ class Invoice extends CI_Controller {
         // For each invoice, fetch its items and payment info
         foreach ($invoices as &$invoice) {
             $invoice['items'] = $this->Invoice_model->get_invoice_items($invoice['id']);
-            $payment = $this->db->get_where('payments', ['invoice_id' => $invoice['id']])->row_array();
-            $invoice['payment'] = $payment;
+            // Fetch all payments for this invoice using the model
+            $invoice['payments'] = $this->Invoice_model->get_payments_by_invoice($invoice['id']);
         }
         $this->load->view('list_invoice', ['invoices' => $invoices, 'payment_methods' => $payment_methods]);
     }

@@ -55,13 +55,41 @@
                                     <?php echo htmlspecialchars(number_format($invoice['amount'], 2)); ?>
                                 </td>
                                 <td>
-                                    <?php if (!empty($invoice['payment'])): ?>
-                                        <span class="badge bg-success">Paid</span><br>
-                                        <small>Amount: <?php echo htmlspecialchars(number_format($invoice['payment']['payment_amount'],2)); ?></small><br>
-                                        <small>Date: <?php echo htmlspecialchars($invoice['payment']['payment_date']); ?></small><br>
-                                        <small>Mode: <?php echo htmlspecialchars($invoice['payment']['payment_mode']); ?></small>
-                                    <?php else: ?>
-                                        <button type="button" class="btn btn-success btn-sm" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
+                                    <?php 
+                                    $total_paid = 0;
+                                    if (!empty($invoice['payments'])) {
+                                        foreach ($invoice['payments'] as $pay) {
+                                            $total_paid += $pay['payment_amount'];
+                                        }
+                                    }
+                                    $invoice_total = $invoice['amount'];
+                                    $status = '';
+                                    if ($total_paid == 0) {
+                                        $status = '<span class="badge bg-warning text-dark">Pending</span>';
+                                    } elseif ($total_paid < $invoice_total) {
+                                        $status = '<span class="badge bg-info text-dark">Partially Paid</span>';
+                                    } elseif ($total_paid == $invoice_total) {
+                                        $status = '<span class="badge bg-success">Paid</span>';
+                                    } elseif ($total_paid > $invoice_total) {
+                                        $status = '<span class="badge bg-danger">Over Paid</span>';
+                                    }
+                                    echo $status;
+                                    ?>
+                                    <?php if (!empty($invoice['payments'])): ?>
+                                        <div class="mt-1">
+                                            <?php foreach ($invoice['payments'] as $pay): ?>
+                                                <div class="border rounded p-2 mb-1 bg-light">
+                                                    <small><b>Amount:</b> <?php echo htmlspecialchars(number_format($pay['payment_amount'],2)); ?></small><br>
+                                                    <small><b>Date:</b> <?php echo htmlspecialchars($pay['payment_date']); ?></small><br>
+                                                    <small><b>Mode:</b> <?php echo htmlspecialchars($pay['payment_mode']); ?></small><br>
+                                                    <?php if (!empty($pay['reference_no'])): ?><small><b>Ref:</b> <?php echo htmlspecialchars($pay['reference_no']); ?></small><br><?php endif; ?>
+                                                    <?php if (!empty($pay['remarks'])): ?><small><b>Remarks:</b> <?php echo htmlspecialchars($pay['remarks']); ?></small><?php endif; ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($total_paid < $invoice_total): ?>
+                                        <button type="button" class="btn btn-success btn-sm mt-1" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
                                     <?php endif; ?>
                                 </td>
                             </tr>

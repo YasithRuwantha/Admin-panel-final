@@ -1,3 +1,4 @@
+
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -41,5 +42,9 @@ class Invoice_model extends CI_Model {
 
     public function get_all_invoices() {
         return $this->db->get('invoice')->result_array();
+    }
+
+    public function get_payments_by_invoice($invoice_id) {
+    return $this->db->get_where('payments', ['invoice_id' => $invoice_id])->result_array();
     }
 }
