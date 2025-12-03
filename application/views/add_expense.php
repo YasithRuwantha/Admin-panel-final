@@ -24,14 +24,34 @@
                     <div class="alert alert-danger"><?php echo $this->session->flashdata('error'); ?></div>
                 <?php endif; ?>
                 <form method="post" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label>Project Code</label>
-                        <input type="text" name="project_code" class="form-control" required>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Project Name</label>
+                            <select name="project_name" id="project_name" class="form-select" required onchange="setProjectCode()">
+                                <option value="">Select Project</option>
+                                <?php if (!empty($projects)): ?>
+                                    <?php foreach ($projects as $project): ?>
+                                        <option value="<?php echo htmlspecialchars($project['name']); ?>" data-code="<?php echo htmlspecialchars($project['project_code']); ?>">
+                                            <?php echo htmlspecialchars($project['name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Project Code</label>
+                            <input type="text" name="project_code" id="project_code" class="form-control" required readonly placeholder="Auto-filled">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label>Project Name</label>
-                        <input type="text" name="project_name" class="form-control" required>
-                    </div>
+                    </script>
+                    <script>
+                    function setProjectCode() {
+                        var select = document.getElementById('project_name');
+                        var selected = select.options[select.selectedIndex];
+                        var code = selected.getAttribute('data-code') || '';
+                        document.getElementById('project_code').value = code;
+                    }
+                    </script>
                     <div class="row mb-3">
                         <div class="col">
                             <label>Date</label>

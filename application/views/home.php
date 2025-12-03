@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home - Admin Panel</title>
+    <title>Home - CanoAccounts</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <style>
         body { background: #f8f9fa; }
@@ -17,7 +17,7 @@
 <div class="d-flex">
     <?php $this->load->view('sidebar'); ?>
     <div class="main-content flex-grow-1">
-        <h2>Welcome to the Admin Panel</h2>
+        <h2>Welcome to the CanoAccounts</h2>
         <p>Select an option from the sidebar to get started.</p>
     </div>
 </div>
