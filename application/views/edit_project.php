@@ -23,7 +23,7 @@
                         <?php if($this->session->flashdata('error')): ?>
                             <div class="alert alert-danger mb-3"><?php echo $this->session->flashdata('error'); ?></div>
                         <?php endif; ?>
-                        <form method="post" action="<?php echo site_url('project/edit/' . $project['id']); ?>">
+                        <form id="editProjectForm" method="post" action="<?php echo site_url('project/edit/' . $project['id']); ?>">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Project Name</label>
                                 <input type="text" class="form-control" id="name" name="name" required value="<?php echo htmlspecialchars($project['name']); ?>">
@@ -59,8 +59,26 @@
                                 </select>
                             </div>
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-warning px-4 py-2"><i class="bi bi-pencil-square me-2"></i>Update Project</button>
+                                <button type="button" class="btn px-4 py-2" style="background:#ffc107;color:#222;" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal"><i class="bi bi-pencil-square me-2"></i>Update Project</button>
                             </div>
+        <!-- Confirmation Modal -->
+        <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmUpdateModalLabel">Confirm Update</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to update this project?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn" style="background:#ffc107;color:#222;" onclick="document.getElementById('editProjectForm').submit();">Yes, Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
                         </form>
                     </div>
                 </div>
@@ -70,5 +88,6 @@
 </div>
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
