@@ -54,7 +54,7 @@
                                 </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;"> <?php echo htmlspecialchars(number_format($quote['amount'], 2)); ?> </td>
                                 <td style="word-break:break-word;max-width:120px;white-space:pre-line;">
-                                    <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                    <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Show Quotation</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
