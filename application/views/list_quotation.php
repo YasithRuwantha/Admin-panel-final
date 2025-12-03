@@ -22,6 +22,7 @@
                         <!-- <th>Service Description</th> -->
                         <th>Amount</th>
                         <th>Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,10 +53,13 @@
                                     <?php endif; ?>
                                 </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;"> <?php echo htmlspecialchars(number_format($quote['amount'], 2)); ?> </td>
+                                <td style="word-break:break-word;max-width:120px;white-space:pre-line;">
+                                    <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="8" class="text-center">No quotations found.</td></tr>
+                        <tr><td colspan="9" class="text-center">No quotations found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>

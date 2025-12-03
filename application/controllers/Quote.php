@@ -54,4 +54,37 @@ class Quote extends CI_Controller {
         }
         $this->load->view('list_quotation', ['quotations' => $quotations]);
     }
+
+	    public function edit($id) {
+        $quote = $this->Quote_model->get_quote_by_id($id);
+        if (!$quote) {
+            show_404();
+        }
+        $quote['items'] = $this->Quote_model->get_quote_items($id);
+        if ($this->input->post()) {
+            $items = [];
+            $descriptions = $this->input->post('description');
+            $amounts = $this->input->post('amount');
+            for ($i = 0; $i < count($descriptions); $i++) {
+                if (!empty($descriptions[$i]) && !empty($amounts[$i])) {
+                    $items[] = [
+                        'description' => $descriptions[$i],
+                        'amount'      => (float)$amounts[$i]
+                    ];
+                }
+            }
+            $quote_data = [
+                'name'          => $this->input->post('name'),
+                'quotation_no'  => $this->input->post('quotation_no'),
+                'address'       => $this->input->post('address'),
+                'quote_date'    => $this->input->post('quote_date'),
+                'project_code'  => $this->input->post('project_code'),
+                'updated_at'    => date('Y-m-d H:i:s'),
+            ];
+            $this->Quote_model->update_quote_with_items($id, $quote_data, $items);
+            $this->session->set_flashdata('success', 'Quotation updated successfully');
+            redirect('quote/edit/' . $id);
+        }
+        $this->load->view('edit_quotation', ['quote' => $quote]);
+    }
 }

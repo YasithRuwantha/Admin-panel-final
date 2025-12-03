@@ -62,5 +62,6 @@ $route['quote/add'] = 'quote/add';
 $route['quote/list'] = 'quote/list';
 $route['expense/add'] = 'expense/add';
 $route['expense/list_expenses'] = 'expense/list_expenses';
+$route['quote/edit/(:num)'] = 'Quote/edit/$1';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
