@@ -19,7 +19,7 @@
                         <th>Address</th>
                         <th>Date</th>
                         <th>Project Code</th>
-                        <th>Service Description</th>
+                        <!-- <th>Service Description</th> -->
                         <th>Amount</th>
                         <th>Total</th>
                     </tr>
@@ -33,7 +33,7 @@
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"> <?php echo htmlspecialchars($quote['address']); ?> </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"> <?php echo htmlspecialchars($quote['quote_date']); ?> </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"> <?php echo htmlspecialchars($quote['project_code']); ?> </td>
-                                <td style="word-break:break-word;max-width:180px;white-space:pre-line;">
+                                <!-- <td style="word-break:break-word;max-width:180px;white-space:pre-line;">
                                     <?php if (!empty($quote['items'])): ?>
                                         <?php foreach ($quote['items'] as $item): ?>
                                             <?php echo htmlspecialchars($item['description']); ?><br>
@@ -41,7 +41,7 @@
                                     <?php else: ?>
                                         <?php echo htmlspecialchars($quote['description']); ?>
                                     <?php endif; ?>
-                                </td>
+                                </td> -->
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;">
                                     <?php if (!empty($quote['items'])): ?>
                                         <?php foreach ($quote['items'] as $item): ?>
