@@ -83,7 +83,7 @@ class Quote extends CI_Controller {
             ];
             $this->Quote_model->update_quote_with_items($id, $quote_data, $items);
             $this->session->set_flashdata('success', 'Quotation updated successfully');
-            redirect('quote/edit/' . $id);
+            redirect('quote/list');
         }
         $this->load->view('edit_quotation', ['quote' => $quote]);
     }
