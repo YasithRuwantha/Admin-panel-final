@@ -1,3 +1,4 @@
+
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -37,5 +38,36 @@ class Quote_model extends CI_Model {
 
     public function get_all_quotes() {
         return $this->db->get('quote')->result_array();
+    }
+	    public function get_quote_by_id($id) {
+        return $this->db->get_where('quote', ['id' => $id])->row_array();
+    }
+
+    public function update_quote_with_items($id, $quote_data, $items) {
+        // Concatenate all descriptions for the quote table
+        $all_descriptions = array_map(function($item) {
+            return $item['description'];
+        }, $items);
+        $quote_data['description'] = implode(', ', $all_descriptions);
+
+        // Update quote main data
+        $this->db->where('id', $id)->update('quote', $quote_data);
+
+        // Remove old items
+        $this->db->where('quote_id', $id)->delete('quotation_items');
+
+        $total = 0;
+        foreach ($items as $item) {
+            $item_data = [
+                'quote_id'   => $id,
+                'description'=> $item['description'],
+                'amount'     => $item['amount']
+            ];
+            $this->db->insert('quotation_items', $item_data);
+            $total += $item['amount'];
+        }
+        // Update quote total
+        $this->db->where('id', $id)->update('quote', ['amount' => $total]);
+        return $id;
     }
 }
