@@ -22,6 +22,7 @@ class Project_model extends CI_Model {
     }
 
     public function get_all_projects() {
+        $this->db->order_by('id', 'DESC');
         return $this->db->get('project')->result_array();
     }
 }
