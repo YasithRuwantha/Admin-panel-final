@@ -19,7 +19,7 @@
                         <th>Address</th>
                         <th>Date</th>
                         <th>Project Code</th>
-                        <th>Service Description</th>
+                        <!-- <th>Service Description</th> -->
                         <th>Amount</th>
                         <th>Total</th>
                     </tr>
@@ -33,7 +33,7 @@
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"> <?php echo htmlspecialchars($invoice['address']); ?> </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"> <?php echo htmlspecialchars($invoice['invoice_date']); ?> </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"> <?php echo htmlspecialchars($invoice['project_code']); ?> </td>
-                                <td style="word-break:break-word;max-width:180px;white-space:pre-line;">
+                                <!-- <td style="word-break:break-word;max-width:180px;white-space:pre-line;">
                                     <?php if (!empty($invoice['items'])): ?>
                                         <?php foreach ($invoice['items'] as $item): ?>
                                             <?php echo htmlspecialchars($item['description']); ?><br>
@@ -41,7 +41,7 @@
                                     <?php else: ?>
                                         <?php echo htmlspecialchars($invoice['description']); ?>
                                     <?php endif; ?>
-                                </td>
+                                </td> -->
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;">
                                     <?php if (!empty($invoice['items'])): ?>
                                         <?php foreach ($invoice['items'] as $item): ?>
