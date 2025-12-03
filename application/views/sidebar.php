@@ -20,7 +20,7 @@
     }
 </style>
 <div class="sidebar position-fixed">
-    <h4 class="text-center mb-4">Admin Panel</h4>
+    <h4 class="text-center mb-4">CanoAccounts</h4>
     <a href="<?php echo site_url('home'); ?>" class="<?php echo (uri_string() == 'home') ? 'active' : ''; ?>">Home</a>
     <a href="<?php echo site_url('project/add'); ?>" class="<?php echo (uri_string() == 'project/add') ? 'active' : ''; ?>">Add Projects</a>
     <a href="<?php echo site_url('project/list'); ?>" class="<?php echo (uri_string() == 'project/list') ? 'active' : ''; ?>">List Projects</a>
