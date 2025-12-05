@@ -9,13 +9,14 @@ class Expense extends CI_Controller {
         $this->load->helper(['form', 'url', 'auth']);
         require_login();
         $this->load->model('Expense_model');
+        $this->load->model('Config_model');
     }
 
     public function add() {
         // Get dropdown data
         $categories = $this->Expense_model->get_expense_categories();
         $payment_methods = $this->Expense_model->get_payment_methods();
-        $users = $this->db->get('user')->result_array();
+        $users = $this->Config_model->get_by_type('user');
 
         if ($this->input->post()) {
             $config['upload_path']   = './uploads/expenses/';
