@@ -54,7 +54,14 @@
                                 </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;"> <?php echo htmlspecialchars(number_format($quote['amount'], 2)); ?> </td>
                                 <td style="word-break:break-word;max-width:120px;white-space:pre-line;">
-                                    <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Show Quotation</a>
+                                    <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning mb-1"><i class="bi bi-pencil-square"></i> Show Quotation</a>
+                                    <a href="<?php echo site_url('quote/pdf/' . $quote['id']); ?>" class="btn btn-danger fw-bold d-flex align-items-center justify-content-center" style="gap:4px; width:120px; min-width:70px; height:40px; font-size:1rem;" target="_blank">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
+                                            <path d="M5.5 7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H5v1h.5a.5.5 0 0 1 0 1H5v1a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5h1zm2.5.5a.5.5 0 0 1 .5-.5h.5v4a.5.5 0 0 1-1 0v-4zm2.5-.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5z"/>
+                                            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6.5L14 4.5zm-3-2.5H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5h-3a1 1 0 0 1-1-1V2z"/>
+                                        </svg>
+                                        <span>PDF</span>
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

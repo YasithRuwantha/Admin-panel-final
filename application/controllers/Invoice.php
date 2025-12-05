@@ -82,4 +82,30 @@ class Invoice extends CI_Controller {
             redirect('invoice/list');
         }
     }
+
+    public function pdf($id) {
+        // Get invoice data
+        $invoice = $this->Invoice_model->get_invoice_by_id($id);
+        if (!$invoice) {
+            show_404();
+        }
+        $invoice['items'] = $this->Invoice_model->get_invoice_items($id);
+        $invoice['payments'] = $this->Invoice_model->get_payments_by_invoice($id);
+        
+        // Load HTML content
+        $data['invoice'] = $invoice;
+        $html = $this->load->view('invoice_pdf', $data, true);
+        
+        // Use DomPDF for PDF generation
+        require_once(APPPATH.'libraries/dompdf/autoload.inc.php');
+        
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        
+        // Output PDF for download
+        $filename = 'Invoice_' . $invoice['invoice_no'] . '.pdf';
+        $dompdf->stream($filename, array("Attachment" => true));
+    }
 }

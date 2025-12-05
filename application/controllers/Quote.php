@@ -87,4 +87,29 @@ class Quote extends CI_Controller {
         }
         $this->load->view('edit_quotation', ['quote' => $quote]);
     }
+
+    public function pdf($id) {
+        // Get quote data
+        $quote = $this->Quote_model->get_quote_by_id($id);
+        if (!$quote) {
+            show_404();
+        }
+        $quote['items'] = $this->Quote_model->get_quote_items($id);
+        
+        // Load HTML content
+        $data['quote'] = $quote;
+        $html = $this->load->view('quotation_pdf', $data, true);
+        
+        // Use DomPDF for PDF generation
+        require_once(APPPATH.'libraries/dompdf/autoload.inc.php');
+        
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        
+        // Output PDF for download
+        $filename = 'Quotation_' . $quote['quotation_no'] . '.pdf';
+        $dompdf->stream($filename, array("Attachment" => true));
+    }
 }
