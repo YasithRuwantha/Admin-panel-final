@@ -44,6 +44,10 @@ class Invoice_model extends CI_Model {
         return $this->db->get('invoice')->result_array();
     }
 
+    public function get_invoice_by_id($id) {
+        return $this->db->get_where('invoice', ['id' => $id])->row_array();
+    }
+
     public function get_payments_by_invoice($invoice_id) {
     return $this->db->get_where('payments', ['invoice_id' => $invoice_id])->result_array();
     }
