@@ -108,8 +108,8 @@ class Quote extends CI_Controller {
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         
-        // Output PDF for download
-        $filename = 'Quotation_' . $quote['quotation_no'] . '.pdf';
-        $dompdf->stream($filename, array("Attachment" => true));
+        // Output PDF for inline display
+        $filename = $quote['quotation_no'] . '.pdf';
+        $dompdf->stream($filename, array("Attachment" => false));
     }
 }

@@ -104,8 +104,8 @@ class Invoice extends CI_Controller {
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         
-        // Output PDF for download
-        $filename = 'Invoice_' . $invoice['invoice_no'] . '.pdf';
-        $dompdf->stream($filename, array("Attachment" => true));
+        // Output PDF for inline display
+        $filename = $invoice['invoice_no'] . '.pdf';
+        $dompdf->stream($filename, array("Attachment" => false));
     }
 }
