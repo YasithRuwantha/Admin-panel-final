@@ -37,6 +37,7 @@ class Quote_model extends CI_Model {
     }
 
     public function get_all_quotes() {
+		$this->db->order_by('id', 'DESC');
         return $this->db->get('quote')->result_array();
     }
 	    public function get_quote_by_id($id) {
