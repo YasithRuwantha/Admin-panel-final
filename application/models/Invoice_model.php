@@ -41,6 +41,7 @@ class Invoice_model extends CI_Model {
     }
 
     public function get_all_invoices() {
+		$this->db->order_by('id', 'DESC');
         return $this->db->get('invoice')->result_array();
     }
 
