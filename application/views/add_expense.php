@@ -74,16 +74,18 @@
                         <div class="col">
                             <label>Paid To</label>
                             <select name="paid_to" class="form-control" required>
+                                <option value="">Select User</option>
                                 <?php foreach ($users as $user): ?>
-                                    <option value="<?php echo $user['username']; ?>"><?php echo $user['username']; ?></option>
+                                    <option value="<?php echo $user['config_key']; ?>"><?php echo $user['config_value']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col">
                             <label>Paid By</label>
                             <select name="paid_by" class="form-control" required>
+                                <option value="">Select User</option>
                                 <?php foreach ($users as $user): ?>
-                                    <option value="<?php echo $user['username']; ?>"><?php echo $user['username']; ?></option>
+                                    <option value="<?php echo $user['config_key']; ?>"><?php echo $user['config_value']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
