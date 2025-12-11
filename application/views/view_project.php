@@ -24,7 +24,7 @@
                             <dt class="col-sm-3">Project Code</dt><dd class="col-sm-9"><?php echo htmlspecialchars($project['project_code']); ?></dd>
                             <dt class="col-sm-3">Client Name</dt><dd class="col-sm-9"><?php echo htmlspecialchars($project['client']); ?></dd>
                             <dt class="col-sm-3">Address</dt><dd class="col-sm-9"><?php echo nl2br(htmlspecialchars($project['address'])); ?></dd>
-                            <dt class="col-sm-3">Project Value</dt><dd class="col-sm-9"><?php echo htmlspecialchars($project['paysheet_value']); ?></dd>
+                            <dt class="col-sm-3">Project Value</dt><dd class="col-sm-9"><?php echo htmlspecialchars(number_format((float)$project['paysheet_value'], 2)); ?></dd>
                             <dt class="col-sm-3">Start Date</dt><dd class="col-sm-9"><?php echo htmlspecialchars($project['start_date']); ?></dd>
                             <dt class="col-sm-3">Status</dt><dd class="col-sm-9"><?php echo htmlspecialchars($project['status']); ?></dd>
                         </dl>
