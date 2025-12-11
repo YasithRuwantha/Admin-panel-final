@@ -45,14 +45,14 @@
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;">
                                     <?php if (!empty($invoice['items'])): ?>
                                         <?php foreach ($invoice['items'] as $item): ?>
-                                            <?php echo htmlspecialchars(number_format($item['amount'], 2)); ?><br>
+                                            <?php echo htmlspecialchars(number_format((float)$item['amount'], 2)); ?><br>
                                         <?php endforeach; ?>
                                     <?php else: ?>
-                                        <?php echo htmlspecialchars(number_format($invoice['amount'], 2)); ?>
+                                        <?php echo htmlspecialchars(number_format((float)$invoice['amount'], 2)); ?>
                                     <?php endif; ?>
                                 </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;">
-                                    <?php echo htmlspecialchars(number_format($invoice['amount'], 2)); ?>
+                                    <?php echo htmlspecialchars(number_format((float)$invoice['amount'], 2)); ?>
                                 </td>
                                 <td>
                                     <?php 
@@ -79,7 +79,7 @@
                                         <div class="mt-1">
                                             <?php foreach ($invoice['payments'] as $pay): ?>
                                                 <div class="border rounded p-2 mb-1 bg-light">
-                                                    <small><b>Amount:</b> <?php echo htmlspecialchars(number_format($pay['payment_amount'],2)); ?></small><br>
+                                                    <small><b>Amount:</b> <?php echo htmlspecialchars(number_format((float)$pay['payment_amount'], 2)); ?></small><br>
                                                     <small><b>Date:</b> <?php echo htmlspecialchars($pay['payment_date']); ?></small><br>
                                                     <small><b>Mode:</b> <?php echo htmlspecialchars($pay['payment_mode']); ?></small><br>
                                                     <?php if (!empty($pay['reference_no'])): ?><small><b>Ref:</b> <?php echo htmlspecialchars($pay['reference_no']); ?></small><br><?php endif; ?>
