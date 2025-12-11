@@ -80,4 +80,48 @@ class Expense extends CI_Controller {
         $expenses = $this->Expense_model->get_expenses();
         $this->load->view('list_expenses', ['expenses' => $expenses]);
     }
+
+    public function view($id) {
+        $expense = $this->Expense_model->get_expense_by_id($id);
+        if (!$expense) {
+            $this->session->set_flashdata('error', 'Expense not found');
+            redirect('expense/list_expenses');
+            return;
+        }
+        $this->load->view('view_expense', ['expense' => $expense]);
+    }
+
+    public function edit($id) {
+        $expense = $this->Expense_model->get_expense_by_id($id);
+        if (!$expense) {
+            $this->session->set_flashdata('error', 'Expense not found');
+            redirect('expense/list_expenses');
+            return;
+        }
+
+        if ($this->input->method() === 'post') {
+            $update = array(
+                'project_name' => $this->input->post('project_name'),
+                'project_code' => $this->input->post('project_code'),
+                'expense_date' => $this->input->post('expense_date'),
+                'category' => $this->input->post('category'),
+                'description' => $this->input->post('description'),
+                'paid_to' => $this->input->post('paid_to'),
+                'paid_by' => $this->input->post('paid_by'),
+                'amount' => $this->input->post('amount'),
+                'payment_method' => $this->input->post('payment_method'),
+                'status' => $this->input->post('status'),
+                'remark' => $this->input->post('remark'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            );
+            if ($this->Expense_model->update_expense($id, $update)) {
+                $this->session->set_flashdata('success', 'Expense updated successfully');
+                redirect('expense/list_expenses');
+                return;
+            }
+            $this->session->set_flashdata('error', 'Failed to update expense');
+        }
+
+        $this->load->view('edit_expense', ['expense' => $expense]);
+    }
 }

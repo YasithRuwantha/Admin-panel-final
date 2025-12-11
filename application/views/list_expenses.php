@@ -27,6 +27,7 @@
                     <th>Status</th>
                     <th>Remark</th>
                     <th>Document</th>
+                    <th style="width:140px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -66,10 +67,14 @@
                                     N/A
                                 <?php endif; ?>
                             </td>
+                                <td>
+                                    <a href="<?php echo site_url('expense/view/' . $expense['id']); ?>" class="btn btn-sm btn-primary me-1"><i class="bi bi-eye"></i> View</a>
+                                    <a href="<?php echo site_url('expense/edit/' . $expense['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="13" class="text-center">No expenses found.</td></tr>
+                    <tr><td colspan="14" class="text-center">No expenses found.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

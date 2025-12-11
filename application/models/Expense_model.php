@@ -24,4 +24,13 @@ class Expense_model extends CI_Model {
     public function add_expense($data) {
         return $this->db->insert('expense', $data);
     }
+
+    public function get_expense_by_id($id) {
+        return $this->db->get_where('expense', ['id' => $id])->row_array();
+    }
+
+    public function update_expense($id, $data) {
+        $this->db->where('id', $id);
+        return $this->db->update('expense', $data);
+    }
 }
