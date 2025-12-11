@@ -42,7 +42,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Category</label>
-                                    <input type="text" name="category" class="form-control" value="<?php echo htmlspecialchars($expense['category']); ?>">
+                                    <select name="category" class="form-select">
+                                        <?php if (!empty($categories)): ?>
+                                            <?php foreach ($categories as $cat): ?>
+                                                <?php $val = isset($cat['config_value']) ? $cat['config_value'] : (isset($cat['value']) ? $cat['value'] : ''); ?>
+                                                <option value="<?php echo htmlspecialchars($val); ?>" <?php echo ($expense['category'] === $val) ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($val); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <option value="<?php echo htmlspecialchars($expense['category']); ?>" selected><?php echo htmlspecialchars($expense['category']); ?></option>
+                                        <?php endif; ?>
+                                    </select>
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -66,7 +77,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Payment Method</label>
-                                    <input type="text" name="payment_method" class="form-control" value="<?php echo htmlspecialchars($expense['payment_method']); ?>">
+                                    <select name="payment_method" class="form-select">
+                                        <?php if (!empty($payment_methods)): ?>
+                                            <?php foreach ($payment_methods as $pm): ?>
+                                                <?php $val = isset($pm['config_value']) ? $pm['config_value'] : (isset($pm['value']) ? $pm['value'] : ''); ?>
+                                                <option value="<?php echo htmlspecialchars($val); ?>" <?php echo ($expense['payment_method'] === $val) ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($val); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <option value="<?php echo htmlspecialchars($expense['payment_method']); ?>" selected><?php echo htmlspecialchars($expense['payment_method']); ?></option>
+                                        <?php endif; ?>
+                                    </select>
                                 </div>
                             </div>
                             <div class="row mb-3">
