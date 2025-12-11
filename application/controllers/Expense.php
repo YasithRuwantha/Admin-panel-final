@@ -98,6 +98,9 @@ class Expense extends CI_Controller {
             redirect('expense/list_expenses');
             return;
         }
+        // Get dropdown data for edit form (same as add)
+        $categories = $this->Expense_model->get_expense_categories();
+        $payment_methods = $this->Expense_model->get_payment_methods();
 
         if ($this->input->method() === 'post') {
             $update = array(
@@ -122,6 +125,10 @@ class Expense extends CI_Controller {
             $this->session->set_flashdata('error', 'Failed to update expense');
         }
 
-        $this->load->view('edit_expense', ['expense' => $expense]);
+        $this->load->view('edit_expense', [
+            'expense' => $expense,
+            'categories' => $categories,
+            'payment_methods' => $payment_methods,
+        ]);
     }
 }
