@@ -55,6 +55,15 @@ class Quote extends CI_Controller {
         $this->load->view('list_quotation', ['quotations' => $quotations]);
     }
 
+    public function view($id) {
+        $quote = $this->Quote_model->get_quote_by_id($id);
+        if (!$quote) {
+            show_404();
+        }
+        $quote['items'] = $this->Quote_model->get_quote_items($id);
+        $this->load->view('view_quotation', ['quote' => $quote]);
+    }
+
 	    public function edit($id) {
         $quote = $this->Quote_model->get_quote_by_id($id);
         if (!$quote) {
