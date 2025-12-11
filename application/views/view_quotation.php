@@ -39,20 +39,20 @@
                                         <?php foreach ($quote['items'] as $item): ?>
                                             <tr>
                                                 <td><?php echo htmlspecialchars($item['description']); ?></td>
-                                                <td class="text-end"><?php echo htmlspecialchars(number_format($item['amount'], 2)); ?></td>
+                                                <td class="text-end"><?php echo htmlspecialchars(number_format((float)$item['amount'], 2)); ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($quote['description']); ?></td>
-                                            <td class="text-end"><?php echo htmlspecialchars(number_format($quote['amount'], 2)); ?></td>
+                                            <td class="text-end"><?php echo htmlspecialchars(number_format((float)$quote['amount'], 2)); ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <th>Total</th>
-                                        <th class="text-end"><?php echo htmlspecialchars(number_format($quote['amount'], 2)); ?></th>
+                                        <th class="text-end"><?php echo htmlspecialchars(number_format((float)$quote['amount'], 2)); ?></th>
                                     </tr>
                                 </tfoot>
                             </table>

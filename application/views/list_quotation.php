@@ -46,13 +46,13 @@
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;">
                                     <?php if (!empty($quote['items'])): ?>
                                         <?php foreach ($quote['items'] as $item): ?>
-                                            <?php echo htmlspecialchars(number_format($item['amount'], 2)); ?><br>
+                                            <?php echo htmlspecialchars(number_format((float)$item['amount'], 2)); ?><br>
                                         <?php endforeach; ?>
                                     <?php else: ?>
-                                        <?php echo htmlspecialchars(number_format($quote['amount'], 2)); ?>
+                                        <?php echo htmlspecialchars(number_format((float)$quote['amount'], 2)); ?>
                                     <?php endif; ?>
                                 </td>
-                                <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;"> <?php echo htmlspecialchars(number_format($quote['amount'], 2)); ?> </td>
+                                <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;"> <?php echo htmlspecialchars(number_format((float)$quote['amount'], 2)); ?> </td>
                                 <td style="white-space:nowrap;">
                                     <a href="<?php echo site_url('quote/view/' . $quote['id']); ?>" class="btn btn-sm btn-primary me-1"><i class="bi bi-eye"></i> View</a>
                                     <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil-square"></i> Edit</a>

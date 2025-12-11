@@ -42,7 +42,7 @@
                             <td><?php echo htmlspecialchars($expense['description']); ?></td>
                             <td><?php echo htmlspecialchars($expense['paid_to']); ?></td>
                             <td><?php echo htmlspecialchars($expense['paid_by']); ?></td>
-                            <td><?php echo htmlspecialchars($expense['amount']); ?></td>
+                            <td><?php echo htmlspecialchars(number_format((float)$expense['amount'], 2)); ?></td>
                             <td><?php echo htmlspecialchars($expense['payment_method']); ?></td>
                             <td><?php echo htmlspecialchars($expense['status']); ?></td>
                             <td><?php echo htmlspecialchars($expense['remark']); ?></td>
