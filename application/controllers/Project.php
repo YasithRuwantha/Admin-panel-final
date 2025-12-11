@@ -68,4 +68,13 @@ class Project extends CI_Controller {
         $projects = $this->Project_model->get_all_projects();
         $this->load->view('list_projects', ['projects' => $projects]);
     }
+
+    public function view($id) {
+        $project = $this->Project_model->get_project_by_id($id);
+        if (!$project) {
+            show_404();
+            return;
+        }
+        $this->load->view('view_project', ['project' => $project]);
+    }
 }
