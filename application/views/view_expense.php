@@ -27,7 +27,7 @@
                             <dt class="col-sm-3">Description</dt><dd class="col-sm-9"><?php echo nl2br(htmlspecialchars($expense['description'])); ?></dd>
                             <dt class="col-sm-3">Paid To</dt><dd class="col-sm-9"><?php echo htmlspecialchars($expense['paid_to']); ?></dd>
                             <dt class="col-sm-3">Paid By</dt><dd class="col-sm-9"><?php echo htmlspecialchars($expense['paid_by']); ?></dd>
-                            <dt class="col-sm-3">Amount</dt><dd class="col-sm-9"><?php echo htmlspecialchars($expense['amount']); ?></dd>
+                            <dt class="col-sm-3">Amount</dt><dd class="col-sm-9"><?php echo htmlspecialchars(number_format((float)$expense['amount'], 2)); ?></dd>
                             <dt class="col-sm-3">Payment Method</dt><dd class="col-sm-9"><?php echo htmlspecialchars($expense['payment_method']); ?></dd>
                             <dt class="col-sm-3">Status</dt><dd class="col-sm-9"><?php echo htmlspecialchars($expense['status']); ?></dd>
                             <dt class="col-sm-3">Remark</dt><dd class="col-sm-9"><?php echo nl2br(htmlspecialchars($expense['remark'])); ?></dd>
