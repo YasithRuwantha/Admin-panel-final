@@ -67,7 +67,9 @@
                             </td>
                                 <td>
                                     <a href="<?php echo site_url('expense/view/' . $expense['id']); ?>" class="btn btn-sm btn-primary me-1"><i class="bi bi-eye"></i> View</a>
-                                    <a href="<?php echo site_url('expense/edit/' . $expense['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                    <?php if (function_exists('is_admin') && is_admin()): ?>
+                                        <a href="<?php echo site_url('expense/edit/' . $expense['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                    <?php endif; ?>
                                 </td>
                         </tr>
                     <?php endforeach; ?>

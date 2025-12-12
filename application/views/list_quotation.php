@@ -55,7 +55,9 @@
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;"> <?php echo htmlspecialchars(number_format((float)$quote['amount'], 2)); ?> </td>
                                 <td style="white-space:nowrap;">
                                     <a href="<?php echo site_url('quote/view/' . $quote['id']); ?>" class="btn btn-sm btn-primary me-1"><i class="bi bi-eye"></i> View</a>
-                                    <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil-square"></i> Edit</a>
+                                    <?php if (function_exists('is_admin') && is_admin()): ?>
+                                        <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil-square"></i> Edit</a>
+                                    <?php endif; ?>
                                     <a href="<?php echo site_url('quote/pdf/' . $quote['id']); ?>" class="btn btn-danger fw-bold d-inline-flex align-items-center justify-content-center" style="gap:4px; min-width:90px; height:32px; font-size:0.9rem;" target="_blank">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
                                             <path d="M5.5 7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H5v1h.5a.5.5 0 0 1 0 1H5v1a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5h1zm2.5.5a.5.5 0 0 1 .5-.5h.5v4a.5.5 0 0 1-1 0v-4zm2.5-.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5z"/>
