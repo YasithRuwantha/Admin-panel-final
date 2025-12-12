@@ -22,7 +22,12 @@ class Expense extends CI_Controller {
         $status_options   = $this->Config_model->get_by_type('status');
 
         if ($this->input->post()) {
-            $config['upload_path']   = './uploads/expenses/';
+            // Ensure absolute upload path and directory existence across environments
+            $upload_dir = FCPATH . 'uploads/expenses/';
+            if (!is_dir($upload_dir)) {
+                @mkdir($upload_dir, 0755, true);
+            }
+            $config['upload_path']   = $upload_dir;
             $config['allowed_types'] = 'jpg|jpeg|png|pdf|doc|docx';
             $config['max_size']      = 4096;
             $this->load->library('upload', $config);
