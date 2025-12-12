@@ -113,6 +113,10 @@ class Expense extends CI_Controller {
         // Get dropdown data for edit form (same as add)
         $categories = $this->Expense_model->get_expense_categories();
         $payment_methods = $this->Expense_model->get_payment_methods();
+        // Config-driven dropdowns
+        $paid_to_options = $this->Config_model->get_by_type('paid_to');
+        $paid_by_options = $this->Config_model->get_by_type('paid_by');
+        $status_options   = $this->Config_model->get_by_type('status');
 
         if ($this->input->method() === 'post') {
             $update = array(
@@ -141,6 +145,9 @@ class Expense extends CI_Controller {
             'expense' => $expense,
             'categories' => $categories,
             'payment_methods' => $payment_methods,
+            'paid_to_options' => $paid_to_options,
+            'paid_by_options' => $paid_by_options,
+            'status_options' => $status_options,
         ]);
     }
 }
