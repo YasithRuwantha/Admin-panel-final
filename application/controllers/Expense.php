@@ -19,6 +19,7 @@ class Expense extends CI_Controller {
         // Load config-driven dropdowns for paid_to, paid_by, and status
         $paid_to_options = $this->Config_model->get_by_type('paid_to');
         $paid_by_options = $this->Config_model->get_by_type('paid_by');
+        $status_options   = $this->Config_model->get_by_type('status');
 
         if ($this->input->post()) {
             $config['upload_path']   = './uploads/expenses/';
@@ -75,6 +76,7 @@ class Expense extends CI_Controller {
             'payment_methods' => $payment_methods,
             'paid_to_options' => $paid_to_options,
             'paid_by_options' => $paid_by_options,
+            'status_options' => $status_options,
             'projects' => $projects
         ]);
     }

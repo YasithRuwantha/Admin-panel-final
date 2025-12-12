@@ -112,10 +112,14 @@
                         <div class="col">
                             <label>Status</label>
                             <select name="status" class="form-control" required>
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                                <option value="Paid">Paid</option>
-                                <option value="Cancelled">Cancelled</option>
+                                <option value="">Select</option>
+                                <?php if (!empty($status_options)) : ?>
+                                    <?php foreach ($status_options as $st): ?>
+                                        <option value="<?php echo htmlspecialchars($st['config_key']); ?>">
+                                            <?php echo htmlspecialchars($st['config_value']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
                     </div>
