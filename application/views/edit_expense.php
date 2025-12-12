@@ -63,11 +63,33 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Paid To</label>
-                                    <input type="text" name="paid_to" class="form-control" value="<?php echo htmlspecialchars($expense['paid_to']); ?>">
+                                    <select name="paid_to" class="form-select">
+                                        <option value="">Select</option>
+                                        <?php if (!empty($paid_to_options)) : ?>
+                                            <?php foreach ($paid_to_options as $opt): ?>
+                                                <?php $key = isset($opt['config_key']) ? $opt['config_key'] : (isset($opt['key']) ? $opt['key'] : ''); ?>
+                                                <?php $val = isset($opt['config_value']) ? $opt['config_value'] : (isset($opt['value']) ? $opt['value'] : ''); ?>
+                                                <option value="<?php echo htmlspecialchars($key); ?>" <?php echo ($expense['paid_to'] === $key || $expense['paid_to'] === $val) ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($val); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Paid By</label>
-                                    <input type="text" name="paid_by" class="form-control" value="<?php echo htmlspecialchars($expense['paid_by']); ?>">
+                                    <select name="paid_by" class="form-select">
+                                        <option value="">Select</option>
+                                        <?php if (!empty($paid_by_options)) : ?>
+                                            <?php foreach ($paid_by_options as $opt): ?>
+                                                <?php $key = isset($opt['config_key']) ? $opt['config_key'] : (isset($opt['key']) ? $opt['key'] : ''); ?>
+                                                <?php $val = isset($opt['config_value']) ? $opt['config_value'] : (isset($opt['value']) ? $opt['value'] : ''); ?>
+                                                <option value="<?php echo htmlspecialchars($key); ?>" <?php echo ($expense['paid_by'] === $key || $expense['paid_by'] === $val) ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($val); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -94,7 +116,18 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
-                                    <input type="text" name="status" class="form-control" value="<?php echo htmlspecialchars($expense['status']); ?>">
+                                    <select name="status" class="form-select">
+                                        <option value="">Select</option>
+                                        <?php if (!empty($status_options)) : ?>
+                                            <?php foreach ($status_options as $st): ?>
+                                                <?php $key = isset($st['config_key']) ? $st['config_key'] : (isset($st['key']) ? $st['key'] : ''); ?>
+                                                <?php $val = isset($st['config_value']) ? $st['config_value'] : (isset($st['value']) ? $st['value'] : ''); ?>
+                                                <option value="<?php echo htmlspecialchars($key); ?>" <?php echo ($expense['status'] === $key || $expense['status'] === $val) ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($val); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Remark</label>
