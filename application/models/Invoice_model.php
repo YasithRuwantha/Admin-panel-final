@@ -52,4 +52,43 @@ class Invoice_model extends CI_Model {
     public function get_payments_by_invoice($invoice_id) {
     return $this->db->get_where('payments', ['invoice_id' => $invoice_id])->result_array();
     }
+
+    public function update_invoice($id, $data) {
+        $this->db->where('id', $id);
+        return $this->db->update('invoice', $data);
+    }
+
+    // Update invoice header and replace items, recomputing total and description
+    public function update_invoice_with_items($id, $data, $items) {
+        // Update header first
+        $this->db->where('id', $id)->update('invoice', $data);
+
+        // Remove existing items
+        $this->db->where('invoice_id', $id)->delete('invoice_items');
+
+        // Insert new items and compute total
+        $total = 0;
+        $descriptions = [];
+        foreach ($items as $item) {
+            if (empty($item['description']) || $item['amount'] === '' || $item['amount'] === null) {
+                continue;
+            }
+            $amount = (float)$item['amount'];
+            $this->db->insert('invoice_items', [
+                'invoice_id'  => $id,
+                'description' => $item['description'],
+                'amount'      => $amount,
+            ]);
+            $total += $amount;
+            $descriptions[] = $item['description'];
+        }
+
+        // Update total and concatenated description on invoice
+        $this->db->where('id', $id)->update('invoice', [
+            'amount'      => $total,
+            'description' => implode(', ', $descriptions),
+        ]);
+
+        return true;
+    }
 }
