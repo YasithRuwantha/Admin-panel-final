@@ -67,11 +67,15 @@
                                     if ($total_paid == 0) {
                                         $status = '<span class="badge bg-warning text-dark">Pending</span>';
                                     } elseif ($total_paid < $invoice_total) {
-                                        $status = '<span class="badge bg-info text-dark">Partially Paid</span>';
+                                        $remaining = max(0, (float)$invoice_total - (float)$total_paid);
+                                        $status = '<span class="badge bg-info text-dark">Partially Paid</span>' .
+                                                  '<div class="small text-muted mt-1"><span class="fw-bold">Remaining To Pay:</span> <span class="fw-bold">' . htmlspecialchars(number_format($remaining, 2)) . '</span></div>';
                                     } elseif ($total_paid == $invoice_total) {
                                         $status = '<span class="badge bg-success">Paid</span>';
                                     } elseif ($total_paid > $invoice_total) {
-                                        $status = '<span class="badge bg-danger">Over Paid</span>';
+                                        $overpaid = max(0, (float)$total_paid - (float)$invoice_total);
+                                        $status = '<span class="badge bg-danger">Over Paid</span>' .
+                                                  '<div class="small text-muted mt-1"><span class="fw-bold">Overpaid:</span> <span class="fw-bold">' . htmlspecialchars(number_format($overpaid, 2)) . '</span></div>';
                                     }
                                     echo $status;
                                     ?>
@@ -91,6 +95,10 @@
                                     <?php if ($total_paid < $invoice_total): ?>
                                         <button type="button" class="btn btn-success btn-sm mt-1" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
                                     <?php endif; ?>
+                                    <div class="mt-2 d-flex gap-2">
+                                        <a href="<?php echo site_url('invoice/view/' . $invoice['id']); ?>" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View</a>
+                                        <a href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                    </div>
                                     <a href="<?php echo site_url('invoice/pdf/' . $invoice['id']); ?>" class="btn btn-danger btn-lg mt-2 fw-bold d-flex align-items-center justify-content-center" style="gap:6px;" target="_blank">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
                                             <path d="M5.5 7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H5v1h.5a.5.5 0 0 1 0 1H5v1a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5h1zm2.5.5a.5.5 0 0 1 .5-.5h.5v4a.5.5 0 0 1-1 0v-4zm2.5-.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5z"/>

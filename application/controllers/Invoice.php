@@ -1,5 +1,3 @@
-
-
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -107,5 +105,88 @@ class Invoice extends CI_Controller {
         // Output PDF for inline display
         $filename = $invoice['invoice_no'] . '.pdf';
         $dompdf->stream($filename, array("Attachment" => false));
+    }
+
+	    public function view($id) {
+        $invoice = $this->Invoice_model->get_invoice_by_id($id);
+        if (!$invoice) {
+            $this->session->set_flashdata('error', 'Invoice not found');
+            redirect('invoice/list');
+            return;
+        }
+        $invoice['items'] = $this->Invoice_model->get_invoice_items($id);
+        $invoice['payments'] = $this->Invoice_model->get_payments_by_invoice($id);
+        $this->load->view('view_invoice', ['invoice' => $invoice]);
+    }
+
+    public function edit($id) {
+        $invoice = $this->Invoice_model->get_invoice_by_id($id);
+        if (!$invoice) {
+            $this->session->set_flashdata('error', 'Invoice not found');
+            redirect('invoice/list');
+            return;
+        }
+        // Load related data for edit view
+        $invoice['items'] = $this->Invoice_model->get_invoice_items($id);
+        $invoice['payments'] = $this->Invoice_model->get_payments_by_invoice($id);
+        $payment_methods = $this->Invoice_model->get_payment_methods();
+        if ($this->input->method() === 'post') {
+            $update = [
+                'name'         => $this->input->post('name'),
+                'invoice_no'   => $this->input->post('invoice_no'),
+                'address'      => $this->input->post('address'),
+                'invoice_date' => $this->input->post('invoice_date'),
+                'project_code' => $this->input->post('project_code'),
+                'project_name' => $this->input->post('project_name'),
+                'updated_at'   => date('Y-m-d H:i:s'),
+            ];
+            // Collect item rows from the form
+            $descriptions = (array)$this->input->post('description');
+            $amounts      = (array)$this->input->post('amount');
+            $items = [];
+            for ($i = 0; $i < count($descriptions); $i++) {
+                $desc = isset($descriptions[$i]) ? trim($descriptions[$i]) : '';
+                $amt  = isset($amounts[$i]) ? $amounts[$i] : '';
+                if ($desc !== '' && $amt !== '') {
+                    $items[] = ['description' => $desc, 'amount' => (float)$amt];
+                }
+            }
+            if (!empty($items)) {
+                $this->Invoice_model->update_invoice_with_items($id, $update, $items);
+            } else {
+                $this->Invoice_model->update_invoice($id, $update);
+            }
+                // Update payments if provided
+                $payment_amounts = (array)$this->input->post('payment_amount');
+                $payment_dates   = (array)$this->input->post('payment_date');
+                $payment_modes   = (array)$this->input->post('payment_mode');
+                $reference_nos   = (array)$this->input->post('reference_no');
+                $remarks_list    = (array)$this->input->post('remarks');
+
+                $payments = [];
+                $count = max(count($payment_amounts), count($payment_dates));
+                for ($i = 0; $i < $count; $i++) {
+                    $payments[] = [
+                        'payment_amount' => isset($payment_amounts[$i]) ? $payment_amounts[$i] : '',
+                        'payment_date'   => isset($payment_dates[$i]) ? $payment_dates[$i] : '',
+                        'payment_mode'   => isset($payment_modes[$i]) ? $payment_modes[$i] : '',
+                        'reference_no'   => isset($reference_nos[$i]) ? $reference_nos[$i] : '',
+                        'remarks'        => isset($remarks_list[$i]) ? $remarks_list[$i] : '',
+                    ];
+                }
+                $this->load->model('Payment_model');
+                $this->Payment_model->delete_payments_by_invoice($id);
+                $this->Payment_model->add_multiple_payments($id, $payments);
+            $this->session->set_flashdata('success', 'Invoice updated successfully');
+            redirect('invoice/list');
+            return;
+        }
+        $this->load->model('Project_model');
+        $projects = $this->Project_model->get_all_projects();
+        $this->load->view('edit_invoice', [
+            'invoice' => $invoice,
+            'projects' => $projects,
+            'payment_methods' => $payment_methods,
+        ]);
     }
 }
