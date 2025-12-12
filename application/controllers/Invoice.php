@@ -64,6 +64,8 @@ class Invoice extends CI_Controller {
     }
 
 	    public function receive_payment() {
+            // Only admin can record payments
+            if (function_exists('require_admin')) { require_admin(); }
         $this->load->model('Payment_model');
         if ($this->input->post()) {
             $data = [
@@ -120,6 +122,8 @@ class Invoice extends CI_Controller {
     }
 
     public function edit($id) {
+        // Only admin can edit invoices
+        if (function_exists('require_admin')) { require_admin(); }
         $invoice = $this->Invoice_model->get_invoice_by_id($id);
         if (!$invoice) {
             $this->session->set_flashdata('error', 'Invoice not found');

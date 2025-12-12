@@ -92,12 +92,14 @@
                                             <?php endforeach; ?>
                                         </div>
                                     <?php endif; ?>
-                                    <?php if ($total_paid < $invoice_total): ?>
+                                    <?php if ($total_paid < $invoice_total && function_exists('is_admin') && is_admin()): ?>
                                         <button type="button" class="btn btn-success btn-sm mt-1" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
                                     <?php endif; ?>
                                     <div class="mt-2 d-flex gap-2">
                                         <a href="<?php echo site_url('invoice/view/' . $invoice['id']); ?>" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View</a>
-                                        <a href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                        <?php if (function_exists('is_admin') && is_admin()): ?>
+                                            <a href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                        <?php endif; ?>
                                     </div>
                                     <a href="<?php echo site_url('invoice/pdf/' . $invoice['id']); ?>" class="btn btn-danger btn-lg mt-2 fw-bold d-flex align-items-center justify-content-center" style="gap:6px;" target="_blank">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">

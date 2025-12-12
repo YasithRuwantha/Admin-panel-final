@@ -39,7 +39,9 @@
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['status']); ?></td>
                             <td style="white-space:nowrap;">
                                 <a href="<?php echo site_url('project/view/' . $project['id']); ?>" class="btn btn-sm btn-primary me-1"><i class="bi bi-eye"></i> View</a>
-                                <a href="<?php echo site_url('project/edit/' . $project['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                <?php if (function_exists('is_admin') && is_admin()): ?>
+                                    <a href="<?php echo site_url('project/edit/' . $project['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

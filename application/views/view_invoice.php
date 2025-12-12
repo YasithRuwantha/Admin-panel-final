@@ -79,7 +79,9 @@
                             </dd>
                         </dl>
                         <div class="d-flex justify-content-end mt-4">
-                            <a href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>" class="btn btn-primary me-2"><i class="bi bi-pencil-square me-2"></i>Edit</a>
+                            <?php if (function_exists('is_admin') && is_admin()): ?>
+                                <a href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>" class="btn btn-primary me-2"><i class="bi bi-pencil-square me-2"></i>Edit</a>
+                            <?php endif; ?>
                             <a href="<?php echo site_url('invoice/list'); ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Back to list</a>
                         </div>
                     </div>

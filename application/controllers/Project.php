@@ -4,6 +4,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Project extends CI_Controller {
         public function edit($id) {
+            // Only admin can edit projects
+            if (function_exists('require_admin')) { require_admin(); }
             $project = $this->Project_model->get_project_by_id($id);
             if (!$project) {
                 show_404();

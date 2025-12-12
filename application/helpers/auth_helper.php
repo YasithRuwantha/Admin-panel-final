@@ -13,3 +13,16 @@ function require_login() {
         exit;
     }
 }
+
+function is_admin() {
+    $CI =& get_instance();
+    $CI->load->library('session');
+    return strtolower((string)$CI->session->userdata('role')) === 'admin';
+}
+
+function require_admin() {
+    if (!is_admin()) {
+        redirect('home');
+        exit;
+    }
+}

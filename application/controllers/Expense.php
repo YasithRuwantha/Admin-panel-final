@@ -102,6 +102,8 @@ class Expense extends CI_Controller {
     }
 
     public function edit($id) {
+        // Only admin can edit expenses
+        if (function_exists('require_admin')) { require_admin(); }
         $expense = $this->Expense_model->get_expense_by_id($id);
         if (!$expense) {
             $this->session->set_flashdata('error', 'Expense not found');

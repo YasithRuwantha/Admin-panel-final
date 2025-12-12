@@ -58,7 +58,9 @@
                             </table>
                         </div>
                         <div class="d-flex justify-content-end mt-4">
-                            <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-warning me-2"><i class="bi bi-pencil-square me-2"></i>Edit</a>
+                            <?php if (function_exists('is_admin') && is_admin()): ?>
+                                <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-warning me-2"><i class="bi bi-pencil-square me-2"></i>Edit</a>
+                            <?php endif; ?>
                             <a href="<?php echo site_url('quote/pdf/' . $quote['id']); ?>" target="_blank" class="btn btn-danger me-2"><i class="bi bi-file-earmark-pdf me-2"></i>PDF</a>
                             <a href="<?php echo site_url('quote/list'); ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Back to list</a>
                         </div>

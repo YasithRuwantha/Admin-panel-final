@@ -65,6 +65,8 @@ class Quote extends CI_Controller {
     }
 
 	    public function edit($id) {
+            // Only admin can edit quotations
+            if (function_exists('require_admin')) { require_admin(); }
         $quote = $this->Quote_model->get_quote_by_id($id);
         if (!$quote) {
             show_404();
