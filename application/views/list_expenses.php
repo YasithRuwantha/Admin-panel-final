@@ -14,7 +14,6 @@
         <table class="table table-bordered table-striped align-middle">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Project Name</th>
                     <th>Project Code</th>
                     <th>Expense Date</th>
@@ -34,7 +33,6 @@
                 <?php if (!empty($expenses)): ?>
                     <?php foreach ($expenses as $expense): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($expense['id']); ?></td>
                             <td><?php echo htmlspecialchars($expense['project_name']); ?></td>
                             <td><?php echo htmlspecialchars($expense['project_code']); ?></td>
                             <td><?php echo htmlspecialchars($expense['expense_date']); ?></td>
