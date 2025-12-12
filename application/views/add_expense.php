@@ -74,19 +74,23 @@
                         <div class="col">
                             <label>Paid To</label>
                             <select name="paid_to" class="form-control" required>
-                                <option value="">Select User</option>
-                                <?php foreach ($users as $user): ?>
-                                    <option value="<?php echo $user['config_key']; ?>"><?php echo $user['config_value']; ?></option>
-                                <?php endforeach; ?>
+                                <option value="">Select</option>
+                                <?php if (!empty($paid_to_options)) : ?>
+                                    <?php foreach ($paid_to_options as $opt): ?>
+                                        <option value="<?php echo htmlspecialchars($opt['config_key']); ?>"><?php echo htmlspecialchars($opt['config_value']); ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
                         <div class="col">
                             <label>Paid By</label>
                             <select name="paid_by" class="form-control" required>
-                                <option value="">Select User</option>
-                                <?php foreach ($users as $user): ?>
-                                    <option value="<?php echo $user['config_key']; ?>"><?php echo $user['config_value']; ?></option>
-                                <?php endforeach; ?>
+                                <option value="">Select</option>
+                                <?php if (!empty($paid_by_options)) : ?>
+                                    <?php foreach ($paid_by_options as $opt): ?>
+                                        <option value="<?php echo htmlspecialchars($opt['config_key']); ?>"><?php echo htmlspecialchars($opt['config_value']); ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
                     </div>
@@ -108,10 +112,14 @@
                         <div class="col">
                             <label>Status</label>
                             <select name="status" class="form-control" required>
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                                <option value="Paid">Paid</option>
-                                <option value="Cancelled">Cancelled</option>
+                                <option value="">Select</option>
+                                <?php if (!empty($status_options)) : ?>
+                                    <?php foreach ($status_options as $st): ?>
+                                        <option value="<?php echo htmlspecialchars($st['config_key']); ?>">
+                                            <?php echo htmlspecialchars($st['config_value']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
                     </div>

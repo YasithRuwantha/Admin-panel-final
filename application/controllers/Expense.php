@@ -16,10 +16,18 @@ class Expense extends CI_Controller {
         // Get dropdown data
         $categories = $this->Expense_model->get_expense_categories();
         $payment_methods = $this->Expense_model->get_payment_methods();
-        $users = $this->Config_model->get_by_type('user');
+        // Load config-driven dropdowns for paid_to, paid_by, and status
+        $paid_to_options = $this->Config_model->get_by_type('paid_to');
+        $paid_by_options = $this->Config_model->get_by_type('paid_by');
+        $status_options   = $this->Config_model->get_by_type('status');
 
         if ($this->input->post()) {
-            $config['upload_path']   = './uploads/expenses/';
+            // Ensure absolute upload path and directory existence across environments
+            $upload_dir = FCPATH . 'uploads/expenses/';
+            if (!is_dir($upload_dir)) {
+                @mkdir($upload_dir, 0755, true);
+            }
+            $config['upload_path']   = $upload_dir;
             $config['allowed_types'] = 'jpg|jpeg|png|pdf|doc|docx';
             $config['max_size']      = 4096;
             $this->load->library('upload', $config);
@@ -71,7 +79,9 @@ class Expense extends CI_Controller {
         $this->load->view('add_expense', [
             'categories' => $categories,
             'payment_methods' => $payment_methods,
-            'users' => $users,
+            'paid_to_options' => $paid_to_options,
+            'paid_by_options' => $paid_by_options,
+            'status_options' => $status_options,
             'projects' => $projects
         ]);
     }
