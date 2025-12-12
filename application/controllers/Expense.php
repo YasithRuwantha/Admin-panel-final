@@ -16,7 +16,9 @@ class Expense extends CI_Controller {
         // Get dropdown data
         $categories = $this->Expense_model->get_expense_categories();
         $payment_methods = $this->Expense_model->get_payment_methods();
-        $users = $this->Config_model->get_by_type('user');
+        // Load config-driven dropdowns for paid_to, paid_by, and status
+        $paid_to_options = $this->Config_model->get_by_type('paid_to');
+        $paid_by_options = $this->Config_model->get_by_type('paid_by');
 
         if ($this->input->post()) {
             $config['upload_path']   = './uploads/expenses/';
@@ -71,7 +73,8 @@ class Expense extends CI_Controller {
         $this->load->view('add_expense', [
             'categories' => $categories,
             'payment_methods' => $payment_methods,
-            'users' => $users,
+            'paid_to_options' => $paid_to_options,
+            'paid_by_options' => $paid_by_options,
             'projects' => $projects
         ]);
     }
