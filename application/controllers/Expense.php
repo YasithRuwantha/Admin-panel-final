@@ -87,8 +87,18 @@ class Expense extends CI_Controller {
     }
 
     public function list_expenses() {
-        $expenses = $this->Expense_model->get_expenses();
-        $this->load->view('list_expenses', ['expenses' => $expenses]);
+        $per_page = 10;
+        $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
+        if ($page < 1) $page = 1;
+        $offset = ($page - 1) * $per_page;
+        $expenses = $this->Expense_model->get_expenses($per_page, $offset);
+        $total_expenses = $this->Expense_model->count_expenses();
+        $total_pages = ceil($total_expenses / $per_page);
+        $this->load->view('list_expenses', [
+            'expenses' => $expenses,
+            'current_page' => $page,
+            'total_pages' => $total_pages
+        ]);
     }
 
     public function view($id) {
