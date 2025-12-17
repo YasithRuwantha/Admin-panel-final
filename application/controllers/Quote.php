@@ -47,12 +47,22 @@ class Quote extends CI_Controller {
     }
 
 	    public function list() {
-        $quotations = $this->Quote_model->get_all_quotes();
+        $per_page = 10;
+        $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
+        if ($page < 1) $page = 1;
+        $offset = ($page - 1) * $per_page;
+        $quotations = $this->Quote_model->get_quotes($per_page, $offset);
+        $total_quotes = $this->Quote_model->count_quotes();
+        $total_pages = ceil($total_quotes / $per_page);
         // For each quote, fetch its items
         foreach ($quotations as &$quote) {
             $quote['items'] = $this->Quote_model->get_quote_items($quote['id']);
         }
-        $this->load->view('list_quotation', ['quotations' => $quotations]);
+        $this->load->view('list_quotation', [
+            'quotations' => $quotations,
+            'current_page' => $page,
+            'total_pages' => $total_pages
+        ]);
     }
 
     public function view($id) {

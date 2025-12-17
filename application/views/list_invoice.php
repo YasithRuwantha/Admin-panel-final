@@ -115,8 +115,27 @@
                         <tr><td colspan="8" class="text-center">No invoices found.</td></tr>
                     <?php endif; ?>
                 </tbody>
-            </table>
-                </div>
+			</table>
+        </div>
+        <!-- Pagination -->
+        <?php if (isset($total_pages) && $total_pages > 1): ?>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item<?php if ($current_page <= 1) echo ' disabled'; ?>">
+                    <a class="page-link" href="?page=<?php echo $current_page - 1; ?>" tabindex="-1">Prev</a>
+                </li>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <li class="page-item<?php if ($i == $current_page) echo ' active'; ?>">
+                        <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+                <li class="page-item<?php if ($current_page >= $total_pages) echo ' disabled'; ?>">
+                    <a class="page-link" href="?page=<?php echo $current_page + 1; ?>">Next</a>
+                </li>
+            </ul>
+			<br><br>
+        </nav>
+        <?php endif; ?>
 
 <!-- Payment Modal -->
 <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">

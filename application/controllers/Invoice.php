@@ -17,7 +17,7 @@ class Invoice extends CI_Controller {
     public function add_invoice() {
         $payment_methods = $this->Invoice_model->get_payment_methods();
         $this->load->model('Project_model');
-        $projects = $this->Project_model->get_all_projects();
+        $projects = $this->Project_model->get_projects(1000, 0); // fetch all for dropdown, adjust limit as needed
         if ($this->input->post()) {
             $items = [];
             $descriptions = $this->input->post('description');
@@ -51,7 +51,13 @@ class Invoice extends CI_Controller {
     }
 
 	    public function list() {
-        $invoices = $this->Invoice_model->get_all_invoices();
+        $per_page = 10;
+        $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
+        if ($page < 1) $page = 1;
+        $offset = ($page - 1) * $per_page;
+        $invoices = $this->Invoice_model->get_invoices($per_page, $offset);
+        $total_invoices = $this->Invoice_model->count_invoices();
+        $total_pages = ceil($total_invoices / $per_page);
         $this->load->model('Payment_model');
         $payment_methods = $this->Invoice_model->get_payment_methods();
         // For each invoice, fetch its items and payment info
@@ -60,7 +66,12 @@ class Invoice extends CI_Controller {
             // Fetch all payments for this invoice using the model
             $invoice['payments'] = $this->Invoice_model->get_payments_by_invoice($invoice['id']);
         }
-        $this->load->view('list_invoice', ['invoices' => $invoices, 'payment_methods' => $payment_methods]);
+        $this->load->view('list_invoice', [
+            'invoices' => $invoices,
+            'payment_methods' => $payment_methods,
+            'current_page' => $page,
+            'total_pages' => $total_pages
+        ]);
     }
 
 	    public function receive_payment() {
@@ -186,7 +197,7 @@ class Invoice extends CI_Controller {
             return;
         }
         $this->load->model('Project_model');
-        $projects = $this->Project_model->get_all_projects();
+        $projects = $this->Project_model->get_projects(1000, 0); // fetch all for dropdown, adjust limit as needed
         $this->load->view('edit_invoice', [
             'invoice' => $invoice,
             'projects' => $projects,

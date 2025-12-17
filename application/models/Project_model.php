@@ -21,8 +21,13 @@ class Project_model extends CI_Model {
         return $this->db->insert('project', $data);
     }
 
-    public function get_all_projects() {
+    public function get_projects($limit = 10, $offset = 0) {
         $this->db->order_by('id', 'DESC');
-        return $this->db->get('project')->result_array();
+        $query = $this->db->get('project', $limit, $offset);
+        return $query->result_array();
+    }
+
+    public function count_projects() {
+        return $this->db->count_all('project');
     }
 }

@@ -75,7 +75,7 @@ class Expense extends CI_Controller {
             redirect('expense/add');
         }
         $this->load->model('Project_model');
-        $projects = $this->Project_model->get_all_projects();
+        $projects = $this->Project_model->get_projects(1000, 0); // fetch all for dropdown, adjust limit as needed
         $this->load->view('add_expense', [
             'categories' => $categories,
             'payment_methods' => $payment_methods,
