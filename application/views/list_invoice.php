@@ -92,10 +92,10 @@
                                             <?php endforeach; ?>
                                         </div>
                                     <?php endif; ?>
-                                    <?php if ($total_paid < $invoice_total && function_exists('is_admin') && is_admin()): ?>
-                                        <button type="button" class="btn btn-success btn-sm mt-1" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
-                                    <?php endif; ?>
                                     <div class="d-flex flex-column gap-2 align-items-start mt-2">
+                                        <?php if ($total_paid < $invoice_total && function_exists('is_admin') && is_admin()): ?>
+                                            <button type="button" class="btn btn-success w-100" style="min-width:70px;" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
+                                        <?php endif; ?>
                                         <a href="<?php echo site_url('invoice/view/' . $invoice['id']); ?>" class="btn btn-primary w-100" style="min-width:70px;"><i class="bi bi-eye"></i> View</a>
                                         <?php if (function_exists('is_admin') && is_admin()): ?>
                                             <a href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>" class="btn btn-warning w-100" style="min-width:70px;"><i class="bi bi-pencil-square"></i> Edit</a>
