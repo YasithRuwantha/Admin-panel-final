@@ -16,9 +16,14 @@ class Expense_model extends CI_Model {
         return $query->result_array();
     }
 
-    public function get_expenses($order_by = 'id DESC') {
+    public function get_expenses($limit = 10, $offset = 0, $order_by = 'id DESC') {
         $this->db->order_by($order_by);
-        return $this->db->get('expense')->result_array();
+        $query = $this->db->get('expense', $limit, $offset);
+        return $query->result_array();
+    }
+
+    public function count_expenses() {
+        return $this->db->count_all('expense');
     }
 
     public function add_expense($data) {
