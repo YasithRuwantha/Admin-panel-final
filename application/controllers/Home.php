@@ -18,7 +18,7 @@ class Home extends CI_Controller {
         $this->load->model('Invoice_model');
         $this->load->model('Expense_model');
 
-        $projects = $this->Project_model->get_all_projects();
+        $projects = $this->Project_model->get_projects(1000, 0); // fetch all for dashboard, adjust limit as needed
 
         $report_rows = [];
         foreach ($projects as $p) {
