@@ -1,4 +1,3 @@
-
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -76,4 +75,12 @@ class Quote_model extends CI_Model {
         $this->db->where('id', $id)->update('quote', ['amount' => $total]);
         return $id;
     }
+	public function delete_quote($id) {
+        // Delete quotation items
+        $this->db->where('quote_id', $id)->delete('quotation_items');
+        // Delete the quote itself
+        return $this->db->delete('quote', ['id' => $id]);
+    }
+
+
 }

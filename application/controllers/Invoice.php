@@ -204,4 +204,22 @@ class Invoice extends CI_Controller {
             'payment_methods' => $payment_methods,
         ]);
     }
+
+	public function delete($id) {
+        // Only admin can delete invoices
+        if (function_exists('require_admin')) { require_admin(); }
+        $invoice = $this->Invoice_model->get_invoice_by_id($id);
+        if (!$invoice) {
+            $this->session->set_flashdata('error', 'Invoice not found');
+            redirect('invoice/list');
+            return;
+        }
+        // Delete related payments
+        $this->load->model('Payment_model');
+        $this->Payment_model->delete_payments_by_invoice($id);
+        // Delete invoice and its items
+        $this->Invoice_model->delete_invoice($id);
+        $this->session->set_flashdata('success', 'Invoice deleted successfully');
+        redirect('invoice/list');
+    }
 }

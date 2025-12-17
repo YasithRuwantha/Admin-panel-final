@@ -53,18 +53,21 @@
                                     <?php endif; ?>
                                 </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;"> <?php echo htmlspecialchars(number_format((float)$quote['amount'], 2)); ?> </td>
-                                <td style="white-space:nowrap;">
-                                    <a href="<?php echo site_url('quote/view/' . $quote['id']); ?>" class="btn btn-sm btn-primary me-1"><i class="bi bi-eye"></i> View</a>
-                                    <?php if (function_exists('is_admin') && is_admin()): ?>
-                                        <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil-square"></i> Edit</a>
-                                    <?php endif; ?>
-                                    <a href="<?php echo site_url('quote/pdf/' . $quote['id']); ?>" class="btn btn-danger fw-bold d-inline-flex align-items-center justify-content-center" style="gap:4px; min-width:90px; height:32px; font-size:0.9rem;" target="_blank">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
-                                            <path d="M5.5 7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H5v1h.5a.5.5 0 0 1 0 1H5v1a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5h1zm2.5.5a.5.5 0 0 1 .5-.5h.5v4a.5.5 0 0 1-1 0v-4zm2.5-.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5z"/>
-                                            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6.5L14 4.5zm-3-2.5H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5h-3a1 1 0 0 1-1-1V2z"/>
-                                        </svg>
-                                        <span>PDF</span>
-                                    </a>
+                                <td>
+                                    <div class="d-flex flex-column gap-2 align-items-start">
+                                        <a href="<?php echo site_url('quote/view/' . $quote['id']); ?>" class="btn btn-primary w-100" style="min-width:70px;"><i class="bi bi-eye"></i> View</a>
+                                        <?php if (function_exists('is_admin') && is_admin()): ?>
+                                            <a href="<?php echo site_url('quote/edit/' . $quote['id']); ?>" class="btn btn-warning w-100" style="min-width:70px;"><i class="bi bi-pencil-square"></i> Edit</a>
+                                            <a href="<?php echo site_url('quote/delete/' . $quote['id']); ?>" class="btn btn-danger w-100" style="min-width:70px;" onclick="return confirm('Are you sure you want to delete this quotation?');"><i class="bi bi-trash"></i> Delete</a>
+                                        <?php endif; ?>
+                                        <a href="<?php echo site_url('quote/pdf/' . $quote['id']); ?>" class="btn btn-danger fw-bold d-inline-flex align-items-center justify-content-center w-100" style="gap:4px; min-width:90px; height:32px; font-size:0.9rem;" target="_blank">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
+                                                <path d="M5.5 7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H5v1h.5a.5.5 0 0 1 0 1H5v1a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5h1zm2.5.5a.5.5 0 0 1 .5-.5h.5v4a.5.5 0 0 1-1 0v-4zm2.5-.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5z"/>
+                                                <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6.5L14 4.5zm-3-2.5H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5h-3a1 1 0 0 1-1-1V2z"/>
+                                            </svg>
+                                            <span>PDF</span>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

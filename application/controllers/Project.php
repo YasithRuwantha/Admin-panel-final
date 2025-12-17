@@ -1,4 +1,3 @@
-
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -89,4 +88,20 @@ class Project extends CI_Controller {
         }
         $this->load->view('view_project', ['project' => $project]);
     }
+
+	public function delete($id) {
+        // Only admin can delete projects
+        if (function_exists('require_admin')) { require_admin(); }
+        $project = $this->Project_model->get_project_by_id($id);
+        if (!$project) {
+            $this->session->set_flashdata('error', 'Project not found');
+            redirect('project/list');
+            return;
+        }
+        $this->Project_model->delete_project($id);
+        $this->session->set_flashdata('success', 'Project deleted successfully');
+        redirect('project/list');
+    }
+
+
 }

@@ -1,4 +1,3 @@
-
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -96,4 +95,12 @@ class Invoice_model extends CI_Model {
 
         return true;
     }
+	public function delete_invoice($id) {
+        // Delete invoice items
+        $this->db->where('invoice_id', $id)->delete('invoice_items');
+        // Delete the invoice itself
+        return $this->db->delete('invoice', ['id' => $id]);
+    }
+
+
 }

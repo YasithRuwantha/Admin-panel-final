@@ -37,11 +37,14 @@
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars(number_format((float)$project['paysheet_value'], 2)); ?></td>
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['start_date']); ?></td>
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['status']); ?></td>
-                            <td style="white-space:nowrap;">
-                                <a href="<?php echo site_url('project/view/' . $project['id']); ?>" class="btn btn-sm btn-primary me-1"><i class="bi bi-eye"></i> View</a>
-                                <?php if (function_exists('is_admin') && is_admin()): ?>
-                                    <a href="<?php echo site_url('project/edit/' . $project['id']); ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
-                                <?php endif; ?>
+                            <td>
+                                <div class="d-flex flex-column gap-2 align-items-start">
+                                    <a href="<?php echo site_url('project/view/' . $project['id']); ?>" class="btn btn-primary w-100" style="min-width:70px;"><i class="bi bi-eye"></i> View</a>
+                                    <?php if (function_exists('is_admin') && is_admin()): ?>
+                                        <a href="<?php echo site_url('project/edit/' . $project['id']); ?>" class="btn btn-warning w-100" style="min-width:70px;"><i class="bi bi-pencil-square"></i> Edit</a>
+                                        <a href="<?php echo site_url('project/delete/' . $project['id']); ?>" class="btn btn-danger w-100" style="min-width:70px;" onclick="return confirm('Are you sure you want to delete this project?');"><i class="bi bi-trash"></i> Delete</a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

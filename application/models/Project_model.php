@@ -30,4 +30,8 @@ class Project_model extends CI_Model {
     public function count_projects() {
         return $this->db->count_all('project');
     }
+
+	public function delete_project($id) {
+        return $this->db->delete('project', ['id' => $id]);
+    }
 }
