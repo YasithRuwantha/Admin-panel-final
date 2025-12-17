@@ -40,9 +40,14 @@ class Invoice_model extends CI_Model {
         return $this->db->get_where('invoice_items', ['invoice_id' => $invoice_id])->result_array();
     }
 
-    public function get_all_invoices() {
+    public function get_invoices($limit = 10, $offset = 0) {
 		$this->db->order_by('id', 'DESC');
-        return $this->db->get('invoice')->result_array();
+        $query = $this->db->get('invoice', $limit, $offset);
+        return $query->result_array();
+    }
+
+    public function count_invoices() {
+        return $this->db->count_all('invoice');
     }
 
     public function get_invoice_by_id($id) {
