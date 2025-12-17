@@ -17,7 +17,7 @@ class Invoice extends CI_Controller {
     public function add_invoice() {
         $payment_methods = $this->Invoice_model->get_payment_methods();
         $this->load->model('Project_model');
-        $projects = $this->Project_model->get_all_projects();
+        $projects = $this->Project_model->get_projects(1000, 0); // fetch all for dropdown, adjust limit as needed
         if ($this->input->post()) {
             $items = [];
             $descriptions = $this->input->post('description');
