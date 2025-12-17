@@ -160,4 +160,18 @@ class Expense extends CI_Controller {
             'status_options' => $status_options,
         ]);
     }
+
+	public function delete($id) {
+        // Only admin can delete expenses
+        if (function_exists('require_admin')) { require_admin(); }
+        $expense = $this->Expense_model->get_expense_by_id($id);
+        if (!$expense) {
+            $this->session->set_flashdata('error', 'Expense not found');
+            redirect('expense/list_expenses');
+            return;
+        }
+        $this->Expense_model->delete_expense($id);
+        $this->session->set_flashdata('success', 'Expense deleted successfully');
+        redirect('expense/list_expenses');
+    }
 }

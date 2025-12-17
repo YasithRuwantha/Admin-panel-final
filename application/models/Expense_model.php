@@ -38,4 +38,8 @@ class Expense_model extends CI_Model {
         $this->db->where('id', $id);
         return $this->db->update('expense', $data);
     }
+	public function delete_expense($id) {
+        $this->db->where('id', $id);
+        return $this->db->delete('expense');
+    }
 }
