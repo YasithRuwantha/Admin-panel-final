@@ -92,14 +92,42 @@
                                             <?php endforeach; ?>
                                         </div>
                                     <?php endif; ?>
-                                    <?php if ($total_paid < $invoice_total && function_exists('is_admin') && is_admin()): ?>
-                                        <button type="button" class="btn btn-success btn-sm mt-1" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
-                                    <?php endif; ?>
                                     <div class="d-flex flex-column gap-2 align-items-start mt-2">
+                                        <?php if ($total_paid < $invoice_total && function_exists('is_admin') && is_admin()): ?>
+                                            <button type="button" class="btn btn-success w-100" style="min-width:70px;" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
+                                        <?php endif; ?>
                                         <a href="<?php echo site_url('invoice/view/' . $invoice['id']); ?>" class="btn btn-primary w-100" style="min-width:70px;"><i class="bi bi-eye"></i> View</a>
                                         <?php if (function_exists('is_admin') && is_admin()): ?>
                                             <a href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>" class="btn btn-warning w-100" style="min-width:70px;"><i class="bi bi-pencil-square"></i> Edit</a>
-                                            <a href="<?php echo site_url('invoice/delete/' . $invoice['id']); ?>" class="btn btn-danger w-100" style="min-width:70px;" onclick="return confirm('Are you sure you want to delete this invoice?');"><i class="bi bi-trash"></i> Delete</a>
+                                            <button type="button" class="btn btn-danger w-100" style="min-width:70px;" onclick="showDeleteModal(<?php echo $invoice['id']; ?>)"><i class="bi bi-trash"></i> Delete</button>
+                                        <!-- Delete Confirmation Modal -->
+                                        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete this invoice?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <a id="deleteConfirmBtn" href="#" class="btn btn-danger">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                                        <script>
+                                        function showDeleteModal(invoiceId) {
+                                                var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                                                var btn = document.getElementById('deleteConfirmBtn');
+                                                btn.href = '<?php echo site_url('invoice/delete/'); ?>' + invoiceId;
+                                                modal.show();
+                                        }
+                                        </script>
                                         <?php endif; ?>
                                     </div>
                                     <a href="<?php echo site_url('invoice/pdf/' . $invoice['id']); ?>" class="btn btn-danger btn-lg mt-2 fw-bold d-flex align-items-center justify-content-center" style="gap:6px;" target="_blank">
