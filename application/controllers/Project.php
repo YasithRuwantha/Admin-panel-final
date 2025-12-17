@@ -67,8 +67,18 @@ class Project extends CI_Controller {
         $this->load->view('add_project');
     }
 	    public function list() {
-        $projects = $this->Project_model->get_all_projects();
-        $this->load->view('list_projects', ['projects' => $projects]);
+        $per_page = 10;
+        $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
+        if ($page < 1) $page = 1;
+        $offset = ($page - 1) * $per_page;
+        $projects = $this->Project_model->get_projects($per_page, $offset);
+        $total_projects = $this->Project_model->count_projects();
+        $total_pages = ceil($total_projects / $per_page);
+        $this->load->view('list_projects', [
+            'projects' => $projects,
+            'current_page' => $page,
+            'total_pages' => $total_pages
+        ]);
     }
 
     public function view($id) {
