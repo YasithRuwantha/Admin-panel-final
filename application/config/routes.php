@@ -62,6 +62,7 @@ $route['expense/list_expenses'] = 'expense/list_expenses';
 $route['expense/delete/(:num)'] = 'expense/delete/$1';
 $route['invoice/delete/(:num)'] = 'invoice/delete/$1';
 $route['project/delete/(:num)'] = 'project/delete/$1';
+$route['quote/delete/(:num)'] = 'quote/delete/$1';
 $route['quote/edit/(:num)'] = 'Quote/edit/$1';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

@@ -1,4 +1,3 @@
-
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -133,4 +132,19 @@ class Quote extends CI_Controller {
         $filename = $quote['quotation_no'] . '.pdf';
         $dompdf->stream($filename, array("Attachment" => false));
     }
+	public function delete($id) {
+        // Only admin can delete quotations
+        if (function_exists('require_admin')) { require_admin(); }
+        $quote = $this->Quote_model->get_quote_by_id($id);
+        if (!$quote) {
+            $this->session->set_flashdata('error', 'Quotation not found');
+            redirect('quote/list');
+            return;
+        }
+        $this->Quote_model->delete_quote($id);
+        $this->session->set_flashdata('success', 'Quotation deleted successfully');
+        redirect('quote/list');
+    }
+
+
 }
