@@ -36,9 +36,14 @@ class Quote_model extends CI_Model {
         return $this->db->get_where('quotation_items', ['quote_id' => $quote_id])->result_array();
     }
 
-    public function get_all_quotes() {
+    public function get_quotes($limit = 10, $offset = 0) {
 		$this->db->order_by('id', 'DESC');
-        return $this->db->get('quote')->result_array();
+        $query = $this->db->get('quote', $limit, $offset);
+        return $query->result_array();
+    }
+
+    public function count_quotes() {
+        return $this->db->count_all('quote');
     }
 	    public function get_quote_by_id($id) {
         return $this->db->get_where('quote', ['id' => $id])->row_array();
