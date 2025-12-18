@@ -145,6 +145,7 @@
                                             <button type="button" class="btn btn-success w-100" style="min-width:70px;" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>')">Receive Payment</button>
                                         <?php endif; ?>
                                         <a href="<?php echo site_url('invoice/view/' . $invoice['id']); ?>" class="btn btn-primary w-100" style="min-width:70px;"><i class="bi bi-eye"></i> View</a>
+                                        <a href="<?php echo site_url('invoice/export_invoice/' . $invoice['id']); ?>" class="btn btn-success w-100" style="min-width:70px;"><i class="bi bi-download"></i> Export</a>
                                         <?php if (function_exists('is_admin') && is_admin()): ?>
                                             <a href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>" class="btn btn-warning w-100" style="min-width:70px;"><i class="bi bi-pencil-square"></i> Edit</a>
                                             <button type="button" class="btn btn-danger w-100" style="min-width:70px;" onclick="showDeleteModal(<?php echo $invoice['id']; ?>)"><i class="bi bi-trash"></i> Delete</button>
