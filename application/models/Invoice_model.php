@@ -130,12 +130,12 @@ class Invoice_model extends CI_Model {
             $this->db->or_like('project_code', $search);
             $this->db->group_end();
         }
-        if ($alpha === 'az') {
-            $this->db->order_by('name', 'ASC');
-        } elseif ($alpha === 'za') {
-            $this->db->order_by('name', 'DESC');
-        } else {
-            $this->db->order_by('invoice_date', 'DESC');
+            if ($alpha === 'az') {
+                $this->db->order_by('name', 'ASC');
+            } elseif ($alpha === 'za') {
+                $this->db->order_by('name', 'DESC');
+            } else {
+                $this->db->order_by('created_at', 'DESC'); // Sort by added date, not invoice date
         }
         $query = $this->db->get('invoice', $limit, $offset);
         $results = $query->result_array();

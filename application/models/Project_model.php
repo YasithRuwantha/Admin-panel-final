@@ -88,13 +88,13 @@ class Project_model extends CI_Model {
      */
     public function get_projects_by_date_range_and_search($range = 'all', $search = '', $limit = 1000, $offset = 0, $alpha = 'az') {
         if ($range === 'today') {
-            $this->db->where('DATE(created_at)', date('Y-m-d'));
+                $this->db->where('DATE(start_date)', date('Y-m-d'));
         } elseif ($range === 'last7') {
-            $this->db->where('created_at >=', date('Y-m-d', strtotime('-6 days')));
-            $this->db->where('created_at <=', date('Y-m-d'));
+                $this->db->where('start_date >=', date('Y-m-d', strtotime('-6 days')));
+                $this->db->where('start_date <=', date('Y-m-d'));
         } elseif ($range === 'month') {
-            $this->db->where('MONTH(created_at)', date('m'));
-            $this->db->where('YEAR(created_at)', date('Y'));
+                $this->db->where('MONTH(start_date)', date('m'));
+                $this->db->where('YEAR(start_date)', date('Y'));
         }
         if (!empty($search)) {
             $this->db->group_start();

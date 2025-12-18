@@ -104,21 +104,21 @@ class Quote_model extends CI_Model {
             $this->db->where('MONTH(quote_date)', date('m'));
             $this->db->where('YEAR(quote_date)', date('Y'));
         }
-        if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->like('name', $search);
-            $this->db->or_like('quotation_no', $search);
-            $this->db->or_like('address', $search);
-            $this->db->or_like('project_code', $search);
-            $this->db->or_like('amount', $search);
-            $this->db->group_end();
-        }
+            if (!empty($search)) {
+                $this->db->group_start();
+                $this->db->like('name', $search);
+                $this->db->or_like('quotation_no', $search);
+                $this->db->or_like('address', $search);
+                $this->db->or_like('project_code', $search);
+                $this->db->or_like('amount', $search);
+                $this->db->group_end();
+            }
         if ($alpha === 'az') {
             $this->db->order_by('name', 'ASC');
         } elseif ($alpha === 'za') {
             $this->db->order_by('name', 'DESC');
         } else {
-            $this->db->order_by('quote_date', 'DESC');
+                $this->db->order_by('created_at', 'DESC'); // Sort by added date, not quotation date
         }
         $query = $this->db->get('quote', $limit, $offset);
         return $query->result_array();
