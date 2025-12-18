@@ -10,6 +10,35 @@
     <?php $this->load->view('sidebar'); ?>
     <div class="container mt-5" style="margin-left:220px;">
         <h2>List Projects</h2>
+        <!-- Date Range Filter Buttons as Form -->
+        <form id="dateRangeForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+            <label class="me-2 fw-semibold">Filter by date:</label>
+            <input type="hidden" name="range" id="rangeInput" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
+            <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'today' ? ' active' : ''; ?>" data-range="today">Today</button>
+            <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'last7' ? ' active' : ''; ?>" data-range="last7">Last 7 days</button>
+            <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'month' ? ' active' : ''; ?>" data-range="month">This month</button>
+            <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'all' ? ' active' : ''; ?>" data-range="all">All time</button>
+        </form>
+
+
+		<!-- Alphabetical Filter -->
+            <form id="alphaForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+                <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
+                <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
+                <label class="fw-semibold me-2">Sort by Project Name:</label>
+                <select name="alpha" class="form-select form-select-sm" style="width:auto;" onchange="document.getElementById('alphaForm').submit();">
+                    <option value="recent"<?php echo (!isset($alpha) || $alpha === 'recent') ? ' selected' : ''; ?>>Recent</option>
+                    <option value="az"<?php echo (isset($alpha) && $alpha === 'az') ? ' selected' : ''; ?>>A-Z</option>
+                    <option value="za"<?php echo (isset($alpha) && $alpha === 'za') ? ' selected' : ''; ?>>Z-A</option>
+                </select>
+            </form>
+
+        <!-- Search Bar -->
+        <form id="searchForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+            <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
+            <input type="text" name="search" id="projectSearch" class="form-control" style="max-width:1212px;" placeholder="Search by name, code, client, address, or status..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
         <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle">
             <thead>
@@ -103,4 +132,21 @@
     </div>
 </div>
 </body>
+<script>
+// Date range filter: submit form on button click, preserving search
+document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        const range = btn.getAttribute('data-range');
+        // If search form exists, submit with search value
+        const searchForm = document.getElementById('searchForm');
+        if (searchForm) {
+            searchForm.querySelector('input[name="range"]').value = range;
+            searchForm.submit();
+        } else {
+            document.getElementById('rangeInput').value = range;
+            document.getElementById('dateRangeForm').submit();
+        }
+    });
+});
+</script>
 </html>

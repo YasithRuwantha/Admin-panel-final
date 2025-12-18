@@ -70,13 +70,38 @@ class Project extends CI_Controller {
         $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
         if ($page < 1) $page = 1;
         $offset = ($page - 1) * $per_page;
-        $projects = $this->Project_model->get_projects($per_page, $offset);
-        $total_projects = $this->Project_model->count_projects();
+
+        // Date range filter
+        $range = $this->input->get('range', true);
+        if (!in_array($range, ['today', 'last7', 'month', 'all'])) {
+            $range = 'all';
+        }
+
+        // Search filter
+        $search = $this->input->get('search', true);
+        $search = is_string($search) ? trim($search) : '';
+
+        // Alphabetical filter
+        $alpha = $this->input->get('alpha', true);
+        if ($alpha === 'za') {
+            $alpha = 'za';
+        } elseif ($alpha === 'az') {
+            $alpha = 'az';
+        } else {
+            $alpha = 'recent';
+        }
+
+        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, $search, $per_page, $offset, $alpha);
+        // For pagination, count total projects in range and search
+        $total_projects = $this->Project_model->count_projects_by_date_range_and_search($range, $search);
         $total_pages = ceil($total_projects / $per_page);
         $this->load->view('list_projects', [
             'projects' => $projects,
             'current_page' => $page,
-            'total_pages' => $total_pages
+            'total_pages' => $total_pages,
+            'selected_range' => $range,
+            'search' => $search,
+            'alpha' => $alpha
         ]);
     }
 
