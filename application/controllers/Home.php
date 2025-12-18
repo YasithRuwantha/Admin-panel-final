@@ -24,7 +24,17 @@ class Home extends CI_Controller {
             $range = 'all';
         }
 
-        $projects = $this->Project_model->get_projects_by_date_range($range, 1000, 0);
+        // Get alpha sort
+        $alpha = $this->input->get('alpha', true);
+        if ($alpha === 'za') {
+            $alpha = 'za';
+        } elseif ($alpha === 'az') {
+            $alpha = 'az';
+        } else {
+            $alpha = 'recent';
+        }
+
+        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, '', 1000, 0, $alpha);
 
         $report_rows = [];
         foreach ($projects as $p) {
@@ -83,6 +93,7 @@ class Home extends CI_Controller {
         $data = [
             'report_rows' => $report_rows,
             'selected_range' => $range,
+            'alpha' => $alpha,
         ];
         $this->load->view('home', $data);
     }
