@@ -50,8 +50,29 @@ class Quote extends CI_Controller {
         $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
         if ($page < 1) $page = 1;
         $offset = ($page - 1) * $per_page;
-        $quotations = $this->Quote_model->get_quotes($per_page, $offset);
-        $total_quotes = $this->Quote_model->count_quotes();
+
+        // Date range filter
+        $range = $this->input->get('range', true);
+        if (!in_array($range, ['today', 'last7', 'month', 'all'])) {
+            $range = 'all';
+        }
+
+        // Search filter
+        $search = $this->input->get('search', true);
+        $search = is_string($search) ? trim($search) : '';
+
+        // Alphabetical filter
+        $alpha = $this->input->get('alpha', true);
+        if ($alpha === 'az') {
+            $alpha = 'az';
+        } elseif ($alpha === 'za') {
+            $alpha = 'za';
+        } else {
+            $alpha = 'recent';
+        }
+
+        $quotations = $this->Quote_model->get_quotes_by_date_range_and_search($range, $search, $per_page, $offset, $alpha);
+        $total_quotes = $this->Quote_model->count_quotes_by_date_range_and_search($range, $search);
         $total_pages = ceil($total_quotes / $per_page);
         // For each quote, fetch its items
         foreach ($quotations as &$quote) {
@@ -60,7 +81,10 @@ class Quote extends CI_Controller {
         $this->load->view('list_quotation', [
             'quotations' => $quotations,
             'current_page' => $page,
-            'total_pages' => $total_pages
+            'total_pages' => $total_pages,
+            'selected_range' => $range,
+            'search' => $search,
+            'alpha' => $alpha
         ]);
     }
 

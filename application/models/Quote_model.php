@@ -1,3 +1,4 @@
+    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -80,6 +81,75 @@ class Quote_model extends CI_Model {
         $this->db->where('quote_id', $id)->delete('quotation_items');
         // Delete the quote itself
         return $this->db->delete('quote', ['id' => $id]);
+    }
+
+
+
+	/**
+     * Get quotes filtered by date range, search, and alpha
+     * @param string $range today|last7|month|all
+     * @param string $search
+     * @param int $limit
+     * @param int $offset
+     * @param string $alpha recent|az|za
+     * @return array
+     */
+    public function get_quotes_by_date_range_and_search($range = 'all', $search = '', $limit = 1000, $offset = 0, $alpha = 'recent') {
+        if ($range === 'today') {
+            $this->db->where('DATE(quote_date)', date('Y-m-d'));
+        } elseif ($range === 'last7') {
+            $this->db->where('quote_date >=', date('Y-m-d', strtotime('-6 days')));
+            $this->db->where('quote_date <=', date('Y-m-d'));
+        } elseif ($range === 'month') {
+            $this->db->where('MONTH(quote_date)', date('m'));
+            $this->db->where('YEAR(quote_date)', date('Y'));
+        }
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('name', $search);
+            $this->db->or_like('quotation_no', $search);
+            $this->db->or_like('address', $search);
+            $this->db->or_like('project_code', $search);
+            $this->db->or_like('amount', $search);
+            $this->db->group_end();
+        }
+        if ($alpha === 'az') {
+            $this->db->order_by('name', 'ASC');
+        } elseif ($alpha === 'za') {
+            $this->db->order_by('name', 'DESC');
+        } else {
+            $this->db->order_by('quote_date', 'DESC');
+        }
+        $query = $this->db->get('quote', $limit, $offset);
+        return $query->result_array();
+    }
+
+    /**
+     * Count quotes filtered by date range and search
+     * @param string $range today|last7|month|all
+     * @param string $search
+     * @return int
+     */
+    public function count_quotes_by_date_range_and_search($range = 'all', $search = '') {
+        if ($range === 'today') {
+            $this->db->where('DATE(quote_date)', date('Y-m-d'));
+        } elseif ($range === 'last7') {
+            $this->db->where('quote_date >=', date('Y-m-d', strtotime('-6 days')));
+            $this->db->where('quote_date <=', date('Y-m-d'));
+        } elseif ($range === 'month') {
+            $this->db->where('MONTH(quote_date)', date('m'));
+            $this->db->where('YEAR(quote_date)', date('Y'));
+        }
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('name', $search);
+            $this->db->or_like('quotation_no', $search);
+            $this->db->or_like('address', $search);
+            $this->db->or_like('project_code', $search);
+            $this->db->or_like('amount', $search);
+            $this->db->group_end();
+        }
+        return $this->db->count_all_results('quote');
     }
 
 
