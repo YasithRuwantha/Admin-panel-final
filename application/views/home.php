@@ -57,6 +57,7 @@
                         <th class="text-end">Cash in Hand</th>
                         <th class="text-end">Cash In Project</th>
                         <th>Status</th>
+                        <th>Export</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,6 +83,9 @@
                         <td class="text-end"><?php echo number_format($balance_in_hand, 2); ?></td>
                         <td class="text-end"><?php echo number_format($cash_in_project, 2); ?></td>
                         <td><?php echo htmlspecialchars($row['status'] ?? ''); ?></td>
+                        <td>
+                            <a href="<?php echo site_url('home/export_excel?range=' . urlencode($selected_range ?? 'all') . '&alpha=' . urlencode($alpha ?? 'recent') . '&project_code=' . urlencode($row['project_code'])); ?>" class="btn btn-outline-primary btn-sm">Export</a>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
