@@ -91,13 +91,19 @@ class Expense extends CI_Controller {
         $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
         if ($page < 1) $page = 1;
         $offset = ($page - 1) * $per_page;
-        $expenses = $this->Expense_model->get_expenses($per_page, $offset);
-        $total_expenses = $this->Expense_model->count_expenses();
+        $range = $this->input->get('range') ?? 'all';
+        $search = $this->input->get('search') ?? '';
+        $alpha = $this->input->get('alpha') ?? 'recent';
+        $expenses = $this->Expense_model->get_expenses_by_date_range_and_search($per_page, $offset, $range, $search, $alpha);
+        $total_expenses = $this->Expense_model->count_expenses_by_date_range_and_search($range, $search);
         $total_pages = ceil($total_expenses / $per_page);
         $this->load->view('list_expenses', [
             'expenses' => $expenses,
             'current_page' => $page,
-            'total_pages' => $total_pages
+            'total_pages' => $total_pages,
+            'selected_range' => $range,
+            'search' => $search,
+            'alpha' => $alpha
         ]);
     }
 
