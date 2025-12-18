@@ -1,3 +1,4 @@
+    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -168,6 +169,71 @@ class Quote extends CI_Controller {
         $this->Quote_model->delete_quote($id);
         $this->session->set_flashdata('success', 'Quotation deleted successfully');
         redirect('quote/list');
+    }
+
+
+	public function export_quote($id) {
+        // Clean output buffer to prevent corruption
+        if (ob_get_length()) ob_end_clean();
+        $autoloadPath = FCPATH . 'vendor/autoload.php';
+        if (!file_exists($autoloadPath)) {
+            $autoloadPath = APPPATH . '../vendor/autoload.php';
+        }
+        require_once $autoloadPath;
+        $quote = $this->Quote_model->get_quote_by_id($id);
+        if (!$quote) show_404();
+        $items = $this->Quote_model->get_quote_items($id);
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // Title row
+        $sheet->mergeCells('A1:H1');
+        $sheet->setCellValue('A1', 'Quotation Details');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        // Header row
+        $headers = ['Name', 'Quotation No', 'Address', 'Date', 'Project Code', 'Item Description', 'Amount', 'Total'];
+        $sheet->fromArray($headers, null, 'A2');
+        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:H2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+        $sheet->getStyle('A2:H2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        // Data row(s)
+        $rowNum = 3;
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $sheet->fromArray([
+                    $quote['name'],
+                    $quote['quotation_no'],
+                    $quote['address'],
+                    $quote['quote_date'],
+                    $quote['project_code'],
+                    $item['description'],
+                    $item['amount'],
+                    $quote['amount'],
+                ], null, 'A' . $rowNum);
+                $rowNum++;
+            }
+        } else {
+            $sheet->fromArray([
+                $quote['name'],
+                $quote['quotation_no'],
+                $quote['address'],
+                $quote['quote_date'],
+                $quote['project_code'],
+                $quote['description'] ?? '',
+                $quote['amount'],
+                $quote['amount'],
+            ], null, 'A3');
+        }
+        // Auto-size columns
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        // Output as XLSX
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename=quotation_' . $id . '_' . date('Ymd_His') . '.xlsx');
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 
 
