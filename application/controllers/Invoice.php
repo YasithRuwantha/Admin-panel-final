@@ -55,22 +55,50 @@ class Invoice extends CI_Controller {
         $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
         if ($page < 1) $page = 1;
         $offset = ($page - 1) * $per_page;
-        $invoices = $this->Invoice_model->get_invoices($per_page, $offset);
-        $total_invoices = $this->Invoice_model->count_invoices();
+
+        // Date range filter
+        $range = $this->input->get('range', true);
+        if (!in_array($range, ['today', 'last7', 'month', 'all'])) {
+            $range = 'all';
+        }
+
+        // Search filter
+        $search = $this->input->get('search', true);
+        $search = is_string($search) ? trim($search) : '';
+
+        // Alphabetical filter
+        $alpha = $this->input->get('alpha', true);
+        if ($alpha === 'az') {
+            $alpha = 'az';
+        } elseif ($alpha === 'za') {
+            $alpha = 'za';
+        } else {
+            $alpha = 'recent';
+        }
+
+        // Status filter
+        $status_filter = $this->input->get('status_filter', true);
+        $status_filter = is_string($status_filter) ? trim($status_filter) : '';
+
+        $invoices = $this->Invoice_model->get_invoices_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $status_filter);
+        $total_invoices = $this->Invoice_model->count_invoices_by_date_range_and_search($range, $search, $status_filter);
         $total_pages = ceil($total_invoices / $per_page);
         $this->load->model('Payment_model');
         $payment_methods = $this->Invoice_model->get_payment_methods();
         // For each invoice, fetch its items and payment info
         foreach ($invoices as &$invoice) {
             $invoice['items'] = $this->Invoice_model->get_invoice_items($invoice['id']);
-            // Fetch all payments for this invoice using the model
             $invoice['payments'] = $this->Invoice_model->get_payments_by_invoice($invoice['id']);
         }
         $this->load->view('list_invoice', [
             'invoices' => $invoices,
             'payment_methods' => $payment_methods,
             'current_page' => $page,
-            'total_pages' => $total_pages
+            'total_pages' => $total_pages,
+            'selected_range' => $range,
+            'search' => $search,
+            'alpha' => $alpha,
+            'status_filter' => $status_filter
         ]);
     }
 
