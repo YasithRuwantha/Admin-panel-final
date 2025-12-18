@@ -1,3 +1,4 @@
+    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -100,6 +101,130 @@ class Invoice_model extends CI_Model {
         $this->db->where('invoice_id', $id)->delete('invoice_items');
         // Delete the invoice itself
         return $this->db->delete('invoice', ['id' => $id]);
+    }
+
+	/**
+     * Get invoices filtered by date range, search, and alpha
+     * @param string $range today|last7|month|all
+     * @param string $search
+     * @param int $limit
+     * @param int $offset
+     * @param string $alpha recent|az|za
+     * @return array
+     */
+    public function get_invoices_by_date_range_and_search($range = 'all', $search = '', $limit = 1000, $offset = 0, $alpha = 'recent', $status_filter = '') {
+        if ($range === 'today') {
+            $this->db->where('DATE(invoice_date)', date('Y-m-d'));
+        } elseif ($range === 'last7') {
+            $this->db->where('invoice_date >=', date('Y-m-d', strtotime('-6 days')));
+            $this->db->where('invoice_date <=', date('Y-m-d'));
+        } elseif ($range === 'month') {
+            $this->db->where('MONTH(invoice_date)', date('m'));
+            $this->db->where('YEAR(invoice_date)', date('Y'));
+        }
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('name', $search);
+            $this->db->or_like('invoice_no', $search);
+            $this->db->or_like('address', $search);
+            $this->db->or_like('project_code', $search);
+            $this->db->group_end();
+        }
+        if ($alpha === 'az') {
+            $this->db->order_by('name', 'ASC');
+        } elseif ($alpha === 'za') {
+            $this->db->order_by('name', 'DESC');
+        } else {
+            $this->db->order_by('invoice_date', 'DESC');
+        }
+        $query = $this->db->get('invoice', $limit, $offset);
+        $results = $query->result_array();
+        // If status_filter is set, filter results in PHP (since status is computed)
+        if (!empty($status_filter)) {
+            $filtered = [];
+            foreach ($results as $invoice) {
+                // Calculate status
+                $total_paid = 0;
+                $ci =& get_instance();
+                $ci->load->model('Invoice_model');
+                $payments = $ci->Invoice_model->get_payments_by_invoice($invoice['id']);
+                foreach ($payments as $pay) {
+                    $total_paid += $pay['payment_amount'];
+                }
+                $invoice_total = $invoice['amount'];
+                $status = '';
+                if ($total_paid == 0) {
+                    $status = 'Pending';
+                } elseif ($total_paid < $invoice_total) {
+                    $status = 'Partially Paid';
+                } elseif ($total_paid == $invoice_total) {
+                    $status = 'Paid';
+                } elseif ($total_paid > $invoice_total) {
+                    $status = 'Over Paid';
+                }
+                if ($status === $status_filter) {
+                    $filtered[] = $invoice;
+                }
+            }
+            return $filtered;
+        }
+        return $results;
+    }
+
+    /**
+     * Count invoices filtered by date range and search
+     * @param string $range today|last7|month|all
+     * @param string $search
+     * @return int
+     */
+    public function count_invoices_by_date_range_and_search($range = 'all', $search = '', $status_filter = '') {
+        if ($range === 'today') {
+            $this->db->where('DATE(invoice_date)', date('Y-m-d'));
+        } elseif ($range === 'last7') {
+            $this->db->where('invoice_date >=', date('Y-m-d', strtotime('-6 days')));
+            $this->db->where('invoice_date <=', date('Y-m-d'));
+        } elseif ($range === 'month') {
+            $this->db->where('MONTH(invoice_date)', date('m'));
+            $this->db->where('YEAR(invoice_date)', date('Y'));
+        }
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('name', $search);
+            $this->db->or_like('invoice_no', $search);
+            $this->db->or_like('address', $search);
+            $this->db->or_like('project_code', $search);
+            $this->db->group_end();
+        }
+        $query = $this->db->get('invoice');
+        $results = $query->result_array();
+        if (!empty($status_filter)) {
+            $filtered = [];
+            foreach ($results as $invoice) {
+                $total_paid = 0;
+                $ci =& get_instance();
+                $ci->load->model('Invoice_model');
+                $payments = $ci->Invoice_model->get_payments_by_invoice($invoice['id']);
+                foreach ($payments as $pay) {
+                    $total_paid += $pay['payment_amount'];
+                }
+                $invoice_total = $invoice['amount'];
+                $status = '';
+                if ($total_paid == 0) {
+                    $status = 'Pending';
+                } elseif ($total_paid < $invoice_total) {
+                    $status = 'Partially Paid';
+                } elseif ($total_paid == $invoice_total) {
+                    $status = 'Paid';
+                } elseif ($total_paid > $invoice_total) {
+                    $status = 'Over Paid';
+                }
+                if ($status === $status_filter) {
+                    $filtered[] = $invoice;
+                }
+            }
+            return count($filtered);
+        }
+        return count($results);
     }
 
 
