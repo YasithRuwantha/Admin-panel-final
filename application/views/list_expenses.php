@@ -108,6 +108,7 @@
                                 <td>
                                     <div class="d-flex flex-column gap-2 align-items-start">
                                         <a href="<?php echo site_url('expense/view/' . $expense['id']); ?>" class="btn btn-primary w-100" style="min-width:70px;"><i class="bi bi-eye"></i> View</a>
+                                        <a href="<?php echo site_url('expense/export_expense/' . $expense['id']); ?>" class="btn btn-success w-100" style="min-width:70px;"><i class="bi bi-download"></i> Export</a>
                                         <?php if (function_exists('is_admin') && is_admin()): ?>
                                             <a href="<?php echo site_url('expense/edit/' . $expense['id']); ?>" class="btn btn-warning w-100" style="min-width:70px;"><i class="bi bi-pencil-square"></i> Edit</a>
                                             <button type="button" class="btn btn-danger w-100" style="min-width:70px;" onclick="showDeleteModal(<?php echo $expense['id']; ?>)"><i class="bi bi-trash"></i> Delete</button>

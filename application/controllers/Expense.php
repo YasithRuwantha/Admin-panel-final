@@ -1,3 +1,4 @@
+    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -179,5 +180,54 @@ class Expense extends CI_Controller {
         $this->Expense_model->delete_expense($id);
         $this->session->set_flashdata('success', 'Expense deleted successfully');
         redirect('expense/list_expenses');
+    }
+
+	public function export_expense($id) {
+        // Clean output buffer to prevent corruption
+        if (ob_get_length()) ob_end_clean();
+        $autoloadPath = FCPATH . 'vendor/autoload.php';
+        if (!file_exists($autoloadPath)) {
+            $autoloadPath = APPPATH . '../vendor/autoload.php';
+        }
+        require_once $autoloadPath;
+        $expense = $this->Expense_model->get_expense_by_id($id);
+        if (!$expense) show_404();
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // Title row
+        $sheet->mergeCells('A1:K1');
+        $sheet->setCellValue('A1', 'Expense Details');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        // Header row
+        $headers = ['Project Name', 'Project Code', 'Expense Date', 'Category', 'Description', 'Paid To', 'Paid By', 'Amount', 'Payment Method', 'Status', 'Remark'];
+        $sheet->fromArray($headers, null, 'A2');
+        $sheet->getStyle('A2:K2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:K2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+        $sheet->getStyle('A2:K2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        // Data row
+        $sheet->fromArray([
+            $expense['project_name'],
+            $expense['project_code'],
+            $expense['expense_date'],
+            $expense['category'],
+            $expense['description'],
+            $expense['paid_to'],
+            $expense['paid_by'],
+            $expense['amount'],
+            $expense['payment_method'],
+            $expense['status'],
+            $expense['remark'],
+        ], null, 'A3');
+        // Auto-size columns
+        foreach (range('A', 'K') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        // Output as XLSX
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename=expense_' . $id . '_' . date('Ymd_His') . '.xlsx');
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }
