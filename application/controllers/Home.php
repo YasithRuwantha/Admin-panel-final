@@ -18,7 +18,13 @@ class Home extends CI_Controller {
         $this->load->model('Invoice_model');
         $this->load->model('Expense_model');
 
-        $projects = $this->Project_model->get_projects(1000, 0); // fetch all for dashboard, adjust limit as needed
+        // Get date range from GET or POST, default to 'all'
+        $range = $this->input->get('range', true) ?: $this->input->post('range', true);
+        if (!in_array($range, ['today', 'last7', 'month', 'all'])) {
+            $range = 'all';
+        }
+
+        $projects = $this->Project_model->get_projects_by_date_range($range, 1000, 0);
 
         $report_rows = [];
         foreach ($projects as $p) {
@@ -76,6 +82,7 @@ class Home extends CI_Controller {
 
         $data = [
             'report_rows' => $report_rows,
+            'selected_range' => $range,
         ];
         $this->load->view('home', $data);
     }

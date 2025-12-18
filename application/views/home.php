@@ -20,6 +20,20 @@
         <h2>Project Financial Report</h2>
         <p class="text-muted">Overview of income, expenses, and balances.</p>
 
+        <!-- Date Range Filter Buttons as Form -->
+        <form id="dateRangeForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+            <label class="me-2 fw-semibold">Filter by date:</label>
+            <input type="hidden" name="range" id="rangeInput" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
+            <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'today' ? ' active' : ''; ?>" data-range="today">Today</button>
+            <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'last7' ? ' active' : ''; ?>" data-range="last7">Last 7 days</button>
+            <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'month' ? ' active' : ''; ?>" data-range="month">This month</button>
+            <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'all' ? ' active' : ''; ?>" data-range="all">All time</button>
+        </form>
+
+        <!-- Live Search Bar -->
+        <div class="mb-3">
+            <input type="text" id="reportSearch" class="form-control" placeholder="Search projects...">
+        </div>
         <div class="table-responsive">
             <table class="table table-striped table-bordered align-middle">
                 <thead class="table-light">
@@ -68,5 +82,33 @@
         </div>
     </div>
 </div>
+</div>
+<script>
+// Live search filter (project name and status only)
+document.getElementById('reportSearch').addEventListener('input', function() {
+    const search = this.value.toLowerCase();
+    document.querySelectorAll('table tbody tr').forEach(function(row) {
+        // Get project name and status columns
+        const projectCell = row.querySelector('td:nth-child(1)');
+        const statusCell = row.querySelector('td:nth-child(7)');
+        if (!projectCell || !statusCell) return;
+        const projectText = projectCell.textContent.toLowerCase();
+        const statusText = statusCell.textContent.toLowerCase();
+        if (projectText.includes(search) || statusText.includes(search)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Date range filter: submit form on button click
+document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.getElementById('rangeInput').value = btn.getAttribute('data-range');
+        document.getElementById('dateRangeForm').submit();
+    });
+});
+</script>
 </body>
 </html>
