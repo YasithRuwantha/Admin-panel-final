@@ -1,66 +1,4 @@
-    public function export_invoice($id) {
-        // Clean output buffer to prevent corruption
-        if (ob_get_length()) ob_end_clean();
-        $autoloadPath = FCPATH . 'vendor/autoload.php';
-        if (!file_exists($autoloadPath)) {
-            $autoloadPath = APPPATH . '../vendor/autoload.php';
-        }
-        require_once $autoloadPath;
-        $invoice = $this->Invoice_model->get_invoice_by_id($id);
-        if (!$invoice) show_404();
-        $items = $this->Invoice_model->get_invoice_items($id);
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        // Title row
-        $sheet->mergeCells('A1:H1');
-        $sheet->setCellValue('A1', 'Invoice Details');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        // Header row
-        $headers = ['Name', 'Invoice No', 'Address', 'Date', 'Project Code', 'Item Description', 'Amount', 'Total'];
-        $sheet->fromArray($headers, null, 'A2');
-        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
-        $sheet->getStyle('A2:H2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
-        $sheet->getStyle('A2:H2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        // Data row(s)
-        $rowNum = 3;
-        if (!empty($items)) {
-            foreach ($items as $item) {
-                $sheet->fromArray([
-                    $invoice['name'],
-                    $invoice['invoice_no'],
-                    $invoice['address'],
-                    $invoice['invoice_date'],
-                    $invoice['project_code'],
-                    $item['description'],
-                    $item['amount'],
-                    $invoice['amount'],
-                ], null, 'A' . $rowNum);
-                $rowNum++;
-            }
-        } else {
-            $sheet->fromArray([
-                $invoice['name'],
-                $invoice['invoice_no'],
-                $invoice['address'],
-                $invoice['invoice_date'],
-                $invoice['project_code'],
-                $invoice['description'] ?? '',
-                $invoice['amount'],
-                $invoice['amount'],
-            ], null, 'A3');
-        }
-        // Auto-size columns
-        foreach (range('A', 'H') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-        // Output as XLSX
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename=invoice_' . $id . '_' . date('Ymd_His') . '.xlsx');
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
-    }
+    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -312,5 +250,69 @@ class Invoice extends CI_Controller {
         $this->Invoice_model->delete_invoice($id);
         $this->session->set_flashdata('success', 'Invoice deleted successfully');
         redirect('invoice/list');
+    }
+
+	public function export_invoice($id) {
+        // Clean output buffer to prevent corruption
+        if (ob_get_length()) ob_end_clean();
+        $autoloadPath = FCPATH . 'vendor/autoload.php';
+        if (!file_exists($autoloadPath)) {
+            $autoloadPath = APPPATH . '../vendor/autoload.php';
+        }
+        require_once $autoloadPath;
+        $invoice = $this->Invoice_model->get_invoice_by_id($id);
+        if (!$invoice) show_404();
+        $items = $this->Invoice_model->get_invoice_items($id);
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        // Title row
+        $sheet->mergeCells('A1:H1');
+        $sheet->setCellValue('A1', 'Invoice Details');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        // Header row
+        $headers = ['Name', 'Invoice No', 'Address', 'Date', 'Project Code', 'Item Description', 'Amount', 'Total'];
+        $sheet->fromArray($headers, null, 'A2');
+        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:H2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+        $sheet->getStyle('A2:H2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        // Data row(s)
+        $rowNum = 3;
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $sheet->fromArray([
+                    $invoice['name'],
+                    $invoice['invoice_no'],
+                    $invoice['address'],
+                    $invoice['invoice_date'],
+                    $invoice['project_code'],
+                    $item['description'],
+                    $item['amount'],
+                    $invoice['amount'],
+                ], null, 'A' . $rowNum);
+                $rowNum++;
+            }
+        } else {
+            $sheet->fromArray([
+                $invoice['name'],
+                $invoice['invoice_no'],
+                $invoice['address'],
+                $invoice['invoice_date'],
+                $invoice['project_code'],
+                $invoice['description'] ?? '',
+                $invoice['amount'],
+                $invoice['amount'],
+            ], null, 'A3');
+        }
+        // Auto-size columns
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        // Output as XLSX
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename=invoice_' . $id . '_' . date('Ymd_His') . '.xlsx');
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }
