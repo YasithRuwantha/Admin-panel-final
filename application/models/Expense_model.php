@@ -1,3 +1,4 @@
+    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -93,5 +94,19 @@ class Expense_model extends CI_Model {
 	public function delete_expense($id) {
         $this->db->where('id', $id);
         return $this->db->delete('expense');
+    }
+
+	// Insert paid_to or paid_by user into config table
+    public function insert_paid_user_config($user, $type) {
+        $data = [
+            'config_type' => $type,
+            'config_key' => $user,
+            'config_value' => $user,
+            'sort_order' => 0,
+            'is_active' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        return $this->db->insert('config', $data);
     }
 }

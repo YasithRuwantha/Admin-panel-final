@@ -72,32 +72,32 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col">
-                            <div class="d-flex align-items-center mb-1">
-                                <label class="me-2">Paid To</label>
-                                <button type="button" class="btn btn-link p-0" id="addPaidToBtn" title="Add Paid To"><i class="bi bi-plus-circle" style="font-size:1.2rem;"></i></button>
+                            <label>Paid To</label>
+                            <div class="input-group">
+                                <select name="paid_to" id="paid_to_select" class="form-control" required>
+                                    <option value="">Select</option>
+                                    <?php if (!empty($paid_to_options)) : ?>
+                                        <?php foreach ($paid_to_options as $opt): ?>
+                                            <option value="<?php echo htmlspecialchars($opt['config_key']); ?>"><?php echo htmlspecialchars($opt['config_value']); ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <button type="button" class="btn btn-outline-primary" id="addPaidToBtn" title="Add User"><i class="bi bi-plus"></i></button>
                             </div>
-                            <select name="paid_to" class="form-control" required>
-                                <option value="">Select</option>
-                                <?php if (!empty($paid_to_options)) : ?>
-                                    <?php foreach ($paid_to_options as $opt): ?>
-                                        <option value="<?php echo htmlspecialchars($opt['config_key']); ?>"><?php echo htmlspecialchars($opt['config_value']); ?></option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
                         </div>
                         <div class="col">
-                            <div class="d-flex align-items-center mb-1">
-                                <label class="me-2">Paid By</label>
-                                <button type="button" class="btn btn-link p-0" id="addPaidByBtn" title="Add Paid By"><i class="bi bi-plus-circle" style="font-size:1.2rem;"></i></button>
+                            <label>Paid By</label>
+                            <div class="input-group">
+                                <select name="paid_by" id="paid_by_select" class="form-control" required>
+                                    <option value="">Select</option>
+                                    <?php if (!empty($paid_by_options)) : ?>
+                                        <?php foreach ($paid_by_options as $opt): ?>
+                                            <option value="<?php echo htmlspecialchars($opt['config_key']); ?>"><?php echo htmlspecialchars($opt['config_value']); ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <button type="button" class="btn btn-outline-primary" id="addPaidByBtn" title="Add User"><i class="bi bi-plus"></i></button>
                             </div>
-                            <select name="paid_by" class="form-control" required>
-                                <option value="">Select</option>
-                                <?php if (!empty($paid_by_options)) : ?>
-                                    <?php foreach ($paid_by_options as $opt): ?>
-                                        <option value="<?php echo htmlspecialchars($opt['config_key']); ?>"><?php echo htmlspecialchars($opt['config_value']); ?></option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -225,5 +225,97 @@
     </div>
 </div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<!-- Modal for adding user -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newUserName" class="form-label">User Name</label>
+                    <input type="text" class="form-control" id="newUserName" placeholder="Enter user name">
+                </div>
+                <div id="userModalAlert" class="alert alert-danger d-none" role="alert">Please enter a user name.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveUserBtn">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Modal logic for adding user to Paid To / Paid By
+let addUserModal = new bootstrap.Modal(document.getElementById('addUserModal'));
+let addPaidToBtn = document.getElementById('addPaidToBtn');
+let addPaidByBtn = document.getElementById('addPaidByBtn');
+let saveUserBtn = document.getElementById('saveUserBtn');
+let newUserName = document.getElementById('newUserName');
+let userModalAlert = document.getElementById('userModalAlert');
+let currentTargetSelect = null;
+let currentType = null;
+
+addPaidToBtn.addEventListener('click', function() {
+    currentTargetSelect = document.getElementById('paid_to_select');
+    currentType = 'paid_to';
+    newUserName.value = '';
+    userModalAlert.classList.add('d-none');
+    addUserModal.show();
+});
+addPaidByBtn.addEventListener('click', function() {
+    currentTargetSelect = document.getElementById('paid_by_select');
+    currentType = 'paid_by';
+    newUserName.value = '';
+    userModalAlert.classList.add('d-none');
+    addUserModal.show();
+});
+
+saveUserBtn.addEventListener('click', function() {
+    let name = newUserName.value.trim();
+    if (!name) {
+        userModalAlert.classList.remove('d-none');
+        newUserName.focus();
+        return;
+    }
+    // AJAX to add user to config table
+    saveUserBtn.disabled = true;
+    fetch('<?php echo base_url("index.php/expense/add_paid_user_config"); ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'user=' + encodeURIComponent(name) + '&type=' + encodeURIComponent(currentType)
+    })
+    .then(response => response.json())
+    .then(data => {
+        saveUserBtn.disabled = false;
+        if (data.success) {
+            let option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            option.selected = true;
+            currentTargetSelect.appendChild(option);
+            addUserModal.hide();
+        } else {
+            userModalAlert.textContent = data.message || 'Failed to add user.';
+            userModalAlert.classList.remove('d-none');
+        }
+    })
+    .catch(() => {
+        saveUserBtn.disabled = false;
+        userModalAlert.textContent = 'Failed to add user (server error).';
+        userModalAlert.classList.remove('d-none');
+    });
+});
+
+// Focus input when modal shown
+document.getElementById('addUserModal').addEventListener('shown.bs.modal', function () {
+    newUserName.focus();
+});
+</script>
 </body>
 </html>
