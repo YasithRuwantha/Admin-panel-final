@@ -95,16 +95,28 @@ class Expense extends CI_Controller {
         $range = $this->input->get('range') ?? 'all';
         $search = $this->input->get('search') ?? '';
         $alpha = $this->input->get('alpha') ?? 'recent';
-        $expenses = $this->Expense_model->get_expenses_by_date_range_and_search($per_page, $offset, $range, $search, $alpha);
-        $total_expenses = $this->Expense_model->count_expenses_by_date_range_and_search($range, $search);
+        $paid_to_filter = $this->input->get('paid_to_filter') ?? '';
+        $paid_by_filter = $this->input->get('paid_by_filter') ?? '';
+
+        $expenses = $this->Expense_model->get_expenses_by_filters($per_page, $offset, $range, $search, $alpha, $paid_to_filter, $paid_by_filter);
+        $total_expenses = $this->Expense_model->count_expenses_by_filters($range, $search, $paid_to_filter, $paid_by_filter);
         $total_pages = ceil($total_expenses / $per_page);
+
+        // Get unique Paid To and Paid By lists for dropdowns
+        $paid_to_list = $this->Expense_model->get_unique_paid_to();
+        $paid_by_list = $this->Expense_model->get_unique_paid_by();
+
         $this->load->view('list_expenses', [
             'expenses' => $expenses,
             'current_page' => $page,
             'total_pages' => $total_pages,
             'selected_range' => $range,
             'search' => $search,
-            'alpha' => $alpha
+            'alpha' => $alpha,
+            'paid_to_filter' => $paid_to_filter,
+            'paid_by_filter' => $paid_by_filter,
+            'paid_to_list' => $paid_to_list,
+            'paid_by_list' => $paid_by_list
         ]);
     }
 

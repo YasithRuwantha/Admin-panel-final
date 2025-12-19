@@ -3,6 +3,109 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Expense_model extends CI_Model {
+        // Get unique Paid To values
+        public function get_unique_paid_to() {
+            $this->db->distinct();
+            $this->db->select('paid_to');
+            $this->db->where('paid_to !=', '');
+            $query = $this->db->get('expense');
+            $result = $query->result_array();
+            $list = array();
+            foreach ($result as $row) {
+                $list[] = $row['paid_to'];
+            }
+            return array_unique($list);
+        }
+
+        // Get unique Paid By values
+        public function get_unique_paid_by() {
+            $this->db->distinct();
+            $this->db->select('paid_by');
+            $this->db->where('paid_by !=', '');
+            $query = $this->db->get('expense');
+            $result = $query->result_array();
+            $list = array();
+            foreach ($result as $row) {
+                $list[] = $row['paid_by'];
+            }
+            return array_unique($list);
+        }
+
+        // Get expenses with filters
+        public function get_expenses_by_filters($limit = 10, $offset = 0, $range = 'all', $search = '', $alpha = 'recent', $paid_to_filter = '', $paid_by_filter = '') {
+            if ($range === 'today') {
+                $this->db->where('DATE(expense_date)', date('Y-m-d'));
+            } elseif ($range === 'last7') {
+                $this->db->where('expense_date >=', date('Y-m-d', strtotime('-6 days')));
+                $this->db->where('expense_date <=', date('Y-m-d'));
+            } elseif ($range === 'month') {
+                $this->db->where('MONTH(expense_date)', date('m'));
+                $this->db->where('YEAR(expense_date)', date('Y'));
+            }
+            if (!empty($search)) {
+                $this->db->group_start();
+                $this->db->like('project_name', $search);
+                $this->db->or_like('project_code', $search);
+                $this->db->or_like('expense_date', $search);
+                $this->db->or_like('category', $search);
+                $this->db->or_like('description', $search);
+                $this->db->or_like('paid_to', $search);
+                $this->db->or_like('paid_by', $search);
+                $this->db->or_like('payment_method', $search);
+                $this->db->or_like('status', $search);
+                $this->db->or_like('remark', $search);
+                $this->db->group_end();
+            }
+            if (!empty($paid_to_filter)) {
+                $this->db->where('paid_to', $paid_to_filter);
+            }
+            if (!empty($paid_by_filter)) {
+                $this->db->where('paid_by', $paid_by_filter);
+            }
+            if ($alpha === 'az') {
+                $this->db->order_by('project_name', 'ASC');
+            } elseif ($alpha === 'za') {
+                $this->db->order_by('project_name', 'DESC');
+            } else {
+                $this->db->order_by('id', 'DESC');
+            }
+            $query = $this->db->get('expense', $limit, $offset);
+            return $query->result_array();
+        }
+
+        // Count expenses with filters
+        public function count_expenses_by_filters($range = 'all', $search = '', $paid_to_filter = '', $paid_by_filter = '') {
+            if ($range === 'today') {
+                $this->db->where('DATE(expense_date)', date('Y-m-d'));
+            } elseif ($range === 'last7') {
+                $this->db->where('expense_date >=', date('Y-m-d', strtotime('-6 days')));
+                $this->db->where('expense_date <=', date('Y-m-d'));
+            } elseif ($range === 'month') {
+                $this->db->where('MONTH(expense_date)', date('m'));
+                $this->db->where('YEAR(expense_date)', date('Y'));
+            }
+            if (!empty($search)) {
+                $this->db->group_start();
+                $this->db->like('project_name', $search);
+                $this->db->or_like('project_code', $search);
+                $this->db->or_like('expense_date', $search);
+                $this->db->or_like('category', $search);
+                $this->db->or_like('description', $search);
+                $this->db->or_like('paid_to', $search);
+                $this->db->or_like('paid_by', $search);
+                $this->db->or_like('payment_method', $search);
+                $this->db->or_like('status', $search);
+                $this->db->or_like('remark', $search);
+                $this->db->group_end();
+            }
+            if (!empty($paid_to_filter)) {
+                $this->db->where('paid_to', $paid_to_filter);
+            }
+            if (!empty($paid_by_filter)) {
+                $this->db->where('paid_by', $paid_by_filter);
+            }
+            return $this->db->count_all_results('expense');
+        }
     public function __construct() {
         parent::__construct();
     }
