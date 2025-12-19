@@ -44,7 +44,7 @@
         <!-- Search Bar -->
         <form id="searchForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
-            <input type="text" name="search" id="invoiceSearch" class="form-control" style="max-width:1212px;" placeholder="Search by name, invoice no, address, project code, or status..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
+            <input type="text" name="search" id="invoiceSearch" class="form-control" style="max-width:1300px;" placeholder="Search by name, invoice no, address, project code, or status..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
         <div class="table-responsive bg-white rounded shadow-sm p-4" style="min-height:500px;">
