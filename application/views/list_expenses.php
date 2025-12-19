@@ -86,23 +86,9 @@
                             <td><?php echo htmlspecialchars($expense['remark']); ?></td>
                             <td>
                                 <?php if (!empty($expense['document_path'])): ?>
-                                    <?php 
-                                    $docs = json_decode($expense['document_path'], true);
-                                    if (is_array($docs)) {
-                                        foreach ($docs as $doc) {
-                                            $ext = strtolower(pathinfo($doc, PATHINFO_EXTENSION));
-                                            if (in_array($ext, ['jpg','jpeg','png'])) {
-                                                echo '<a href="' . base_url(htmlspecialchars($doc)) . '" target="_blank"><img src="' . base_url(htmlspecialchars($doc)) . '" style="max-width:40px;max-height:40px;margin-right:5px;" alt="Document"></a><br>';
-                                            } else {
-                                                echo '<a href="' . base_url(htmlspecialchars($doc)) . '" target="_blank">View</a><br>';
-                                            }
-                                        }
-                                    } else {
-                                        echo '<a href="' . base_url(htmlspecialchars($expense['document_path'])) . '" target="_blank">View</a>';
-                                    }
-                                ?>
+                                    <a href="<?php echo site_url('expense/view/' . $expense['id']); ?>" class="btn btn-link p-0">View</a>
                                 <?php else: ?>
-                                    N/A
+                                    <span class="text-muted">No documents</span>
                                 <?php endif; ?>
                             </td>
                                 <td>
