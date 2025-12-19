@@ -70,6 +70,7 @@
                         <!-- <th>Service Description</th> -->
                         <th>Amount</th>
                         <th>Total</th>
+						<th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
