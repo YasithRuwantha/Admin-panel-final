@@ -21,6 +21,30 @@
             <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'all' ? ' active' : ''; ?>" data-range="all">All time</button>
         </form>
 
+        <!-- Paid To / Paid By Filter -->
+        <form id="paidFilterForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
+            <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
+            <input type="hidden" name="alpha" value="<?php echo htmlspecialchars($alpha ?? 'recent'); ?>">
+            <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
+            <label class="fw-semibold me-2">Filter by:</label>
+            <select name="paid_to_filter" class="form-select form-select-sm" style="width:auto;" onchange="document.getElementById('paidFilterForm').submit();">
+                <option value="">Paid To (All)</option>
+                <?php if (!empty($paid_to_list)): ?>
+                    <?php foreach ($paid_to_list as $paid_to): ?>
+                        <option value="<?php echo htmlspecialchars($paid_to); ?>"<?php echo (isset($paid_to_filter) && $paid_to_filter === $paid_to) ? ' selected' : ''; ?>><?php echo htmlspecialchars($paid_to); ?></option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </select>
+            <select name="paid_by_filter" class="form-select form-select-sm" style="width:auto;" onchange="document.getElementById('paidFilterForm').submit();">
+                <option value="">Paid By (All)</option>
+                <?php if (!empty($paid_by_list)): ?>
+                    <?php foreach ($paid_by_list as $paid_by): ?>
+                        <option value="<?php echo htmlspecialchars($paid_by); ?>"<?php echo (isset($paid_by_filter) && $paid_by_filter === $paid_by) ? ' selected' : ''; ?>><?php echo htmlspecialchars($paid_by); ?></option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </select>
+        </form>
+
         <!-- Alphabetical Filter -->
         <form id="alphaForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
@@ -36,7 +60,7 @@
         <!-- Search Bar -->
         <form id="searchForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
-            <input type="text" name="search" id="expenseSearch" class="form-control" style="max-width:1212px;" placeholder="Search by project name, code, date, category, description, paid to, paid by, payment method, status, or remark..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
+            <input type="text" name="search" id="expenseSearch" class="form-control" style="max-width:1300px;" placeholder="Search by project name, code, date, category, description, paid to, paid by, payment method, status, or remark..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
         <div class="table-responsive bg-white rounded shadow-sm p-4" style="min-height:500px;">
