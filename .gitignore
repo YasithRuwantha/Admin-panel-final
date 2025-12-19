@@ -1,3 +1,5 @@
+/uploads/*
+!/uploads/.htaccess
 .DS_Store
 
 application/cache/*
