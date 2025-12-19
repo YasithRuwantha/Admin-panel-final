@@ -72,7 +72,10 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col">
-                            <label>Paid To</label>
+                            <div class="d-flex align-items-center mb-1">
+                                <label class="me-2">Paid To</label>
+                                <button type="button" class="btn btn-link p-0" id="addPaidToBtn" title="Add Paid To"><i class="bi bi-plus-circle" style="font-size:1.2rem;"></i></button>
+                            </div>
                             <select name="paid_to" class="form-control" required>
                                 <option value="">Select</option>
                                 <?php if (!empty($paid_to_options)) : ?>
