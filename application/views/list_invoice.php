@@ -228,7 +228,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Payment Amount</label>
-                        <input type="number" step="0.01" name="payment_amount" class="form-control" required>
+                        <input type="text" step="0.01" name="payment_amount" class="form-control amount-input" required autocomplete="off">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Payment Date</label>
@@ -289,11 +289,53 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Thousand separator for Payment Amount field in modal
+function formatWithCommas(val) {
+    val = val.replace(/,/g, '');
+    if (val === '' || isNaN(val)) return '';
+    let parts = val.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join('.');
+}
+function removeCommas(val) {
+    return val.replace(/,/g, '');
+}
+function setupAmountInput() {
+    var amountInput = document.querySelector('#paymentModal .amount-input');
+    if (amountInput) {
+        amountInput.addEventListener('input', function() {
+            let value = removeCommas(this.value);
+            if (value && !isNaN(value)) {
+                this.value = formatWithCommas(value);
+            } else {
+                this.value = '';
+            }
+        });
+        amountInput.addEventListener('focus', function() {
+            this.value = removeCommas(this.value);
+        });
+        amountInput.addEventListener('blur', function() {
+            let value = removeCommas(this.value);
+            if (value && !isNaN(value)) {
+                this.value = formatWithCommas(value);
+            } else {
+                this.value = '';
+            }
+        });
+        // Remove commas before form submit
+        amountInput.form.addEventListener('submit', function() {
+            if (amountInput.value) {
+                amountInput.value = removeCommas(amountInput.value);
+            }
+        });
+    }
+}
 function showPaymentModal(invoiceId, invoiceNo) {
     document.getElementById('modal_invoice_id').value = invoiceId;
     document.getElementById('modal_invoice_no').value = invoiceNo;
     var modal = new bootstrap.Modal(document.getElementById('paymentModal'));
     modal.show();
+    setTimeout(setupAmountInput, 200); // Ensure input is ready after modal shows
 }
 </script>
     </div>
