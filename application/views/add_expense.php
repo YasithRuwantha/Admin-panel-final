@@ -173,23 +173,43 @@
                     <div class="mb-3">
                         <label><strong>Support Document(s)</strong></label>
                         <div id="file-input-list">
-                            <input type="file" name="document_path[]" class="form-control mb-2" onchange="addFileInput(this)">
+                            <div class="input-group mb-2 file-input-row">
+                                <input type="file" name="document_path[]" class="form-control" multiple>
+                                <button type="button" class="btn btn-outline-danger remove-file-btn" style="display:none;">&times;</button>
+                            </div>
                         </div>
-                        <small class="text-muted">Choose a file, confirm, and add another. Each input allows one file only.</small>
+                        <button type="button" class="btn btn-secondary btn-sm mb-2" id="add-file-btn"><i class="bi bi-plus-circle"></i> Add Another File</button>
+                        <small class="text-muted">You can add multiple files. Click 'Add Another File' for more.</small>
                         <script>
-                        function addFileInput(input) {
-                            if (input.value) {
-                                var container = document.getElementById('file-input-list');
-                                if (container.lastElementChild === input) {
-                                    var newInput = document.createElement('input');
-                                    newInput.type = 'file';
-                                    newInput.name = 'document_path[]';
-                                    newInput.className = 'form-control mb-2';
-                                    newInput.onchange = function() { addFileInput(newInput); };
-                                    container.appendChild(newInput);
-                                }
+                        // Add new file input row
+                        document.getElementById('add-file-btn').addEventListener('click', function() {
+                            var container = document.getElementById('file-input-list');
+                            var row = document.createElement('div');
+                            row.className = 'input-group mb-2 file-input-row';
+                            row.innerHTML = '<input type="file" name="document_path[]" class="form-control" multiple>' +
+                                '<button type="button" class="btn btn-outline-danger remove-file-btn">&times;</button>';
+                            container.appendChild(row);
+                        });
+                        // Remove file input row
+                        document.getElementById('file-input-list').addEventListener('click', function(e) {
+                            if (e.target.classList.contains('remove-file-btn')) {
+                                var row = e.target.closest('.file-input-row');
+                                if (row) row.remove();
                             }
+                        });
+                        // Show remove button only for extra file inputs
+                        function updateRemoveButtons() {
+                            var rows = document.querySelectorAll('#file-input-list .file-input-row');
+                            rows.forEach(function(row, idx) {
+                                var btn = row.querySelector('.remove-file-btn');
+                                btn.style.display = (rows.length > 1) ? '' : 'none';
+                            });
                         }
+                        // Initial setup
+                        updateRemoveButtons();
+                        // Observe changes to update remove buttons
+                        var observer = new MutationObserver(updateRemoveButtons);
+                        observer.observe(document.getElementById('file-input-list'), { childList: true });
                         </script>
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save</button>
