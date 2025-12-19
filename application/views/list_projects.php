@@ -67,41 +67,42 @@
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['start_date']); ?></td>
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['status']); ?></td>
                             <td>
-                                <div class="d-flex flex-column gap-2 align-items-start">
-                                    <a href="<?php echo site_url('project/view/' . $project['id']); ?>" class="btn btn-primary w-100" style="min-width:70px;"><i class="bi bi-eye"></i> View</a>
-                                    <?php if (function_exists('is_admin') && is_admin()): ?>
-                                        <a href="<?php echo site_url('project/edit/' . $project['id']); ?>" class="btn btn-warning w-100" style="min-width:70px;"><i class="bi bi-pencil-square"></i> Edit</a>
-                                        <button type="button" class="btn btn-danger w-100" style="min-width:70px;" onclick="showDeleteModal(<?php echo $project['id']; ?>)"><i class="bi bi-trash"></i> Delete</button>
-                                    <!-- Delete Confirmation Modal -->
-                                    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    Are you sure you want to delete this project?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <a id="deleteConfirmBtn" href="#" class="btn btn-danger">Delete</a>
-                                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle w-100" type="button" id="manageDropdown<?php echo $project['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-gear"></i> Manage
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="manageDropdown<?php echo $project['id']; ?>">
+                                        <li><a class="dropdown-item" href="<?php echo site_url('project/view/' . $project['id']); ?>"><i class="bi bi-eye"></i> View</a></li>
+                                        <?php if (function_exists('is_admin') && is_admin()): ?>
+                                            <li><a class="dropdown-item" href="<?php echo site_url('project/edit/' . $project['id']); ?>"><i class="bi bi-pencil-square"></i> Edit</a></li>
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-trash"></i> Delete</a></li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
+                                <!-- Delete Confirmation Modal (one per row, unique id) -->
+                                <div class="modal fade" id="deleteModal<?php echo $project['id']; ?>" tabindex="-1" aria-labelledby="deleteModalLabel<?php echo $project['id']; ?>" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel<?php echo $project['id']; ?>">Confirm Delete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete this project?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <a id="deleteConfirmBtn<?php echo $project['id']; ?>" href="<?php echo site_url('project/delete/' . $project['id']); ?>" class="btn btn-danger">Delete</a>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-                                    <script>
-                                    function showDeleteModal(projectId) {
-                                            var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-                                            var btn = document.getElementById('deleteConfirmBtn');
-                                            btn.href = '<?php echo site_url('project/delete/'); ?>' + projectId;
-                                            modal.show();
-                                    }
-                                    </script>
-                                    <?php endif; ?>
                                 </div>
+                                <script>
+                                function showDeleteModal(projectId) {
+                                    var modal = new bootstrap.Modal(document.getElementById('deleteModal' + projectId));
+                                    modal.show();
+                                }
+                                </script>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -132,6 +133,30 @@
     </div>
 </div>
 </body>
+<style>
+/* Enhance visibility of Manage dropdown */
+.dropdown-menu {
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 180px;
+}
+.dropdown-menu .dropdown-item {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: box-shadow 0.2s, background 0.2s;
+}
+.dropdown-menu .dropdown-item:hover, .dropdown-menu .dropdown-item:focus {
+    background: #f5f5f7;
+    box-shadow: 0 4px 18px 0 rgba(100,100,100,0.25), 0 1.5px 4px 0 rgba(0,0,0,0.10);
+    z-index: 2;
+}
+.dropdown-menu .dropdown-item i {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // Date range filter: submit form on button click, preserving search
 document.querySelectorAll('.filter-btn').forEach(function(btn) {
