@@ -42,7 +42,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="paysheet_value" class="form-label">Project Value</label>
-                                <input type="number" step="0.01" class="form-control" id="paysheet_value" name="paysheet_value" placeholder="Enter project value">
+                                <input type="text" class="form-control" id="paysheet_value" name="paysheet_value" placeholder="Enter project value">
                             </div>
                             <div class="mb-3">
                                 <label for="start_date" class="form-label">Project Start Date</label>
@@ -70,5 +70,49 @@
 </div>
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script>
+const paysheetInput = document.getElementById('paysheet_value');
+if (paysheetInput) {
+    let lastRawValue = '';
+    paysheetInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/,/g, '');
+        lastRawValue = value;
+        if (!isNaN(value) && value.length > 0) {
+            let parts = value.split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            this.value = parts.join('.');
+        } else {
+            this.value = '';
+        }
+    });
+    paysheetInput.addEventListener('focus', function() {
+        // On focus, show raw value (no commas)
+        if (this.value) {
+            this.value = this.value.replace(/,/g, '');
+        }
+    });
+    paysheetInput.addEventListener('blur', function() {
+        // On blur, show value with thousand separators
+        let value = this.value.replace(/,/g, '');
+        if (!isNaN(value) && value.length > 0) {
+            let parts = value.split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            this.value = parts.join('.');
+        } else {
+            this.value = '';
+        }
+    });
+    // Remove formatting before form submit
+    // Find the parent form and attach the submit event
+    let parentForm = paysheetInput.form;
+    if (parentForm) {
+        parentForm.addEventListener('submit', function(e) {
+            if (paysheetInput.value) {
+                paysheetInput.value = paysheetInput.value.replace(/,/g, '');
+            }
+        });
+    }
+}
+</script>
 </body>
 </html>
