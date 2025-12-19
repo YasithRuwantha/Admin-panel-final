@@ -10,9 +10,9 @@
 <div class="d-flex">
     <?php $this->load->view('sidebar'); ?>
     <div class="container-fluid" style="margin-left:220px; padding-top:40px;">
-        <div class="row justify-content-center">
-            <div class="col-xl-8 col-lg-10 col-md-11">
-                <div class="card shadow-sm border-0">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm border-0" style="min-height:500px;">
                     <div class="card-header d-flex align-items-center border-bottom" style="background:#fff;">
                         <i class="bi bi-eye" style="font-size:1.5rem;margin-right:10px;color:#6c757d;"></i>
                         <h4 class="mb-0" style="color:#222;font-weight:600;">Invoice Details</h4>
