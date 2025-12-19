@@ -8,7 +8,7 @@
 <body>
 <div class="d-flex">
     <?php $this->load->view('sidebar'); ?>
-    <div class="container mt-5" style="margin-left:220px;">
+    <div class="container-fluid mt-4 px-4" style="margin-left:220px;">
         <h2>List Invoice</h2>
         <!-- Date Range Filter Buttons as Form -->
         <form id="dateRangeForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
@@ -47,7 +47,7 @@
             <input type="text" name="search" id="invoiceSearch" class="form-control" style="max-width:1212px;" placeholder="Search by name, invoice no, address, project code, or status..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
-        <div class="table-responsive">
+        <div class="table-responsive bg-white rounded shadow-sm p-4" style="min-height:500px;">
             </body>
             <script>
             // Date range filter: submit form on button click, reset alpha to default (recent)
