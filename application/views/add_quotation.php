@@ -60,7 +60,7 @@
                                     <tbody>
                                         <tr>
                                             <td><input type="text" name="description[]" class="form-control" required placeholder="Enter service description"></td>
-                                            <td><input type="number" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>
+                                            <td><input type="text" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>
                                             <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
                                         </tr>
                                     </tbody>
@@ -70,7 +70,7 @@
                                         </tr>
                                         <tr>
                                             <td style="font-weight:bold;">Total</td>
-                                            <td><input type="number" step="0.01" name="total" class="form-control" readonly value="0" id="total"></td>
+                                            <td><input type="text" step="0.01" name="total" class="form-control" readonly value="0" id="total"></td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
@@ -90,22 +90,77 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function updateTotal() {
-        let total = 0;
-        document.querySelectorAll('.amount-input').forEach(function(input) {
-            let val = parseFloat(input.value);
-            if (!isNaN(val)) total += val;
-        });
-        document.getElementById('total').value = total.toFixed(2);
+    // Thousand separator for all .amount-input fields
+    function formatWithCommas(val) {
+        val = val.replace(/,/g, '');
+        if (val === '' || isNaN(val)) return '';
+        let parts = val.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join('.');
     }
+    function removeCommas(val) {
+        return val.replace(/,/g, '');
+    }
+    function attachAmountInputEvents(input) {
+        input.addEventListener('input', function() {
+            let value = removeCommas(this.value);
+            if (value && !isNaN(value)) {
+                this.value = formatWithCommas(value);
+            } else {
+                this.value = '';
+            }
+        });
+        input.addEventListener('focus', function() {
+            this.value = removeCommas(this.value);
+        });
+        input.addEventListener('blur', function() {
+            let value = removeCommas(this.value);
+            if (value && !isNaN(value)) {
+                this.value = formatWithCommas(value);
+            } else {
+                this.value = '';
+            }
+        });
+    }
+    // Attach to all current amount-inputs
+    document.querySelectorAll('.amount-input').forEach(attachAmountInputEvents);
+    // Attach to dynamically added rows
     document.getElementById('add-row').addEventListener('click', function() {
         let tbody = document.querySelector('#services-table tbody');
         let row = document.createElement('tr');
         row.innerHTML = '<td><input type="text" name="description[]" class="form-control" required placeholder="Enter service description"></td>' +
-                        '<td><input type="number" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>' +
+                        '<td><input type="text" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>' +
                         '<td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>';
         tbody.appendChild(row);
+        setTimeout(function() {
+            let inputs = document.querySelectorAll('.amount-input');
+            inputs.forEach(function(input) {
+                if (!input.hasAttribute('data-thousand-sep')) {
+                    attachAmountInputEvents(input);
+                    input.setAttribute('data-thousand-sep', '1');
+                }
+            });
+        }, 100);
     });
+    // Remove commas before form submit
+    document.querySelector('form').addEventListener('submit', function(e) {
+        document.querySelectorAll('.amount-input').forEach(function(input) {
+            input.value = removeCommas(input.value);
+        });
+        var totalField = document.getElementById('total');
+        if (totalField) {
+            totalField.value = removeCommas(totalField.value);
+        }
+    });
+    function updateTotal() {
+        let total = 0;
+        document.querySelectorAll('.amount-input').forEach(function(input) {
+            let val = parseFloat(input.value.replace(/,/g, ''));
+            if (!isNaN(val)) total += val;
+        });
+        let totalField = document.getElementById('total');
+        totalField.value = formatWithCommas(total.toFixed(2));
+    }
     document.querySelector('#services-table').addEventListener('input', function(e) {
         if (e.target.classList.contains('amount-input')) {
             updateTotal();
