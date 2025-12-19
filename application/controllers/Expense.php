@@ -230,4 +230,21 @@ class Expense extends CI_Controller {
         $writer->save('php://output');
         exit;
     }
+
+	// AJAX endpoint to add Paid To/Paid By user to config table
+    public function add_paid_user_config() {
+        $this->load->model('Expense_model');
+        $user = $this->input->post('user');
+        $type = $this->input->post('type'); // 'paid_to' or 'paid_by'
+        if (!$user || !$type || !in_array($type, ['paid_to', 'paid_by'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid input.']);
+            return;
+        }
+        $result = $this->Expense_model->insert_paid_user_config($user, $type);
+        if ($result) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to add user.']);
+        }
+    }
 }
