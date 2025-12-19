@@ -97,8 +97,51 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label>Amount</label>
-                            <input type="number" step="0.01" name="amount" class="form-control" required>
+                            <input type="text" step="0.01" name="amount" class="form-control amount-input" required>
                         </div>
+                        </body>
+                        </html>
+                        <script>
+                        // Thousand separator for Amount field
+                        function formatWithCommas(val) {
+                            val = val.replace(/,/g, '');
+                            if (val === '' || isNaN(val)) return '';
+                            let parts = val.split('.');
+                            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            return parts.join('.');
+                        }
+                        function removeCommas(val) {
+                            return val.replace(/,/g, '');
+                        }
+                        var amountInput = document.querySelector('.amount-input');
+                        if (amountInput) {
+                            amountInput.addEventListener('input', function() {
+                                let value = removeCommas(this.value);
+                                if (value && !isNaN(value)) {
+                                    this.value = formatWithCommas(value);
+                                } else {
+                                    this.value = '';
+                                }
+                            });
+                            amountInput.addEventListener('focus', function() {
+                                this.value = removeCommas(this.value);
+                            });
+                            amountInput.addEventListener('blur', function() {
+                                let value = removeCommas(this.value);
+                                if (value && !isNaN(value)) {
+                                    this.value = formatWithCommas(value);
+                                } else {
+                                    this.value = '';
+                                }
+                            });
+                            // Remove commas before form submit
+                            amountInput.form.addEventListener('submit', function() {
+                                if (amountInput.value) {
+                                    amountInput.value = removeCommas(amountInput.value);
+                                }
+                            });
+                        }
+                        </script>
                         <div class="col">
                             <label>Payment Method</label>
                             <select name="payment_method" class="form-control" required>
