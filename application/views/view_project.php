@@ -108,6 +108,42 @@
                             <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($project['status']); ?></dd>
                         </dl>
 
+                        <!-- Documents Section -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="bi bi-paperclip"></i> Project Documents</h5>
+                        <?php if (!empty($documents)): ?>
+                        <div class="row g-3">
+                            <?php foreach ($documents as $doc): ?>
+                                <div class="col-md-3 col-6">
+                                    <div class="card h-100 p-2 text-center border-0 shadow-sm">
+                                        <?php
+                                            $file_path = base_url($doc['file_path']);
+                                            $file_name = htmlspecialchars($doc['file_name']);
+                                            $ext = strtolower(pathinfo($doc['file_name'], PATHINFO_EXTENSION));
+                                        ?>
+                                        <?php if (in_array($ext, ['jpg','jpeg','png','gif','bmp','webp'])): ?>
+                                            <a href="<?php echo $file_path; ?>" target="_blank"><img src="<?php echo $file_path; ?>" alt="<?php echo $file_name; ?>" class="img-fluid rounded mb-2" style="max-height:120px;"></a>
+                                        <?php elseif ($ext === 'pdf'): ?>
+                                            <a href="<?php echo $file_path; ?>" target="_blank">
+                                                <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/pdf.svg" alt="PDF" style="height:60px;width:auto;" class="mb-2"><br>
+                                                <span class="badge bg-danger">PDF</span>
+                                            </a>
+                                        <?php else: ?>
+                                            <a href="<?php echo $file_path; ?>" target="_blank">
+                                                <i class="bi bi-file-earmark-text" style="font-size:2.5rem;color:#6c757d;"></i><br>
+                                                <span class="badge bg-secondary">DOC</span>
+                                            </a>
+                                        <?php endif; ?>
+                                        <div class="mt-2 small text-truncate" title="<?php echo $file_name; ?>"><?php echo $file_name; ?></div>
+                                        <div class="text-muted" style="font-size:0.85em;">Uploaded: <?php echo date('Y-m-d', strtotime($doc['uploaded_at'])); ?></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php else: ?>
+                            <div class="alert alert-info">No documents uploaded for this project.</div>
+                        <?php endif; ?>
+
                         <div class="d-flex justify-content-end mt-4 btn-group-mobile">
                             <?php if (function_exists('is_admin') && is_admin()): ?>
                                 <a href="<?php echo site_url('project/edit/' . $project['id']); ?>" class="btn btn-warning me-2">

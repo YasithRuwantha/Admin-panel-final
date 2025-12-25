@@ -253,12 +253,50 @@
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="manageDropdown<?php echo $project['id']; ?>">
                                             <li><a class="dropdown-item" href="<?php echo site_url('project/view/' . $project['id']); ?>"><i class="bi bi-eye"></i> View</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="showUploadModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-upload"></i> Upload Documents</a></li>
                                             <?php if (function_exists('is_admin') && is_admin()): ?>
                                                 <li><a class="dropdown-item" href="<?php echo site_url('project/edit/' . $project['id']); ?>"><i class="bi bi-pencil-square"></i> Edit</a></li>
                                                 <li><a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-trash"></i> Delete</a></li>
                                             <?php endif; ?>
                                         </ul>
                                     </div>
+                                    <!-- Upload Documents Modal -->
+                                    <div class="modal fade" id="uploadModal<?php echo $project['id']; ?>" tabindex="-1" aria-labelledby="uploadModalLabel<?php echo $project['id']; ?>" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form id="uploadForm<?php echo $project['id']; ?>" action="<?php echo site_url('project/upload_documents/' . $project['id']); ?>" method="post" enctype="multipart/form-data">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="uploadModalLabel<?php echo $project['id']; ?>">Upload Documents</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div id="fileInputs<?php echo $project['id']; ?>">
+                                                            <div class="mb-3 file-input-group">
+                                                                <label class="form-label">Select Document</label>
+                                                                <input class="form-control" type="file" name="documents[]" multiple required>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addFileInput<?php echo $project['id']; ?>()">+ Add Another Document</button>
+                                                        <small class="text-muted d-block mt-2">You can add multiple files. Any file type is allowed.</small>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary">Upload</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script>
+                                    // Add another file input dynamically, keep previous selections
+                                    function addFileInput<?php echo $project['id']; ?>() {
+                                        var container = document.getElementById('fileInputs<?php echo $project['id']; ?>');
+                                        var div = document.createElement('div');
+                                        div.className = 'mb-3 file-input-group';
+                                        div.innerHTML = '<input class="form-control" type="file" name="documents[]" multiple required>';
+                                        container.appendChild(div);
+                                    }
+                                    </script>
                                     <!-- Delete Confirmation Modal -->
                                     <div class="modal fade" id="deleteModal<?php echo $project['id']; ?>" tabindex="-1" aria-labelledby="deleteModalLabel<?php echo $project['id']; ?>" aria-hidden="true">
                                         <div class="modal-dialog">
@@ -278,6 +316,10 @@
                                         </div>
                                     </div>
                                     <script>
+                                    function showUploadModal(projectId) {
+                                        var modal = new bootstrap.Modal(document.getElementById('uploadModal' + projectId));
+                                        modal.show();
+                                    }
                                     function showDeleteModal(projectId) {
                                         var modal = new bootstrap.Modal(document.getElementById('deleteModal' + projectId));
                                         modal.show();

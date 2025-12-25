@@ -1,3 +1,4 @@
+    
 
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -27,6 +28,11 @@ class Project_model extends CI_Model {
         $this->db->order_by('id', 'DESC');
         $query = $this->db->get('project', $limit, $offset);
         return $query->result_array();
+    }
+
+	// Check if a project name already exists
+    public function project_name_exists($name) {
+        return $this->db->where('name', $name)->count_all_results('project') > 0;
     }
 
     /**
