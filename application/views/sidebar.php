@@ -65,7 +65,6 @@
         z-index: 1100;
         box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         cursor: pointer;
-        display: flex;
         align-items: center;
         justify-content: center;
         backdrop-filter: blur(4px);
@@ -105,6 +104,12 @@
         /* Add small left padding to main content so hamburger doesn't overlap text */
         .main-content {
             padding-left: 50px !important;
+        }
+    }
+
+    @media (min-width: 769px) {
+        .hamburger {
+            display: none !important;
         }
     }
 
