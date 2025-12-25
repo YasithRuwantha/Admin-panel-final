@@ -1,3 +1,4 @@
+
 <style>
     body {
         margin: 0;
@@ -18,6 +19,7 @@
         top: 0;
         transition: transform 0.3s ease;
         z-index: 1050;
+        overflow-y: auto;
     }
 
     .sidebar a {
@@ -25,6 +27,7 @@
         text-decoration: none;
         display: block;
         padding: 12px 24px;
+        font-size: 1rem;
     }
 
     .sidebar a:hover {
@@ -40,19 +43,45 @@
         margin-bottom: 20px;
     }
 
-    /* Hamburger */
+    .sidebar h4 {
+        padding: 0 24px;
+        font-weight: 600;
+    }
+
+    /* Hamburger - made smaller and less intrusive */
     .hamburger {
         display: none;
         position: fixed;
-        top: 15px;
-        left: 15px;
-        font-size: 26px;
+        top: 12px;
+        left: 12px;
+        font-size: 20px;           /* Smaller icon */
         color: #fff;
-        background: #343a40;
+        background: rgba(52, 58, 64, 0.85);
         border: none;
-        padding: 6px 12px;
-        border-radius: 4px;
+        width: 36px;               /* Fixed small width */
+        height: 36px;              /* Fixed small height */
+        padding: 0;
+        border-radius: 6px;
         z-index: 1100;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .hamburger:hover {
+        background: #343a40;
+    }
+
+    /* Overlay when sidebar is open on mobile */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1040;
     }
 
     /* Mobile */
@@ -65,13 +94,39 @@
             transform: translateX(0);
         }
 
-        .hamburger {
+        .sidebar.show ~ .sidebar-overlay {
             display: block;
+        }
+
+        .hamburger {
+            display: flex; /* Show on mobile */
+        }
+
+        /* Add small left padding to main content so hamburger doesn't overlap text */
+        .main-content {
+            padding-left: 50px !important;
+        }
+    }
+
+    /* Even smaller on very small screens */
+    @media (max-width: 480px) {
+        .hamburger {
+            font-size: 19px;
+            width: 34px;
+            height: 34px;
+            top: 10px;
+            left: 10px;
+        }
+
+        .main-content {
+            padding-left: 48px !important;
         }
     }
 </style>
 
-<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div class="sidebar" id="sidebar">
     <h4 class="text-center mb-4">CanoAccounts</h4>
@@ -88,7 +143,48 @@
 </div>
 
 <script>
+
     function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('show');
+        var sidebar = document.getElementById('sidebar');
+        var hamburger = document.getElementById('hamburgerBtn');
+        sidebar.classList.toggle('show');
+        // Hide hamburger when sidebar is open (on mobile)
+        if (sidebar.classList.contains('show')) {
+            hamburger.style.display = 'none';
+        } else {
+            hamburger.style.display = '';
+        }
     }
+
+    // Close sidebar when clicking a link on mobile
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+                document.getElementById('hamburgerBtn').style.display = '';
+            }
+        });
+    });
+
+	// Hide sidebar if clicking outside of sidebar or hamburger (on mobile)
+	document.addEventListener('click', function(event) {
+    var sidebar = document.getElementById('sidebar');
+    var hamburger = document.getElementById('hamburgerBtn');
+    var overlay = document.querySelector('.sidebar-overlay');
+    // Only on mobile and only if sidebar is open
+    if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
+        // If click is NOT inside sidebar, NOT on hamburger, and NOT on overlay
+        if (!sidebar.contains(event.target) && event.target !== hamburger && event.target !== overlay) {
+            sidebar.classList.remove('show');
+            hamburger.style.display = '';
+        }
+    }
+});
+</script>
+<script>
+    // Also close sidebar and show hamburger if overlay is clicked
+    document.querySelector('.sidebar-overlay').addEventListener('click', function() {
+        document.getElementById('sidebar').classList.remove('show');
+        document.getElementById('hamburgerBtn').style.display = '';
+    });
 </script>

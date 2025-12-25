@@ -42,9 +42,7 @@
             th:nth-child(1), td:nth-child(1) { min-width: 140px; }
             th, td { white-space: nowrap; }
 
-            @media (max-width: 480px) {
-                th:nth-child(6), td:nth-child(6) { display: none; }
-            }
+
 
             /* On mobile: keep sort and rows on same line if possible, export goes to right or below */
             .filters-upper-row {
@@ -174,6 +172,7 @@
                         Export Projects
                     </a>
                 </div>
+				
             </div>
         </form>
 
