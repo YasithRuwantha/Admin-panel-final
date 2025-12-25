@@ -5,6 +5,8 @@
         color: #fff;
         padding-top: 30px;
         width: 220px;
+        display: flex;
+        flex-direction: column;
     }
     .sidebar a {
         color: #fff;
@@ -18,6 +20,10 @@
     .sidebar .active {
         background: #007bff;
     }
+    .sidebar .logout-link {
+        margin-top: auto;
+        margin-bottom: 20px;
+    }
 </style>
 <div class="sidebar position-fixed">
     <h4 class="text-center mb-4">CanoAccounts</h4>
@@ -30,5 +36,5 @@
     <a href="<?php echo site_url('quote/list'); ?>" class="<?php echo (uri_string() == 'quote/list') ? 'active' : ''; ?>">List Quotation</a>
     <a href="<?php echo site_url('expense/add'); ?>" class="<?php echo (uri_string() == 'expense/add') ? 'active' : ''; ?>">Add Expenses</a>
     <a href="<?php echo site_url('expense/list_expenses'); ?>" class="<?php echo (uri_string() == 'expense/list_expenses') ? 'active' : ''; ?>">List Expenses</a>
-    <a href="<?php echo site_url('auth/logout'); ?>">Logout</a>
+    <a href="<?php echo site_url('auth/logout'); ?>" class="logout-link">Logout</a>
 </div>
