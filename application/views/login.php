@@ -3,10 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+
+    <!-- Essential for mobile responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
     <style>
-        body { background: #f8f9fa; }
-        .login-container { max-width: 400px; margin: 80px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        body { 
+            background: #f8f9fa; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container { 
+            max-width: 400px; 
+            width: 100%;
+            margin: 20px auto; 
+            padding: 30px; 
+            background: #fff; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+        }
+
+        /* Mobile adjustments - make it more comfortable on small screens */
+        @media (max-width: 576px) {
+            .login-container {
+                margin: 15px;
+                padding: 25px;
+                border-radius: 12px;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .btn {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -24,12 +59,11 @@
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
-		<div class="form-group">
-    		<label>
-				<input type="checkbox" name="remember"> Remember Me
-			</label>
-		</div>
-		<br>
+        <div class="form-group mb-3">
+            <label>
+                <input type="checkbox" name="remember"> Remember Me
+            </label>
+        </div>
         <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>
 </div>
