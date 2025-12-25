@@ -1,3 +1,4 @@
+        
     
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -256,67 +257,236 @@ class Invoice extends CI_Controller {
         redirect('invoice/list');
     }
 
-	public function export_invoice($id) {
-        // Clean output buffer to prevent corruption
-        if (ob_get_length()) ob_end_clean();
-        $autoloadPath = FCPATH . 'vendor/autoload.php';
-        if (!file_exists($autoloadPath)) {
-            $autoloadPath = APPPATH . '../vendor/autoload.php';
-        }
-        require_once $autoloadPath;
-        $invoice = $this->Invoice_model->get_invoice_by_id($id);
-        if (!$invoice) show_404();
-        $items = $this->Invoice_model->get_invoice_items($id);
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        // Title row
-        $sheet->mergeCells('A1:H1');
-        $sheet->setCellValue('A1', 'Invoice Details');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        // Header row
-        $headers = ['Name', 'Invoice No', 'Address', 'Date', 'Project Code', 'Item Description', 'Amount', 'Total'];
-        $sheet->fromArray($headers, null, 'A2');
-        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
-        $sheet->getStyle('A2:H2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
-        $sheet->getStyle('A2:H2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        // Data row(s)
-        $rowNum = 3;
-        if (!empty($items)) {
-            foreach ($items as $item) {
-                $sheet->fromArray([
-                    $invoice['name'],
-                    $invoice['invoice_no'],
-                    $invoice['address'],
-                    $invoice['invoice_date'],
-                    $invoice['project_code'],
-                    $item['description'],
-                    $item['amount'],
-                    $invoice['amount'],
-                ], null, 'A' . $rowNum);
-                $rowNum++;
+	// public function export_invoice($id) {
+    //     // Clean output buffer to prevent corruption
+    //     if (ob_get_length()) ob_end_clean();
+    //     $autoloadPath = FCPATH . 'vendor/autoload.php';
+    //     if (!file_exists($autoloadPath)) {
+    //         $autoloadPath = APPPATH . '../vendor/autoload.php';
+    //     }
+    //     require_once $autoloadPath;
+    //     $invoice = $this->Invoice_model->get_invoice_by_id($id);
+    //     if (!$invoice) show_404();
+    //     $items = $this->Invoice_model->get_invoice_items($id);
+    //     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    //     $sheet = $spreadsheet->getActiveSheet();
+    //     // Title row
+    //     $sheet->mergeCells('A1:H1');
+    //     $sheet->setCellValue('A1', 'Invoice Details');
+    //     $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+    //     $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    //     // Header row
+    //     $headers = ['Name', 'Invoice No', 'Address', 'Date', 'Project Code', 'Item Description', 'Amount', 'Total'];
+    //     $sheet->fromArray($headers, null, 'A2');
+    //     $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+    //     $sheet->getStyle('A2:H2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+    //     $sheet->getStyle('A2:H2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    //     // Data row(s)
+    //     $rowNum = 3;
+    //     if (!empty($items)) {
+    //         $first = true;
+    //         foreach ($items as $item) {
+    //             $item_amount = (float)$item['amount'];
+    //             $invoice_total = (float)$invoice['amount'];
+    //             if ($first) {
+    //                 $sheet->fromArray([
+    //                     $invoice['name'],
+    //                     $invoice['invoice_no'],
+    //                     $invoice['address'],
+    //                     $invoice['invoice_date'],
+    //                     $invoice['project_code'],
+    //                     $item['description'],
+    //                     $item_amount,
+    //                     $invoice_total,
+    //                 ], null, 'A' . $rowNum);
+    //                 // Set number format for Amount and Total
+    //                 $sheet->getStyle('G' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+    //                 $sheet->getStyle('H' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+    //                 $first = false;
+    //             } else {
+    //                 $sheet->fromArray([
+    //                     '', '', '', '', '',
+    //                     $item['description'],
+    //                     $item_amount,
+    //                     '',
+    //                 ], null, 'A' . $rowNum);
+    //                 $sheet->getStyle('G' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+    //             }
+    //             $rowNum++;
+    //         }
+    //     } else {
+    //         $invoice_total = (float)$invoice['amount'];
+    //         $sheet->fromArray([
+    //             $invoice['name'],
+    //             $invoice['invoice_no'],
+    //             $invoice['address'],
+    //             $invoice['invoice_date'],
+    //             $invoice['project_code'],
+    //             $invoice['description'] ?? '',
+    //             $invoice_total,
+    //             $invoice_total,
+    //         ], null, 'A3');
+    //         $sheet->getStyle('G3')->getNumberFormat()->setFormatCode('#,##0.00');
+    //         $sheet->getStyle('H3')->getNumberFormat()->setFormatCode('#,##0.00');
+    //     }
+    //     // Auto-size columns
+    //     foreach (range('A', 'H') as $col) {
+    //         $sheet->getColumnDimension($col)->setAutoSize(true);
+    //     }
+    //     // Output as XLSX
+    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //     header('Content-Disposition: attachment; filename=invoice_' . $id . '_' . date('Ymd_His') . '.xlsx');
+    //     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    //     $writer->save('php://output');
+    //     exit;
+    // }
+
+
+
+
+	public function export_all() {
+            // Clean output buffer to prevent corruption
+            if (ob_get_length()) ob_end_clean();
+            $autoloadPath = FCPATH . 'vendor/autoload.php';
+            if (!file_exists($autoloadPath)) {
+                $autoloadPath = APPPATH . '../vendor/autoload.php';
             }
-        } else {
-            $sheet->fromArray([
-                $invoice['name'],
-                $invoice['invoice_no'],
-                $invoice['address'],
-                $invoice['invoice_date'],
-                $invoice['project_code'],
-                $invoice['description'] ?? '',
-                $invoice['amount'],
-                $invoice['amount'],
-            ], null, 'A3');
+            require_once $autoloadPath;
+            $this->load->model('Invoice_model');
+            // Get filters from GET params
+            $range = $this->input->get('range', true) ?? 'all';
+            $search = $this->input->get('search', true) ?? '';
+            $alpha = $this->input->get('alpha', true) ?? 'recent';
+            $status_filter = $this->input->get('status_filter', true) ?? '';
+            $per_page = $this->input->get('per_page') ? (int)$this->input->get('per_page') : 10;
+            if (!in_array($per_page, [10, 25, 50, 100])) {
+                $per_page = 10;
+            }
+            $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
+            if ($page < 1) $page = 1;
+            $offset = ($page - 1) * $per_page;
+            $invoices = $this->Invoice_model->get_invoices_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $status_filter);
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            // Title row
+            $sheet->mergeCells('A1:H1');
+            $sheet->setCellValue('A1', 'All Invoices');
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            // Header row (add Status column)
+            $headers = ['Name', 'Invoice No', 'Address', 'Date', 'Project Code', 'Item Description', 'Amount', 'Total', 'Status'];
+            $sheet->fromArray($headers, null, 'A2');
+            $sheet->getStyle('A2:I2')->getFont()->setBold(true);
+            $sheet->getStyle('A2:I2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+            // Align all header columns A-I to left
+            foreach (range('A','I') as $col) {
+                $sheet->getStyle($col . '2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+            }
+
+            // Align all data columns A-H to left for all data rows (after $rowNum is set)
+            $alignDataRows = function($sheet, $rowStart, $rowEnd) {
+                for ($i = $rowStart; $i < $rowEnd; $i++) {
+                    foreach (range('A','I') as $col) {
+                        $sheet->getStyle($col . $i)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                    }
+                }
+            };
+            // Data rows
+            $rowNum = 3;
+            $groupColor1 = 'FFFFFFFF'; // white
+            $groupColor2 = 'FFDAECFF'; // light blue
+            $useColor1 = true;
+            foreach ($invoices as $invoice) {
+                $items = $this->Invoice_model->get_invoice_items($invoice['id']);
+                $payments = $this->Invoice_model->get_payments_by_invoice($invoice['id']);
+                $total_paid = 0;
+                foreach ($payments as $pay) {
+                    $total_paid += $pay['payment_amount'];
+                }
+                $invoice_total = (float)$invoice['amount'];
+                $status = '';
+                $status_detail = '';
+                if ($total_paid == 0) {
+                    $status = 'Pending';
+                } elseif ($total_paid < $invoice_total) {
+                    $status = 'Partially Paid';
+                    $status_detail = ' (Remaining: ' . number_format($invoice_total - $total_paid, 2) . ')';
+                } elseif ($total_paid == $invoice_total) {
+                    $status = 'Paid';
+                } elseif ($total_paid > $invoice_total) {
+                    $status = 'Over Paid';
+                    $status_detail = ' (Overpaid: ' . number_format($total_paid - $invoice_total, 2) . ')';
+                }
+                $first = true;
+                $groupStart = $rowNum;
+                if (!empty($items)) {
+                    foreach ($items as $item) {
+                        $item_amount = (float)$item['amount'];
+                        if ($first) {
+                            $sheet->fromArray([
+                                $invoice['name'],
+                                $invoice['invoice_no'],
+                                $invoice['address'],
+                                $invoice['invoice_date'],
+                                $invoice['project_code'],
+                                $item['description'],
+                                $item_amount,
+                                $invoice_total,
+                                $status . $status_detail,
+                            ], null, 'A' . $rowNum);
+                            $sheet->getStyle('G' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+                            $sheet->getStyle('H' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+                            $first = false;
+                        } else {
+                            $sheet->fromArray([
+                                '', '', '', '', '',
+                                $item['description'],
+                                $item_amount,
+                                '',
+                                '',
+                            ], null, 'A' . $rowNum);
+                            $sheet->getStyle('G' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+                        }
+                        $rowNum++;
+                    }
+                } else {
+                    $sheet->fromArray([
+                        $invoice['name'],
+                        $invoice['invoice_no'],
+                        $invoice['address'],
+                        $invoice['invoice_date'],
+                        $invoice['project_code'],
+                        $invoice['description'] ?? '',
+                        $invoice_total,
+                        $invoice_total,
+                        $status . $status_detail,
+                    ], null, 'A' . $rowNum);
+                    $sheet->getStyle('G' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+                    $sheet->getStyle('H' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+                    $rowNum++;
+                }
+                // Color the group rows and keep table grid lines
+                $groupEnd = $rowNum - 1;
+                $fillColor = $useColor1 ? $groupColor1 : $groupColor2;
+                for ($r = $groupStart; $r <= $groupEnd; $r++) {
+                    $style = $sheet->getStyle('A' . $r . ':I' . $r);
+                    $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($fillColor);
+                    $style->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF000000'));
+                }
+                $useColor1 = !$useColor1;
+            }
+            // Align all data columns A-H to left for all data rows (now $rowNum is set)
+            $alignDataRows($sheet, 3, $rowNum);
+            // Auto-size columns
+            foreach (range('A', 'I') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+            // Output as XLSX (ensure no output before headers)
+            if (ob_get_length()) ob_end_clean();
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename=invoices_' . date('Ymd_His') . '.xlsx');
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
+            exit;
         }
-        // Auto-size columns
-        foreach (range('A', 'H') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-        // Output as XLSX
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename=invoice_' . $id . '_' . date('Ymd_His') . '.xlsx');
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
-    }
 }

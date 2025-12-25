@@ -21,7 +21,7 @@
             <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'all' ? ' active' : ''; ?>" data-range="all">All time</button>
         </form>
 
-        <!-- Alphabetical, Status Filter + Rows per page selector (combined) -->
+        <!-- Alphabetical, Status Filter + Rows per page selector (combined) + Export Button -->
         <form id="alphaForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
@@ -46,6 +46,24 @@
                     <option value="<?php echo $opt; ?>"<?php echo (isset($per_page) && $per_page == $opt) ? ' selected' : ''; ?>><?php echo $opt; ?></option>
                 <?php endforeach; ?>
             </select>
+            <!-- Export Shown Invoices Button (with filters) -->
+            <?php
+                // Build export URL with current filters/search/pagination
+                $export_params = [];
+                if (!empty($selected_range)) $export_params['range'] = $selected_range;
+                if (!empty($search)) $export_params['search'] = $search;
+                if (!empty($alpha)) $export_params['alpha'] = $alpha;
+                if (!empty($status_filter)) $export_params['status_filter'] = $status_filter;
+                if (!empty($per_page)) $export_params['per_page'] = $per_page;
+                if (!empty($current_page)) $export_params['page'] = $current_page;
+                $export_url = site_url('invoice/export_all');
+                if (!empty($export_params)) {
+                    $export_url .= '?' . http_build_query($export_params);
+                }
+            ?>
+            <a href="<?php echo $export_url; ?>" class="btn btn-success ms-2">
+                <i class="bi bi-download"></i> Export Invoices
+            </a>
         </form>
 
         <!-- Search Bar -->
@@ -157,7 +175,7 @@
                                                 <li><a class="dropdown-item" href="#" onclick="showPaymentModal(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['invoice_no']); ?>'); return false;"><i class="bi bi-cash-coin"></i> Receive Payment</a></li>
                                             <?php endif; ?>
                                             <li><a class="dropdown-item" href="<?php echo site_url('invoice/view/' . $invoice['id']); ?>"><i class="bi bi-eye"></i> View</a></li>
-                                            <li><a class="dropdown-item" href="<?php echo site_url('invoice/export_invoice/' . $invoice['id']); ?>"><i class="bi bi-download"></i> Export</a></li>
+                                            <!-- Export per-invoice removed: now only one export button at top -->
                                             <?php if (function_exists('is_admin') && is_admin()): ?>
                                                 <li><a class="dropdown-item" href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>"><i class="bi bi-pencil-square"></i> Edit</a></li>
                                                 <li><a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $invoice['id']; ?>); return false;"><i class="bi bi-trash"></i> Delete</a></li>
