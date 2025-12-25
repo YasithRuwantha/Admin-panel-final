@@ -21,7 +21,7 @@
             <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'all' ? ' active' : ''; ?>" data-range="all">All time</button>
         </form>
 
-        <!-- Alphabetical and Status Filter -->
+        <!-- Alphabetical, Status Filter + Rows per page selector (combined) -->
         <form id="alphaForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
@@ -38,6 +38,13 @@
                 <option value="Over Paid"<?php echo (isset($status_filter) && $status_filter === 'Over Paid') ? ' selected' : ''; ?>>Over Paid</option>
                 <option value="Pending"<?php echo (isset($status_filter) && $status_filter === 'Pending') ? ' selected' : ''; ?>>Pending</option>
                 <option value="Partially Paid"<?php echo (isset($status_filter) && $status_filter === 'Partially Paid') ? ' selected' : ''; ?>>Partially Paid</option>
+            </select>
+            <label for="perPageSelect" class="fw-semibold ms-3 me-2">Number of rows:</label>
+            <select name="per_page" id="perPageSelect" class="form-select form-select-sm" style="width:auto;" onchange="document.getElementById('alphaForm').submit();">
+                <?php $perPageOptions = [10, 25, 50, 100]; ?>
+                <?php foreach ($perPageOptions as $opt): ?>
+                    <option value="<?php echo $opt; ?>"<?php echo (isset($per_page) && $per_page == $opt) ? ' selected' : ''; ?>><?php echo $opt; ?></option>
+                <?php endforeach; ?>
             </select>
         </form>
 
@@ -195,16 +202,27 @@
         <?php if (isset($total_pages) && $total_pages > 1): ?>
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
+                <?php
+                // Build base query string for pagination links, preserving filters
+                $query_params = [
+                    'range' => htmlspecialchars($selected_range ?? 'all'),
+                    'search' => htmlspecialchars($search ?? ''),
+                    'alpha' => htmlspecialchars($alpha ?? 'recent'),
+                    'status_filter' => htmlspecialchars($status_filter ?? ''),
+                    'per_page' => htmlspecialchars($per_page ?? 10)
+                ];
+                $base_query = http_build_query($query_params);
+                ?>
                 <li class="page-item<?php if ($current_page <= 1) echo ' disabled'; ?>">
-                    <a class="page-link" href="?page=<?php echo $current_page - 1; ?>" tabindex="-1">Prev</a>
+                    <a class="page-link" href="?<?php echo $base_query . '&page=' . ($current_page - 1); ?>" tabindex="-1">Prev</a>
                 </li>
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                     <li class="page-item<?php if ($i == $current_page) echo ' active'; ?>">
-                        <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                        <a class="page-link" href="?<?php echo $base_query . '&page=' . $i; ?>"><?php echo $i; ?></a>
                     </li>
                 <?php endfor; ?>
                 <li class="page-item<?php if ($current_page >= $total_pages) echo ' disabled'; ?>">
-                    <a class="page-link" href="?page=<?php echo $current_page + 1; ?>">Next</a>
+                    <a class="page-link" href="?<?php echo $base_query . '&page=' . ($current_page + 1); ?>">Next</a>
                 </li>
             </ul>
 			<br><br>
