@@ -1,3 +1,5 @@
+            
+        
     
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -198,54 +200,54 @@ class Expense extends CI_Controller {
         redirect('expense/list_expenses');
     }
 
-	public function export_expense($id) {
-        // Clean output buffer to prevent corruption
-        if (ob_get_length()) ob_end_clean();
-        $autoloadPath = FCPATH . 'vendor/autoload.php';
-        if (!file_exists($autoloadPath)) {
-            $autoloadPath = APPPATH . '../vendor/autoload.php';
-        }
-        require_once $autoloadPath;
-        $expense = $this->Expense_model->get_expense_by_id($id);
-        if (!$expense) show_404();
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        // Title row
-        $sheet->mergeCells('A1:K1');
-        $sheet->setCellValue('A1', 'Expense Details');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        // Header row
-        $headers = ['Project Name', 'Project Code', 'Expense Date', 'Category', 'Description', 'Paid To', 'Paid By', 'Amount', 'Payment Method', 'Status', 'Remark'];
-        $sheet->fromArray($headers, null, 'A2');
-        $sheet->getStyle('A2:K2')->getFont()->setBold(true);
-        $sheet->getStyle('A2:K2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
-        $sheet->getStyle('A2:K2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        // Data row
-        $sheet->fromArray([
-            $expense['project_name'],
-            $expense['project_code'],
-            $expense['expense_date'],
-            $expense['category'],
-            $expense['description'],
-            $expense['paid_to'],
-            $expense['paid_by'],
-            $expense['amount'],
-            $expense['payment_method'],
-            $expense['status'],
-            $expense['remark'],
-        ], null, 'A3');
-        // Auto-size columns
-        foreach (range('A', 'K') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-        // Output as XLSX
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename=expense_' . $id . '_' . date('Ymd_His') . '.xlsx');
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
-    }
+	// public function export_expense($id) {
+    //     // Clean output buffer to prevent corruption
+    //     if (ob_get_length()) ob_end_clean();
+    //     $autoloadPath = FCPATH . 'vendor/autoload.php';
+    //     if (!file_exists($autoloadPath)) {
+    //         $autoloadPath = APPPATH . '../vendor/autoload.php';
+    //     }
+    //     require_once $autoloadPath;
+    //     $expense = $this->Expense_model->get_expense_by_id($id);
+    //     if (!$expense) show_404();
+    //     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    //     $sheet = $spreadsheet->getActiveSheet();
+    //     // Title row
+    //     $sheet->mergeCells('A1:K1');
+    //     $sheet->setCellValue('A1', 'Expense Details');
+    //     $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+    //     $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    //     // Header row
+    //     $headers = ['Project Name', 'Project Code', 'Expense Date', 'Category', 'Description', 'Paid To', 'Paid By', 'Amount', 'Payment Method', 'Status', 'Remark'];
+    //     $sheet->fromArray($headers, null, 'A2');
+    //     $sheet->getStyle('A2:K2')->getFont()->setBold(true);
+    //     $sheet->getStyle('A2:K2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+    //     $sheet->getStyle('A2:K2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    //     // Data row
+    //     $sheet->fromArray([
+    //         $expense['project_name'],
+    //         $expense['project_code'],
+    //         $expense['expense_date'],
+    //         $expense['category'],
+    //         $expense['description'],
+    //         $expense['paid_to'],
+    //         $expense['paid_by'],
+    //         $expense['amount'],
+    //         $expense['payment_method'],
+    //         $expense['status'],
+    //         $expense['remark'],
+    //     ], null, 'A3');
+    //     // Auto-size columns
+    //     foreach (range('A', 'K') as $col) {
+    //         $sheet->getColumnDimension($col)->setAutoSize(true);
+    //     }
+    //     // Output as XLSX
+    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //     header('Content-Disposition: attachment; filename=expense_' . $id . '_' . date('Ymd_His') . '.xlsx');
+    //     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    //     $writer->save('php://output');
+    //     exit;
+    // }
 
 	// AJAX endpoint to add Paid To/Paid By user to config table
     public function add_paid_user_config() {
@@ -263,4 +265,94 @@ class Expense extends CI_Controller {
             echo json_encode(['success' => false, 'message' => 'Failed to add user.']);
         }
     }
+
+
+
+
+	// Export all shown/filtered expenses to Excel (like invoices/quotations)
+    // Update export_all to alternate row group background colors (blue/white)
+            public function export_all() {
+                // Clean output buffer to prevent corruption
+                if (ob_get_length()) ob_end_clean();
+                $autoloadPath = FCPATH . 'vendor/autoload.php';
+                if (!file_exists($autoloadPath)) {
+                    $autoloadPath = APPPATH . '../vendor/autoload.php';
+                }
+                require_once $autoloadPath;
+
+                // Get filters from GET
+                $per_page = $this->input->get('per_page') ? (int)$this->input->get('per_page') : 10;
+                if (!in_array($per_page, [10, 25, 50, 100])) {
+                    $per_page = 10;
+                }
+                $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
+                if ($page < 1) $page = 1;
+                $offset = ($page - 1) * $per_page;
+                $range = $this->input->get('range') ?? 'all';
+                $search = $this->input->get('search') ?? '';
+                $alpha = $this->input->get('alpha') ?? 'recent';
+                $paid_to_filter = $this->input->get('paid_to_filter') ?? '';
+                $paid_by_filter = $this->input->get('paid_by_filter') ?? '';
+
+                $expenses = $this->Expense_model->get_expenses_by_filters($per_page, $offset, $range, $search, $alpha, $paid_to_filter, $paid_by_filter);
+
+                $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+                // Title row
+                $sheet->mergeCells('A1:K1');
+                $sheet->setCellValue('A1', 'Expense List');
+                $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                // Header row
+                $headers = ['Project Name', 'Project Code', 'Expense Date', 'Category', 'Description', 'Paid To', 'Paid By', 'Amount', 'Payment Method', 'Status', 'Remark'];
+                $sheet->fromArray($headers, null, 'A2');
+                $sheet->getStyle('A2:K2')->getFont()->setBold(true);
+                $sheet->getStyle('A2:K2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+                $sheet->getStyle('A2:K2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+                $row = 3;
+                $groupColor1 = 'FFFFFFFF'; // white
+                $groupColor2 = 'FFDAECFF'; // light blue
+                $useColor1 = true;
+                foreach ($expenses as $expense) {
+                    $groupStart = $row;
+                    $sheet->setCellValue('A'.$row, $expense['project_name']);
+                    $sheet->setCellValue('B'.$row, $expense['project_code']);
+                    $sheet->setCellValue('C'.$row, $expense['expense_date']);
+                    $sheet->setCellValue('D'.$row, $expense['category']);
+                    $sheet->setCellValue('E'.$row, $expense['description']);
+                    $sheet->setCellValue('F'.$row, $expense['paid_to']);
+                    $sheet->setCellValue('G'.$row, $expense['paid_by']);
+                    $sheet->setCellValue('H'.$row, $expense['amount']);
+                    $sheet->setCellValue('I'.$row, $expense['payment_method']);
+                    $sheet->setCellValue('J'.$row, $expense['status']);
+                    $sheet->setCellValue('K'.$row, $expense['remark']);
+                    // Alignment: all left except Amount (H)
+                    $sheet->getStyle('A'.$row.':G'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                    $sheet->getStyle('I'.$row.':K'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                    $sheet->getStyle('H'.$row.':H'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                    // Amount: number format with thousand separator
+                    $sheet->getStyle('H'.$row.':H'.$row)->getNumberFormat()->setFormatCode('#,##0.00');
+                    $row++;
+                    // Color the group row and keep table grid lines
+                    $groupEnd = $row - 1;
+                    $fillColor = $useColor1 ? $groupColor1 : $groupColor2;
+                    for ($r = $groupStart; $r <= $groupEnd; $r++) {
+                        $style = $sheet->getStyle('A' . $r . ':K' . $r);
+                        $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($fillColor);
+                        $style->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF000000'));
+                    }
+                    $useColor1 = !$useColor1;
+                }
+                // Auto-size columns
+                foreach (range('A', 'K') as $col) {
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
+                // Output as XLSX
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment; filename=expenses_' . date('Ymd_His') . '.xlsx');
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+                $writer->save('php://output');
+                exit;
+            }
 }

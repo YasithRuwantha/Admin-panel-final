@@ -3,19 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Expense</title>
+
+    <!-- Essential for mobile responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        /* Desktop: sidebar offset */
+        .main-container {
+            margin-left: 220px;
+            padding-top: 40px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .main-container {
+                margin-left: 0 !important;
+                padding: 20px 15px;
+            }
+
+            /* Stack form rows vertically on mobile */
+            .row.mb-3 > .col,
+            .row.mb-3 > .col-md-6 {
+                margin-bottom: 1rem;
+            }
+
+            /* Full width inputs and selects */
+            .form-control,
+            .form-select {
+                width: 100%;
+            }
+
+            /* Stack action buttons vertically on mobile */
+            .action-buttons {
+                flex-direction: column !important;
+                gap: 0.75rem;
+                width: 100%;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Card full width */
+            .card {
+                max-width: 100% !important;
+                margin: 0 auto;
+            }
+        }
+
+        /* Card styling */
+        .card {
+            border-radius: 0.75rem;
+            background: #fff;
+        }
+
+        .card-header {
+            background: #fff !important;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .card-header h4 {
+            color: #222;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
+
 <div class="d-flex">
     <?php $this->load->view('sidebar'); ?>
-    <div class="container-fluid" style="margin-left:220px; padding-top:40px;">
+    
+    <div class="container-fluid main-container">
         <div class="row justify-content-center">
-            <div class="col-xl-8 col-lg-10 col-md-11">
+            <div class="col-xl-8 col-lg-10 col-md-11 col-12">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header d-flex align-items-center border-bottom" style="background:#fff;">
+                    <div class="card-header d-flex align-items-center border-bottom">
                         <i class="bi bi-pencil-square" style="font-size:1.5rem;margin-right:10px;color:#0d6efd;"></i>
-                        <h4 class="mb-0" style="color:#222;font-weight:600;">Edit Expense</h4>
+                        <h4 class="mb-0">Edit Expense</h4>
                     </div>
                     <div class="card-body p-4">
                         <?php if($this->session->flashdata('success')): ?>
@@ -24,6 +98,7 @@
                         <?php if($this->session->flashdata('error')): ?>
                             <div class="alert alert-danger mb-3"><?php echo $this->session->flashdata('error'); ?></div>
                         <?php endif; ?>
+
                         <form method="post" action="<?php echo site_url('expense/edit/' . $expense['id']); ?>">
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -35,6 +110,7 @@
                                     <input type="text" name="project_code" class="form-control" value="<?php echo htmlspecialchars($expense['project_code']); ?>">
                                 </div>
                             </div>
+
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Expense Date</label>
@@ -56,10 +132,12 @@
                                     </select>
                                 </div>
                             </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Description</label>
                                 <textarea name="description" class="form-control" rows="3"><?php echo htmlspecialchars($expense['description']); ?></textarea>
                             </div>
+
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Paid To</label>
@@ -92,6 +170,7 @@
                                     </select>
                                 </div>
                             </div>
+
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Amount</label>
@@ -113,6 +192,7 @@
                                     </select>
                                 </div>
                             </div>
+
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
@@ -134,9 +214,14 @@
                                     <input type="text" name="remark" class="form-control" value="<?php echo htmlspecialchars($expense['remark']); ?>">
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal"><i class="bi bi-save me-2"></i>Update</button>
-                                <a href="<?php echo site_url('expense/list_expenses'); ?>" class="btn btn-outline-secondary ms-2"><i class="bi bi-arrow-left me-2"></i>Cancel</a>
+
+                            <div class="d-flex justify-content-end action-buttons">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal">
+                                    <i class="bi bi-save me-2"></i>Update
+                                </button>
+                                <a href="<?php echo site_url('expense/list_expenses'); ?>" class="btn btn-outline-secondary ms-2">
+                                    <i class="bi bi-arrow-left me-2"></i>Cancel
+                                </a>
                             </div>
 
                             <!-- Confirmation Modal -->
@@ -164,6 +249,7 @@
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,4 +1,3 @@
-    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -35,7 +34,16 @@ class Home extends CI_Controller {
             $alpha = 'recent';
         }
 
-        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, '', 1000, 0, $alpha);
+        // Get per_page filter
+        $per_page = $this->input->get('per_page', true);
+        if ($per_page === 'all' || $per_page === null || $per_page === false || $per_page === '') {
+            $per_page = 1000; // Show all (or a large number)
+        } else {
+            $per_page = (int)$per_page;
+            if ($per_page <= 0) $per_page = 1000;
+        }
+
+        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, '', $per_page, 0, $alpha);
 
         $report_rows = [];
         foreach ($projects as $p) {
@@ -95,6 +103,7 @@ class Home extends CI_Controller {
             'report_rows' => $report_rows,
             'selected_range' => $range,
             'alpha' => $alpha,
+            'per_page' => $this->input->get('per_page', true) ?? 'all',
         ];
         $this->load->view('home', $data);
     }
@@ -167,7 +176,6 @@ class Home extends CI_Controller {
         }
         // Clean output buffer to prevent corruption
         if (ob_get_length()) ob_end_clean();
-        // Adjust autoload path if needed
         $autoloadPath = FCPATH . 'vendor/autoload.php';
         if (!file_exists($autoloadPath)) {
             $autoloadPath = APPPATH . '../vendor/autoload.php';
@@ -175,25 +183,28 @@ class Home extends CI_Controller {
         require_once $autoloadPath;
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-
         // Title row
         $sheet->mergeCells('A1:G1');
-        $sheet->setCellValue('A1', 'Project Financial Report');
+        $sheet->setCellValue('A1', 'All Projects Financial Report');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
         // Header row
-        $headers = ['Project', 'Total Budget', 'Total Expenses', 'Total Income', 'Cash in Hand', 'Cash In Project', 'Status'];
+        $headers = ['Project', 'Project Code', 'Total Budget', 'Total Expenses', 'Total Income', 'Cash in Hand', 'Cash In Project', 'Status'];
         $sheet->fromArray($headers, null, 'A2');
-        $sheet->getStyle('A2:G2')->getFont()->setBold(true);
-        $sheet->getStyle('A2:G2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
-        $sheet->getStyle('A2:G2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
+        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:H2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+        foreach (range('A','H') as $col) {
+            $sheet->getStyle($col . '2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        }
         // Data rows
         $rowNum = 3;
+        $groupColor1 = 'FFFFFFFF'; // white
+        $groupColor2 = 'FFDAECFF'; // light blue
+        $useColor1 = true;
         foreach ($report_rows as $row) {
             $sheet->fromArray([
                 $row['project_name'],
+                $row['project_code'],
                 $row['project_value'],
                 $row['total_expenses'],
                 $row['total_income'],
@@ -201,17 +212,31 @@ class Home extends CI_Controller {
                 $row['cash_in_project'],
                 $row['status'],
             ], null, 'A' . $rowNum);
+            // Set left alignment for Project and Project Code columns
+            $sheet->getStyle('A' . $rowNum)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle('B' . $rowNum)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+            // Set number format for numeric columns
+            $sheet->getStyle('C' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle('D' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle('E' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle('F' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle('G' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+            // Color the row and keep table grid lines
+            $fillColor = $useColor1 ? $groupColor1 : $groupColor2;
+            $style = $sheet->getStyle('A' . $rowNum . ':H' . $rowNum);
+            $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($fillColor);
+            $style->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF000000'));
+            $useColor1 = !$useColor1;
             $rowNum++;
         }
-
         // Auto-size columns
-        foreach (range('A', 'G') as $col) {
+        foreach (range('A', 'H') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
-
         // Output as XLSX
+        if (ob_get_length()) ob_end_clean();
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename=project_report_' . date('Ymd_His') . '.xlsx');
+        header('Content-Disposition: attachment; filename=projects_' . date('Ymd_His') . '.xlsx');
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
