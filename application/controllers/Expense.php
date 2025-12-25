@@ -88,7 +88,10 @@ class Expense extends CI_Controller {
     }
 
     public function list_expenses() {
-        $per_page = 10;
+        $per_page = $this->input->get('per_page') ? (int)$this->input->get('per_page') : 10;
+        if (!in_array($per_page, [10, 25, 50, 100])) {
+            $per_page = 10;
+        }
         $page = $this->input->get('page') ? (int)$this->input->get('page') : 1;
         if ($page < 1) $page = 1;
         $offset = ($page - 1) * $per_page;
@@ -116,7 +119,8 @@ class Expense extends CI_Controller {
             'paid_to_filter' => $paid_to_filter,
             'paid_by_filter' => $paid_by_filter,
             'paid_to_list' => $paid_to_list,
-            'paid_by_list' => $paid_by_list
+            'paid_by_list' => $paid_by_list,
+            'per_page' => $per_page
         ]);
     }
 
