@@ -1,4 +1,3 @@
-    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -35,7 +34,16 @@ class Home extends CI_Controller {
             $alpha = 'recent';
         }
 
-        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, '', 1000, 0, $alpha);
+        // Get per_page filter
+        $per_page = $this->input->get('per_page', true);
+        if ($per_page === 'all' || $per_page === null || $per_page === false || $per_page === '') {
+            $per_page = 1000; // Show all (or a large number)
+        } else {
+            $per_page = (int)$per_page;
+            if ($per_page <= 0) $per_page = 1000;
+        }
+
+        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, '', $per_page, 0, $alpha);
 
         $report_rows = [];
         foreach ($projects as $p) {
@@ -95,6 +103,7 @@ class Home extends CI_Controller {
             'report_rows' => $report_rows,
             'selected_range' => $range,
             'alpha' => $alpha,
+            'per_page' => $this->input->get('per_page', true) ?? 'all',
         ];
         $this->load->view('home', $data);
     }
