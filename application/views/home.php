@@ -21,31 +21,11 @@
             transition: margin-left 0.3s ease;
         }
 
-        /* Mobile adjustments - full width when sidebar collapses */
+        /* Mobile adjustments */
         @media (max-width: 768px) {
             .main-content {
-                margin-left: 0 !important; /* Override fixed sidebar margin */
+                margin-left: 0 !important;
                 padding: 20px 15px;
-            }
-
-            /* Make filter buttons stack nicely on very small screens */
-            #dateRangeForm .btn {
-                font-size: 0.875rem;
-                padding: 0.375rem 0.75rem;
-            }
-
-            /* Form groups stack vertically on mobile */
-            #dateRangeForm,
-            #alphaForm,
-            .mb-3.d-flex {
-                flex-direction: column;
-                align-items: flex-start !important;
-            }
-
-            #dateRangeForm .gap-2,
-            #alphaForm .gap-2,
-            .mb-3.d-flex.gap-2 {
-                gap: 0.5rem !important;
             }
 
             /* Search input full width on mobile */
@@ -59,36 +39,39 @@
                 font-size: 0.875rem;
             }
 
-            /* Make table headers abbreviate on small screens if needed */
             th:nth-child(1), td:nth-child(1) { min-width: 140px; }
             th, td { white-space: nowrap; }
 
-            /* Hide less critical columns on very small screens (optional but improves readability) */
             @media (max-width: 480px) {
-                th:nth-child(6), td:nth-child(6), /* Cash In Project */
-                th:nth-child(8), td:nth-child(8) { /* Export button */
-                    display: none;
-                }
+                th:nth-child(6), td:nth-child(6) { display: none; }
             }
 
-            /* Make filter buttons appear in a single horizontal row on mobile */
-            .date-btn-group {
-                flex-wrap: wrap !important;
-                overflow-x: visible;
+            /* On mobile: keep sort and rows on same line if possible, export goes to right or below */
+            .filters-upper-row {
+                flex-direction: row !important;
+                flex-wrap: wrap;
+                gap: 1rem;
                 width: 100%;
-                gap: 0.25rem !important;
-                justify-content: flex-start;
             }
-            .date-btn-group .btn {
-                min-width: unset;
-                font-size: 0.62rem;
-                padding: 0.08rem 0.25rem;
-                white-space: nowrap;
-                margin-bottom: 2px;
+            .filters-upper-row > div {
+                flex: 1 1 auto;
+                min-width: 200px;
             }
         }
 
-        /* Ensure container adjusts properly */
+        @media (min-width: 769px) {
+            /* Desktop only: larger gap */
+            .filters-upper-row {
+                gap: 2rem;
+            }
+
+            /* Desktop: Export button immediately after "Number of rows" */
+            .export-desktop {
+                margin-left: 1.5rem; /* Space after the rows dropdown */
+            }
+        }
+
+        /* Container adjustments */
         .container-fluid {
             transition: margin-left 0.3s ease;
         }
@@ -100,22 +83,55 @@
                 padding-right: 15px;
             }
         }
+
+        /* Date filter buttons - smaller and wrap naturally */
+        .date-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .date-btn-group .btn {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            min-width: 70px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 576px) {
+            .date-btn-group .btn {
+                font-size: 0.72rem;
+                padding: 0.2rem 0.4rem;
+            }
+        }
+
+        /* Align label with buttons */
+        #dateRangeForm {
+            align-items: flex-start;
+        }
+
+        #dateRangeForm label {
+            margin-bottom: 0;
+            margin-top: 0.35rem;
+        }
     </style>
 </head>
 <body>
 
 <div class="d-flex">
     <?php $this->load->view('sidebar'); ?>
-    <div class="container-fluid mt-4 px-4 main-content"> <!-- Added main-content class -->
+    <div class="container-fluid mt-4 px-4 main-content">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
             <h2 class="mb-0">Project Financial Report</h2>
         </div>
 
-        <!-- Date Range Filter Buttons as Form -->
-        <form id="dateRangeForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
-            <label class="me-2 fw-semibold nowrap">Filter by date:</label>
+        <!-- Date Range Filter Buttons -->
+        <form id="dateRangeForm" method="get" class="mb-4 d-flex flex-column flex-sm-row flex-wrap align-items-start gap-3">
+            <label class="fw-semibold nowrap me-3">Filter by date:</label>
             <input type="hidden" name="range" id="rangeInput" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
-            <div class="date-btn-group d-flex flex-row flex-nowrap gap-2 w-100" style="overflow-x:auto;">
+            <div class="date-btn-group">
                 <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'today' ? ' active' : ''; ?>" data-range="today">Today</button>
                 <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'last7' ? ' active' : ''; ?>" data-range="last7">Last 7 days</button>
                 <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'month' ? ' active' : ''; ?>" data-range="month">This month</button>
@@ -123,35 +139,47 @@
             </div>
         </form>
 
-        <!-- Alphabetical Filter + Rows per page selector -->
-        <form id="alphaForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
-            <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
-            <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
-            <label class="fw-semibold me-2">Sort by Project Name:</label>
-            <select name="alpha" class="form-select form-select-sm" style="width:auto;" onchange="document.getElementById('alphaForm').submit();">
-                <option value="recent"<?php echo (!isset($alpha) || $alpha === 'recent') ? ' selected' : ''; ?>>Recent</option>
-                <option value="az"<?php echo (isset($alpha) && $alpha === 'az') ? ' selected' : ''; ?>>A-Z</option>
-                <option value="za"<?php echo (isset($alpha) && $alpha === 'za') ? ' selected' : ''; ?>>Z-A</option>
-            </select>
-            <label for="perPageSelect" class="fw-semibold ms-3 me-2">Number of rows:</label>
-            <select name="per_page" id="perPageSelect" class="form-select form-select-sm" style="width:auto;" onchange="document.getElementById('alphaForm').submit();">
-                <option value="all"<?php echo (!isset($per_page) || $per_page === 'all') ? ' selected' : ''; ?>>All</option>
-                <option value="20"<?php echo (isset($per_page) && $per_page == 20) ? ' selected' : ''; ?>>20</option>
-                <option value="50"<?php echo (isset($per_page) && $per_page == 50) ? ' selected' : ''; ?>>50</option>
-                <option value="100"<?php echo (isset($per_page) && $per_page == 100) ? ' selected' : ''; ?>>100</option>
-            </select>
+        <!-- Sort, Rows per page, and Export Button -->
+        <form id="alphaForm" method="get" class="mb-3">
+            <div class="d-flex align-items-center filters-upper-row flex-wrap">
+                <div class="d-flex align-items-center gap-2">
+                    <label class="fw-semibold me-2 mb-0">Sort by Project Name:</label>
+                    <select name="alpha" class="form-select form-select-sm" style="width:auto;min-width:120px;" onchange="this.form.submit();">
+                        <option value="recent"<?php echo (!isset($alpha) || $alpha === 'recent') ? ' selected' : ''; ?>>Recent</option>
+                        <option value="az"<?php echo (isset($alpha) && $alpha === 'az') ? ' selected' : ''; ?>>A-Z</option>
+                        <option value="za"<?php echo (isset($alpha) && $alpha === 'za') ? ' selected' : ''; ?>>Z-A</option>
+                    </select>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <label for="perPageSelect" class="fw-semibold me-2 mb-0">Number of rows:</label>
+                    <select name="per_page" id="perPageSelect" class="form-select form-select-sm" style="width:auto;min-width:100px;" onchange="this.form.submit();">
+                        <option value="all"<?php echo (!isset($per_page) || $per_page === 'all') ? ' selected' : ''; ?>>All</option>
+                        <option value="20"<?php echo (isset($per_page) && $per_page == 20) ? ' selected' : ''; ?>>20</option>
+                        <option value="50"<?php echo (isset($per_page) && $per_page == 50) ? ' selected' : ''; ?>>50</option>
+                        <option value="100"<?php echo (isset($per_page) && $per_page == 100) ? ' selected' : ''; ?>>100</option>
+                    </select>
+
+                    <!-- Export button placed right after Number of rows on desktop -->
+                    <a href="<?php echo site_url('home/export_excel?range=' . urlencode($selected_range ?? 'all') . '&alpha=' . urlencode($alpha ?? 'recent') . '&per_page=' . urlencode($per_page ?? 'all')); ?>"
+                       class="btn btn-success btn-sm export-desktop d-none d-lg-inline-flex align-items-center">
+                        Export Projects
+                    </a>
+                </div>
+
+                <!-- Fallback for mobile/small screens: export at the far right -->
+                <div class="ms-auto d-lg-none">
+                    <a href="<?php echo site_url('home/export_excel?range=' . urlencode($selected_range ?? 'all') . '&alpha=' . urlencode($alpha ?? 'recent') . '&per_page=' . urlencode($per_page ?? 'all')); ?>"
+                       class="btn btn-success btn-sm">
+                        Export Projects
+                    </a>
+                </div>
+            </div>
         </form>
 
         <!-- Search Bar (Live Search) -->
-        <div class="mb-3 d-flex flex-wrap align-items-center gap-2">
-            <input type="text" id="liveSearchInput" class="form-control" placeholder="Live search projects by name, code, or status...">
-        </div>
-
-        <!-- Export All Button -->
         <div class="mb-3">
-            <a href="<?php echo site_url('home/export_excel?range=' . urlencode($selected_range ?? 'all') . '&alpha=' . urlencode($alpha ?? 'recent')); ?>" class="btn btn-outline-primary btn-sm">
-                Export All Projects
-            </a>
+            <input type="text" id="liveSearchInput" class="form-control" placeholder="Live search projects by name, code, or status...">
         </div>
 
         <div class="table-responsive bg-white rounded shadow-sm p-4" style="min-height:500px;">
@@ -165,7 +193,6 @@
                         <th class="text-end">Cash in Hand</th>
                         <th class="text-end">Cash In Project</th>
                         <th>Status</th>
-                        <!-- Removed Export column header -->
                     </tr>
                 </thead>
                 <tbody>
@@ -189,7 +216,6 @@
                         <td class="text-end"><?php echo number_format($balance_in_hand, 2); ?></td>
                         <td class="text-end"><?php echo number_format($cash_in_project, 2); ?></td>
                         <td><?php echo htmlspecialchars($row['status'] ?? ''); ?></td>
-                        <!-- Removed Export button from each row -->
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -210,7 +236,7 @@
                     'range' => htmlspecialchars($selected_range ?? 'all'),
                     'search' => htmlspecialchars($search ?? ''),
                     'alpha' => htmlspecialchars($alpha ?? 'recent'),
-                    'per_page' => htmlspecialchars($per_page ?? 10)
+                    'per_page' => htmlspecialchars($per_page ?? 'all')
                 ];
                 $base_query = http_build_query($query_params);
                 ?>
@@ -253,33 +279,24 @@
     font-size: 1.2em;
 }
 
-/* Prevent text wrapping issues */
 .nowrap { white-space: nowrap; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Date range filter: submit form on button click, preserving search
+// Date range filter
 document.querySelectorAll('.filter-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
         const range = btn.getAttribute('data-range');
-        // If search form exists, submit with search value
-        const searchForm = document.getElementById('searchForm');
-        if (searchForm) {
-            searchForm.querySelector('input[name="range"]').value = range;
-            searchForm.submit();
-        } else {
-            document.getElementById('rangeInput').value = range;
-            document.getElementById('dateRangeForm').submit();
-        }
+        document.getElementById('rangeInput').value = range;
+        document.getElementById('dateRangeForm').submit();
     });
 });
 
-// Live search for table rows
+// Live search
 document.getElementById('liveSearchInput').addEventListener('input', function () {
     const search = this.value.toLowerCase();
     document.querySelectorAll('table tbody tr').forEach(row => {
-        // Project name/code in first cell, status in 7th cell
         const project = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
         const status = row.querySelector('td:nth-child(7)')?.textContent.toLowerCase() || '';
         row.style.display = (project.includes(search) || status.includes(search)) ? '' : 'none';
