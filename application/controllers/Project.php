@@ -1,3 +1,5 @@
+        
+    
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -43,13 +45,20 @@ class Project extends CI_Controller {
     public function add() {
         if ($this->input->post()) {
             $project_code = $this->input->post('project_code');
+            $project_name = trim($this->input->post('name'));
             if ($this->Project_model->project_code_exists($project_code)) {
                 $this->session->set_flashdata('error', 'Project code already exists.');
                 redirect('project/add');
                 return;
             }
+            // Check for duplicate project name
+            if ($this->Project_model->project_name_exists($project_name)) {
+                $this->session->set_flashdata('error', 'Project name already exists.');
+                redirect('project/add');
+                return;
+            }
             $data = [
-                'name' => $this->input->post('name'),
+                'name' => $project_name,
                 'project_code' => $project_code,
                 'client' => $this->input->post('client'),
                 'address' => $this->input->post('address'),
@@ -115,7 +124,9 @@ class Project extends CI_Controller {
             show_404();
             return;
         }
-        $this->load->view('view_project', ['project' => $project]);
+        // Fetch documents for this project
+        $documents = $this->db->get_where('project_documents', ['project_id' => $id])->result_array();
+        $this->load->view('view_project', ['project' => $project, 'documents' => $documents]);
     }
 
 	public function delete($id) {
@@ -131,6 +142,72 @@ class Project extends CI_Controller {
         $this->session->set_flashdata('success', 'Project deleted successfully');
         redirect('project/list');
     }
+
+
+
+	/**
+         * Handle document upload for a project
+         * URL: project/upload_documents/{project_id}
+         */
+        public function upload_documents($project_id) {
+            // Only allow POST
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                show_404();
+                return;
+            }
+            // Check project exists
+            $project = $this->Project_model->get_project_by_id($project_id);
+            if (!$project) {
+                $this->session->set_flashdata('error', 'Project not found.');
+                redirect('project/list');
+                return;
+            }
+            // Prepare upload directory using project name (slugified)
+            $project_name_slug = strtolower(trim(preg_replace('/[^A-Za-z0-9]+/', '-', $project['name']), '-'));
+            $upload_dir = FCPATH . 'uploads/projects/' . $project_name_slug . '/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            $files = $_FILES['documents'] ?? null;
+            $success = 0;
+            $errors = [];
+            if ($files && isset($files['name']) && is_array($files['name'])) {
+                $count = count($files['name']);
+                for ($i = 0; $i < $count; $i++) {
+                    if ($files['error'][$i] === UPLOAD_ERR_OK) {
+                        $tmp_name = $files['tmp_name'][$i];
+                        $orig_name = basename($files['name'][$i]);
+                        $safe_name = time() . '_' . preg_replace('/[^A-Za-z0-9_.-]/', '_', $orig_name);
+                        $target_path = $upload_dir . $safe_name;
+                        if (move_uploaded_file($tmp_name, $target_path)) {
+                            // Save to DB
+                            $this->db->insert('project_documents', [
+                                'project_id' => $project_id,
+                                'file_name' => $orig_name,
+                                'file_path' => 'uploads/projects/' . $project_name_slug . '/' . $safe_name,
+                                'uploaded_at' => date('Y-m-d H:i:s')
+                            ]);
+                            $success++;
+                        } else {
+                            $errors[] = $orig_name . ' (move failed)';
+                        }
+                    } else {
+                        $errors[] = $files['name'][$i] . ' (upload error)';
+                    }
+                }
+            } else {
+                $this->session->set_flashdata('error', 'No files selected.');
+                redirect('project/list');
+                return;
+            }
+            if ($success > 0) {
+                $this->session->set_flashdata('success', "$success document(s) uploaded successfully.");
+            }
+            if (!empty($errors)) {
+                $this->session->set_flashdata('error', 'Some files failed: ' . implode(', ', $errors));
+            }
+            redirect('project/list');
+        }
 
 
 }
