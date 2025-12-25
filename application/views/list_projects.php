@@ -50,7 +50,7 @@
         <table class="table table-bordered table-striped align-middle mb-0">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <!-- <th>ID</th> -->
                     <th>Project Name</th>
                     <th>Project Code</th>
                     <th>Client Name</th>
@@ -65,7 +65,7 @@
                 <?php if (!empty($projects)): ?>
                     <?php foreach ($projects as $project): ?>
                         <tr>
-                            <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['id']); ?></td>
+                            <!-- <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['id']); ?></td> -->
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['name']); ?></td>
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['project_code']); ?></td>
                             <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['client']); ?></td>
