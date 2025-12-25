@@ -3,15 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        /* Desktop: sidebar takes space */
+        .main-content {
+            margin-left: 220px;
+            padding-top: 40px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Mobile: full width, no left margin */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 20px 15px;
+            }
+
+            .card {
+                min-height: auto !important;
+            }
+
+            .card-body {
+                padding: 1.5rem !important;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
+
 <div class="d-flex">
     <?php $this->load->view('sidebar'); ?>
-    <div class="container-fluid" style="margin-left:220px; padding-top:40px;">
+    <div class="container-fluid main-content">
         <div class="row justify-content-center">
-            <div class="col-xl-8 col-lg-10 col-md-11">
-                <div class="card shadow-sm border-0" style="background:#fff; min-height:730px; width:100%; max-width:1100px; margin:auto;">
+            <div class="col-xl-8 col-lg-10 col-md-11 col-12">
+                <div class="card shadow-sm border-0" style="background:#fff; min-height:730px;">
                     <div class="card-header d-flex align-items-center border-bottom" style="border-radius:0.5rem 0.5rem 0 0; background:#fff;">
                         <i class="bi bi-folder-plus" style="font-size:1.5rem;margin-right:10px;color:#0d6efd;"></i>
                         <h4 class="mb-0" style="color:#222;font-weight:600;">Add New Project</h4>
@@ -68,8 +103,10 @@
         </div>
     </div>
 </div>
+
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 <script>
 const paysheetInput = document.getElementById('paysheet_value');
 if (paysheetInput) {
@@ -86,13 +123,11 @@ if (paysheetInput) {
         }
     });
     paysheetInput.addEventListener('focus', function() {
-        // On focus, show raw value (no commas)
         if (this.value) {
             this.value = this.value.replace(/,/g, '');
         }
     });
     paysheetInput.addEventListener('blur', function() {
-        // On blur, show value with thousand separators
         let value = this.value.replace(/,/g, '');
         if (!isNaN(value) && value.length > 0) {
             let parts = value.split('.');
@@ -102,8 +137,6 @@ if (paysheetInput) {
             this.value = '';
         }
     });
-    // Remove formatting before form submit
-    // Find the parent form and attach the submit event
     let parentForm = paysheetInput.form;
     if (parentForm) {
         parentForm.addEventListener('submit', function(e) {
@@ -114,5 +147,6 @@ if (paysheetInput) {
     }
 }
 </script>
+
 </body>
 </html>
