@@ -9,7 +9,10 @@
 <div class="d-flex">
     <?php $this->load->view('sidebar'); ?>
     <div class="container-fluid mt-4 px-4" style="margin-left:220px;">
-        <h2>List Quotation</h2>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="mb-0">List Quotation</h2>
+            <a href="<?php echo site_url('quote/add'); ?>" class="btn btn-primary" style="min-width:150px; font-weight:500; font-size:1.1rem;">+ Add Quotation</a>
+        </div>
         <!-- Date Range Filter Buttons as Form -->
         <form id="dateRangeForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <label class="me-2 fw-semibold">Filter by date:</label>
