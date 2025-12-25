@@ -45,7 +45,7 @@
             </select>
         </form>
 
-        <!-- Alphabetical Filter + Rows per page selector (combined) -->
+        <!-- Alphabetical Filter + Rows per page selector (combined) + Export Button -->
         <form id="alphaForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
@@ -64,6 +64,21 @@
                     <option value="<?php echo $opt; ?>"<?php echo (isset($per_page) && $per_page == $opt) ? ' selected' : ''; ?>><?php echo $opt; ?></option>
                 <?php endforeach; ?>
             </select>
+            <!-- Export All Expenses Button (filtered) -->
+            <?php
+                $export_query = http_build_query([
+                    'range' => htmlspecialchars($selected_range ?? 'all'),
+                    'search' => htmlspecialchars($search ?? ''),
+                    'alpha' => htmlspecialchars($alpha ?? 'recent'),
+                    'paid_to_filter' => htmlspecialchars($paid_to_filter ?? ''),
+                    'paid_by_filter' => htmlspecialchars($paid_by_filter ?? ''),
+                    'per_page' => htmlspecialchars($per_page ?? 10),
+                    'page' => htmlspecialchars($current_page ?? 1)
+                ]);
+            ?>
+            <a href="<?php echo site_url('expense/export_all?' . $export_query); ?>" class="btn btn-success ms-3">
+                <i class="bi bi-download"></i> Export Expenses
+            </a>
         </form>
 
         <!-- Search Bar -->
@@ -131,7 +146,6 @@
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="manageDropdown<?php echo $expense['id']; ?>">
                                             <li><a class="dropdown-item" href="<?php echo site_url('expense/view/' . $expense['id']); ?>"><i class="bi bi-eye"></i> View</a></li>
-                                            <li><a class="dropdown-item" href="<?php echo site_url('expense/export_expense/' . $expense['id']); ?>"><i class="bi bi-download"></i> Export</a></li>
                                             <?php if (function_exists('is_admin') && is_admin()): ?>
                                                 <li><a class="dropdown-item" href="<?php echo site_url('expense/edit/' . $expense['id']); ?>"><i class="bi bi-pencil-square"></i> Edit</a></li>
                                                 <li><a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $expense['id']; ?>); return false;"><i class="bi bi-trash"></i> Delete</a></li>
