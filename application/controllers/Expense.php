@@ -25,8 +25,9 @@ class Expense extends CI_Controller {
         $status_options   = $this->Config_model->get_by_type('status');
 
         if ($this->input->post()) {
-            // Ensure absolute upload path and directory existence across environments
-            $upload_dir = FCPATH . 'uploads/expenses/';
+            $project_name = $this->input->post('project_name');
+            $safe_project_name = preg_replace('/[^A-Za-z0-9_\-]/', '_', $project_name);
+            $upload_dir = FCPATH . 'uploads/expenses/' . $safe_project_name . '/';
             if (!is_dir($upload_dir)) {
                 @mkdir($upload_dir, 0755, true);
             }
@@ -38,7 +39,6 @@ class Expense extends CI_Controller {
             if (!empty($_FILES['document_path']['name'][0])) {
                 $filesCount = count($_FILES['document_path']['name']);
                 for ($i = 0; $i < $filesCount; $i++) {
-                    // Skip empty file inputs
                     if (empty($_FILES['document_path']['name'][$i])) {
                         continue;
                     }
@@ -49,7 +49,7 @@ class Expense extends CI_Controller {
                     $_FILES['userfile']['size']     = $_FILES['document_path']['size'][$i];
                     $this->upload->initialize($config);
                     if ($this->upload->do_upload('userfile')) {
-                        $document_paths[] = 'uploads/expenses/' . $this->upload->data('file_name');
+                        $document_paths[] = 'uploads/expenses/' . $safe_project_name . '/' . $this->upload->data('file_name');
                     } else {
                         $this->session->set_flashdata('error', $this->upload->display_errors());
                         redirect('expense/add');
@@ -59,7 +59,7 @@ class Expense extends CI_Controller {
             }
             $data = [
                 'project_code'   => $this->input->post('project_code'),
-                'project_name'   => $this->input->post('project_name'),
+                'project_name'   => $project_name,
                 'expense_date'   => $this->input->post('expense_date'),
                 'category'       => $this->input->post('category'),
                 'description'    => $this->input->post('description'),
