@@ -167,49 +167,57 @@
 
         <!-- Sort by Project Name and Number of Rows (side by side, mobile responsive) -->
         <form id="alphaForm" method="get" class="mb-3">
-            <div class="d-flex align-items-center filters-upper-row flex-wrap">
-                <div class="d-flex align-items-center gap-2">
+            <div class="filters-upper-row-vertical">
+                <div class="mb-2">
+                    <label class="fw-semibold me-2 mb-0">Status:</label>
+                    <select name="status_filter" class="form-select form-select-sm" style="width:auto;min-width:120px;max-width:300px;display:inline-block;" onchange="this.form.submit();">
+                        <option value=""<?php echo (!isset($status_filter) || $status_filter === '') ? ' selected' : ''; ?>>All</option>
+                        <option value="Planned"<?php echo (isset($status_filter) && $status_filter === 'Planned') ? ' selected' : ''; ?>>Planned</option>
+                        <option value="Ongoing"<?php echo (isset($status_filter) && $status_filter === 'Ongoing') ? ' selected' : ''; ?>>Ongoing</option>
+                        <option value="Completed"<?php echo (isset($status_filter) && $status_filter === 'Completed') ? ' selected' : ''; ?>>Completed</option>
+                        <option value="On Hold"<?php echo (isset($status_filter) && $status_filter === 'On Hold') ? ' selected' : ''; ?>>On Hold</option>
+                        <option value="Cancelled"<?php echo (isset($status_filter) && $status_filter === 'Cancelled') ? ' selected' : ''; ?>>Cancelled</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label for="perPageSelect" class="fw-semibold me-2 mb-0">Number of rows:</label>
+                    <select name="per_page" id="perPageSelect" class="form-select form-select-sm" style="width:auto;min-width:100px;max-width:200px;display:inline-block;" onchange="this.form.submit();">
+                        <option value="10"<?php echo (!isset($per_page) || $per_page == 10) ? ' selected' : ''; ?>>10</option>
+                        <option value="25"<?php echo (isset($per_page) && $per_page == 25) ? ' selected' : ''; ?>>25</option>
+                        <option value="50"<?php echo (isset($per_page) && $per_page == 50) ? ' selected' : ''; ?>>50</option>
+                        <option value="100"<?php echo (isset($per_page) && $per_page == 100) ? ' selected' : ''; ?>>100</option>
+                    </select>
+                </div>
+                <div class="mb-2">
                     <label class="fw-semibold me-2 mb-0">Sort by Project Name:</label>
-                    <select name="alpha" class="form-select form-select-sm" style="width:auto;min-width:120px;" onchange="this.form.submit();">
+                    <select name="alpha" class="form-select form-select-sm" style="width:auto;min-width:120px;max-width:300px;display:inline-block;" onchange="this.form.submit();">
                         <option value="recent"<?php echo (!isset($alpha) || $alpha === 'recent') ? ' selected' : ''; ?>>Recent</option>
                         <option value="az"<?php echo (isset($alpha) && $alpha === 'az') ? ' selected' : ''; ?>>A-Z</option>
                         <option value="za"<?php echo (isset($alpha) && $alpha === 'za') ? ' selected' : ''; ?>>Z-A</option>
                     </select>
                 </div>
             </div>
-            <div class="d-flex align-items-center gap-2 mt-2">
-                <label for="perPageSelect" class="fw-semibold me-2 mb-0">Number of rows:</label>
-                <select name="per_page" id="perPageSelect" class="form-select form-select-sm" style="width:auto;min-width:100px;" onchange="this.form.submit();">
-                    <option value="10"<?php echo (!isset($per_page) || $per_page == 10) ? ' selected' : ''; ?>>10</option>
-                    <option value="25"<?php echo (isset($per_page) && $per_page == 25) ? ' selected' : ''; ?>>25</option>
-                    <option value="50"<?php echo (isset($per_page) && $per_page == 50) ? ' selected' : ''; ?>>50</option>
-                    <option value="100"<?php echo (isset($per_page) && $per_page == 100) ? ' selected' : ''; ?>>100</option>
-                </select>
-            </div>
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
         </form>
         <style>
-        .filters-upper-row {
-            flex-direction: row !important;
-            flex-wrap: wrap;
-            gap: 1rem;
+        .filters-upper-row-vertical > div {
             width: 100%;
+            max-width: 400px;
         }
-        .filters-upper-row > div {
-            flex: 1 1 auto;
-            min-width: 200px;
+        .filters-upper-row-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
         }
         @media (max-width: 768px) {
-            .filters-upper-row {
-                flex-direction: row !important;
-                flex-wrap: wrap;
-                gap: 1rem;
-                width: 100%;
+            .filters-upper-row-vertical {
+                flex-direction: column;
+                align-items: stretch;
             }
-            .filters-upper-row > div {
-                flex: 1 1 auto;
-                min-width: 120px;
+            .filters-upper-row-vertical > div {
+                max-width: 100%;
             }
         }
         </style>
@@ -344,7 +352,8 @@
                     'range' => htmlspecialchars($selected_range ?? 'all'),
                     'search' => htmlspecialchars($search ?? ''),
                     'alpha' => htmlspecialchars($alpha ?? 'recent'),
-                    'per_page' => htmlspecialchars($per_page ?? 10)
+                    'per_page' => htmlspecialchars($per_page ?? 10),
+                    'status_filter' => isset($status_filter) ? htmlspecialchars($status_filter) : ''
                 ];
                 $base_query = http_build_query($query_params);
                 ?>

@@ -103,9 +103,17 @@ class Project extends CI_Controller {
             $alpha = 'recent';
         }
 
-        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, $search, $per_page, $offset, $alpha);
+        // Status filter (default to Ongoing)
+        // Only default to 'Ongoing' if status_filter is not present in GET (not even as empty string)
+        if (isset($_GET['status_filter'])) {
+            $status_filter = $this->input->get('status_filter', true);
+        } else {
+            $status_filter = 'Ongoing';
+        }
+
+        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $status_filter);
         // For pagination, count total projects in range and search
-        $total_projects = $this->Project_model->count_projects_by_date_range_and_search($range, $search);
+        $total_projects = $this->Project_model->count_projects_by_date_range_and_search($range, $search, $status_filter);
         $total_pages = ceil($total_projects / $per_page);
         $this->load->view('list_projects', [
             'projects' => $projects,
@@ -114,7 +122,8 @@ class Project extends CI_Controller {
             'selected_range' => $range,
             'search' => $search,
             'alpha' => $alpha,
-            'per_page' => $per_page
+            'per_page' => $per_page,
+            'status_filter' => $status_filter
         ]);
     }
 
