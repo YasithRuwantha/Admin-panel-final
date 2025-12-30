@@ -14,10 +14,13 @@ class Invoice extends CI_Controller {
         $this->output->set_header('Cache-Control: post-check=0, pre-check=0', false);
         $this->output->set_header('Pragma: no-cache');
         $this->load->model('Invoice_model');
+        $this->load->model('Project_model');
+        $this->load->model('Payment_model');
     }
 
     public function add_invoice() {
         $payment_methods = $this->Invoice_model->get_payment_methods();
+        $service_descriptions = $this->Invoice_model->get_service_descriptions();
         $this->load->model('Project_model');
         $projects = $this->Project_model->get_projects(1000, 0); // fetch all for dropdown, adjust limit as needed
         if ($this->input->post()) {
@@ -47,7 +50,8 @@ class Invoice extends CI_Controller {
         } else {
             $this->load->view('add_invoice', [
                 'payment_methods' => $payment_methods,
-                'projects' => $projects
+                'projects' => $projects,
+                'service_descriptions' => $service_descriptions
             ]);
         }
     }
@@ -111,7 +115,7 @@ class Invoice extends CI_Controller {
 	    public function receive_payment() {
             // Only admin can record payments
             if (function_exists('require_admin')) { require_admin(); }
-        $this->load->model('Payment_model');
+        $this->load->model('payment_model');
         if ($this->input->post()) {
             $data = [
                 'invoice_id'     => $this->input->post('invoice_id'),
@@ -140,15 +144,18 @@ class Invoice extends CI_Controller {
         // Load HTML content
         $data['invoice'] = $invoice;
         $html = $this->load->view('invoice_pdf', $data, true);
-        
+
+        // Clean output buffer to prevent corruption
+        if (ob_get_length()) ob_end_clean();
+
         // Use DomPDF for PDF generation
         require_once(APPPATH.'libraries/dompdf/autoload.inc.php');
-        
+
         $dompdf = new \Dompdf\Dompdf();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        
+
         // Output PDF for inline display
         $filename = $invoice['invoice_no'] . '.pdf';
         $dompdf->stream($filename, array("Attachment" => false));
