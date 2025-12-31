@@ -145,19 +145,28 @@ class Quote extends CI_Controller {
             show_404();
         }
         $quote['items'] = $this->Quote_model->get_quote_items($id);
-        
+
+        // Get show_signature param from GET (default true if not set)
+        $show_signature = $this->input->get('show_signature');
+        if ($show_signature === null) {
+            $show_signature = true;
+        } else {
+            $show_signature = ($show_signature == '1' || $show_signature === true || $show_signature === 'true');
+        }
+
         // Load HTML content
         $data['quote'] = $quote;
+        $data['show_signature'] = $show_signature;
         $html = $this->load->view('quotation_pdf', $data, true);
-        
+
         // Use DomPDF for PDF generation
         require_once(APPPATH.'libraries/dompdf/autoload.inc.php');
-        
+
         $dompdf = new \Dompdf\Dompdf();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        
+
         // Output PDF for inline display
         $filename = $quote['quotation_no'] . '.pdf';
         $dompdf->stream($filename, array("Attachment" => false));

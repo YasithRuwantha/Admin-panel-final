@@ -291,6 +291,7 @@
                         <th>Date</th>
                         <th>Project Code</th>
                         <th>Total</th>
+                        <th>Signature</th>
                         <th style="width:180px;">Actions</th>
                     </tr>
                 </thead>
@@ -304,6 +305,9 @@
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"> <?php echo htmlspecialchars($quote['quote_date']); ?> </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"> <?php echo htmlspecialchars($quote['project_code']); ?> </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;"> <?php echo htmlspecialchars(number_format((float)$quote['amount'], 2)); ?> </td>
+                                <td style="text-align:center;vertical-align:middle;">
+                                    <input type="checkbox" style="width:20px;height:20px;">
+                                </td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-primary dropdown-toggle w-100" type="button" id="manageDropdown<?php echo $quote['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
@@ -315,7 +319,7 @@
                                                 <li><a class="dropdown-item" href="<?php echo site_url('quote/edit/' . $quote['id']); ?>">Edit</a></li>
                                                 <li><a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $quote['id']; ?>); return false;">Delete</a></li>
                                             <?php endif; ?>
-                                            <li><a class="dropdown-item text-danger fw-bold d-flex align-items-center" href="<?php echo site_url('quote/pdf/' . $quote['id']); ?>" target="_blank">PDF</a></li>
+                                            <li><a class="dropdown-item text-danger fw-bold d-flex align-items-center pdf-link" data-quote-id="<?php echo $quote['id']; ?>" href="#">PDF</a></li>
                                         </ul>
                                     </div>
                                     <!-- Delete Confirmation Modal (one per row, unique id) -->
@@ -391,6 +395,20 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
         document.getElementById('rangeInput').value = btn.getAttribute('data-range');
         document.getElementById('alphaInput').value = 'recent';
         document.getElementById('dateRangeForm').submit();
+    });
+});
+</script>
+<script>
+// PDF link logic for signature tick box (like invoice list)
+document.querySelectorAll('.pdf-link').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var tr = link.closest('tr');
+        var checkbox = tr.querySelector('input[type="checkbox"]');
+        var showSignature = checkbox && checkbox.checked ? '1' : '0';
+        var quoteId = link.getAttribute('data-quote-id');
+        var pdfUrl = '<?php echo site_url('quote/pdf/'); ?>' + quoteId + '?show_signature=' + showSignature;
+        window.open(pdfUrl, '_blank');
     });
 });
 </script>

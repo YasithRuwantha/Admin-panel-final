@@ -313,27 +313,39 @@
     </div>
 
     <div class="signature-section">
+        <?php 
+        // Show signature image if $show_signature is true (set from controller based on tick box)
+        if (isset($show_signature) && $show_signature) {
+            $signature_path = FCPATH . 'assets/images/Signature.png';
+            if (file_exists($signature_path)) {
+                $signature_data = base64_encode(file_get_contents($signature_path));
+                echo '<div style="text-align:left; margin-left:20px; margin-bottom:-10px;">'
+                    . '<img src="data:image/png;base64,' . $signature_data . '" alt="Signature" style="width:190px;">'
+                    . '</div>';
+            }
+        }
+        ?>
         <div class="signature-line"></div>
         <div class="signature-name">Stamp & Signature</div>
     </div>
 
     <div class="footer-sections">
         <div class="note-section">
-            <span class="highlight">Note:</span> The offer valid only 30 Days from the date. <span class="highlight">This Quotation did not include any statutory fees enforced by UDA or other relevant organizations. </span>
+            <span class="highlight">Note:</span> The offer valid only 30 Days from the date. <span class="highlight">This Quotation did not include any statutory fees enforced by relevant organizations. </span>
         </div>
 
         <div class="payment-terms">
             <h4>Payment Terms:</h4>
             <ul>
                 <li>Advance Payment for commencement of the assignment: 50%</li>
-                <li>On submission of Draft Report to the UDA: 30%</li>
+                <li>On submission of Draft Report: 30%</li>
                 <li>After the Final Report: 20%</li>
             </ul>
         </div>
 <br>
         <div class="declaration">
-            <span class="highlight">Declaration:</span><br>
-            Our consultant team did not take the responsibility for any <span class="highlight">errors or omissions in the architectural / engineering drawings.</span>
+            <span class="highlight">Beneficiary: CANOPUS PVT LTD | A/C No: 284100190049754 | Bank: People’s Bank (Kannathiddy Branch)<br>
+            Payment Reference:  Please include the Invoice Number as a reference for all bank transfers.</span>
         </div>
 
         <div class="company-footer">
