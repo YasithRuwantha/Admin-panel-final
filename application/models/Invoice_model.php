@@ -1,3 +1,4 @@
+        
     
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -226,6 +227,13 @@ class Invoice_model extends CI_Model {
         }
         return count($results);
     }
+
+
+	// Get service descriptions from config table
+        public function get_service_descriptions() {
+            $query = $this->db->get_where('config', ['config_type' => 'service description', 'is_active' => 1]);
+            return $query->result_array();
+        }
 
 
 }

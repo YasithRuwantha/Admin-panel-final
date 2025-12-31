@@ -190,7 +190,20 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><input type="text" name="description[]" class="form-control" required placeholder="Enter service description"></td>
+                                            <td>
+                                                <select name="description_select[]" class="form-select service-desc-dropdown" onchange="handleServiceDescChange(this)">
+                                                    <option value="">Select from list...</option>
+                                                    <?php 
+                                                    if (isset($service_descriptions) && is_array($service_descriptions)) {
+                                                        foreach ($service_descriptions as $desc) {
+                                                            echo '<option value="'.htmlspecialchars($desc['config_value']).'">'.htmlspecialchars($desc['config_value']).'</option>';
+                                                        }
+                                                    }
+                                                    ?>
+                                                    <!-- <option value="__custom__">Other (Type below)</option> -->
+                                                </select>
+                                                <input type="text" name="description[]" class="form-control mt-2 service-desc-input" placeholder="Type service description" style="display:block;" />
+                                            </td>
                                             <td><input type="text" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>
                                             <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
                                         </tr>
@@ -355,7 +368,19 @@ document.getElementById('add-row').addEventListener('click', function() {
     let tbody = document.querySelector('#services-table tbody');
     let row = document.createElement('tr');
     row.innerHTML = `
-        <td><input type="text" name="description[]" class="form-control" required placeholder="Enter service description"></td>
+        <td>
+            <select name="description_select[]" class="form-select service-desc-dropdown" onchange="handleServiceDescChange(this)">
+                <option value="">Select from list...</option>
+                <?php 
+                if (isset($service_descriptions) && is_array($service_descriptions)) {
+                    foreach ($service_descriptions as $desc) {
+                        echo '<option value="'.htmlspecialchars($desc['config_value']).'">'.htmlspecialchars($desc['config_value']).'</option>';
+                    }
+                }
+                ?>
+            </select>
+            <input type="text" name="description[]" class="form-control mt-2 service-desc-input" placeholder="Type service description" style="display:block;" />
+        </td>
         <td><input type="text" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>
         <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
     `;
@@ -370,6 +395,26 @@ document.getElementById('add-row').addEventListener('click', function() {
         }
     }, 100);
 });
+// Service description dropdown logic
+function handleServiceDescChange(select) {
+    var input = select.parentElement.querySelector('.service-desc-input');
+    if (select.value === '__custom__') {
+        input.style.display = '';
+        input.required = true;
+        input.value = '';
+        input.focus();
+        select.value = '';
+    } else if (select.value) {
+        input.style.display = '';
+        input.required = false;
+        input.value = select.value;
+        select.value = '';
+    } else {
+        input.style.display = 'none';
+        input.required = false;
+        input.value = '';
+    }
+}
 
 document.querySelector('#services-table').addEventListener('input', function(e) {
     if (e.target.classList.contains('amount-input')) {
