@@ -268,6 +268,7 @@
                         <th>Project Code</th>
                         <th>Amount</th>
                         <th>Total</th>
+                        <th>Signature</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -291,6 +292,9 @@
                                 </td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line; font-weight:bold;">
                                     <?php echo htmlspecialchars(number_format((float)$invoice['amount'], 2)); ?>
+                                </td>
+                                <td style="text-align:center;">
+                                    <input type="checkbox" style="width:20px;height:20px;">
                                 </td>
                                 <td>
                                     <?php 
@@ -343,7 +347,7 @@
                                                 <li><a class="dropdown-item" href="<?php echo site_url('invoice/edit/' . $invoice['id']); ?>">Edit</a></li>
                                                 <li><a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $invoice['id']; ?>); return false;">Delete</a></li>
                                             <?php endif; ?>
-                                            <li><a class="dropdown-item text-danger fw-bold d-flex align-items-center" href="<?php echo site_url('invoice/pdf/' . $invoice['id']); ?>" target="_blank">PDF</a></li>
+                                            <li><a class="dropdown-item text-danger fw-bold d-flex align-items-center pdf-link" data-invoice-id="<?php echo $invoice['id']; ?>" href="#" target="_blank">PDF</a></li>
                                         </ul>
                                     </div>
                                     <div class="modal fade" id="deleteModal<?php echo $invoice['id']; ?>" tabindex="-1">
@@ -460,6 +464,7 @@
     </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -469,6 +474,19 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
         document.getElementById('rangeInput').value = btn.getAttribute('data-range');
         document.getElementById('alphaInput').value = 'recent';
         document.getElementById('dateRangeForm').submit();
+    });
+});
+
+// PDF link logic for signature tick box
+document.querySelectorAll('.pdf-link').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var tr = link.closest('tr');
+        var checkbox = tr.querySelector('input[type="checkbox"]');
+        var showSignature = checkbox && checkbox.checked ? '1' : '0';
+        var invoiceId = link.getAttribute('data-invoice-id');
+        var pdfUrl = '<?php echo site_url('invoice/pdf/'); ?>' + invoiceId + '?show_pending=1&show_signature=' + showSignature;
+        window.open(pdfUrl, '_blank');
     });
 });
 

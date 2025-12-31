@@ -140,9 +140,18 @@ class Invoice extends CI_Controller {
         }
         $invoice['items'] = $this->Invoice_model->get_invoice_items($id);
         $invoice['payments'] = $this->Invoice_model->get_payments_by_invoice($id);
-        
+
+        // Get show_signature from GET param, default true
+        $show_signature = $this->input->get('show_signature');
+        if ($show_signature === null) {
+            $show_signature = true;
+        } else {
+            $show_signature = ($show_signature == '1' || $show_signature === true || $show_signature === 'true');
+        }
+
         // Load HTML content
         $data['invoice'] = $invoice;
+        $data['show_signature'] = $show_signature;
         $html = $this->load->view('invoice_pdf', $data, true);
 
         // Clean output buffer to prevent corruption
