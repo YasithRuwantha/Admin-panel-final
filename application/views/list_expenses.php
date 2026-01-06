@@ -319,7 +319,7 @@
                         <th>Payment Method</th>
                         <th>Status</th>
                         <th>Remark</th>
-                        <th>Document</th>
+                        <th>Docs</th>
                         <th style="width:140px;">Actions</th>
                     </tr>
                 </thead>
@@ -342,7 +342,7 @@
                                     <?php if (!empty($expense['document_path'])): ?>
                                         <a href="<?php echo site_url('expense/view/' . $expense['id']); ?>" class="btn btn-link p-0">View</a>
                                     <?php else: ?>
-                                        <span class="text-muted">No documents</span>
+                                        <span class="text-muted">No doc</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>

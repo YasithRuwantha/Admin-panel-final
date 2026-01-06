@@ -116,9 +116,11 @@
                                         <option value="">Select Project</option>
                                         <?php if (!empty($projects)): ?>
                                             <?php foreach ($projects as $project): ?>
-                                                <option value="<?php echo htmlspecialchars($project['name']); ?>" data-code="<?php echo htmlspecialchars($project['project_code']); ?>">
-                                                    <?php echo htmlspecialchars($project['name']); ?>
-                                                </option>
+                                                <?php if (isset($project['status']) && strtolower($project['status']) === 'ongoing'): ?>
+                                                    <option value="<?php echo htmlspecialchars($project['name']); ?>" data-code="<?php echo htmlspecialchars($project['project_code']); ?>">
+                                                        <?php echo htmlspecialchars($project['name']); ?>
+                                                    </option>
+                                                <?php endif; ?>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
