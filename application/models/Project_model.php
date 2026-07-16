@@ -111,7 +111,7 @@ class Project_model extends CI_Model {
             $this->db->where('status', $status_filter);
         }
         if (!empty($project_type_filter)) {
-            $this->db->where('project_type', $project_type_filter);
+            $this->db->where("FIND_IN_SET(" . $this->db->escape($project_type_filter) . ", project_type) > 0");
         }
         if (!empty($search)) {
             $this->db->group_start();
@@ -153,7 +153,7 @@ class Project_model extends CI_Model {
             $this->db->where('status', $status_filter);
         }
         if (!empty($project_type_filter)) {
-            $this->db->where('project_type', $project_type_filter);
+            $this->db->where("FIND_IN_SET(" . $this->db->escape($project_type_filter) . ", project_type) > 0");
         }
         if (!empty($search)) {
             $this->db->group_start();

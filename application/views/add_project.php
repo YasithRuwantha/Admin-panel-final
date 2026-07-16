@@ -5,6 +5,7 @@
     <title>Add Project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         body {
             background: #f8f9fa;
@@ -81,8 +82,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="project_type" class="form-label">Project Type</label>
-                                <select class="form-select" id="project_type" name="project_type">
-                                    <option value="">Select Project Type</option>
+                                <select class="form-select" id="project_type" name="project_type[]" multiple="multiple">
                                     <?php if (!empty($project_types)): ?>
                                         <?php foreach ($project_types as $type): ?>
                                             <option value="<?php echo htmlspecialchars($type['config_value']); ?>">
@@ -159,6 +159,19 @@ if (paysheetInput) {
         });
     }
 }
+</script>
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#project_type').select2({
+        placeholder: "Select Project Type(s)",
+        allowClear: true
+    });
+});
 </script>
 
 </body>
