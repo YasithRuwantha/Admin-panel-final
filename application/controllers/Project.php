@@ -21,7 +21,7 @@ class Project extends CI_Controller {
                     'paysheet_value' => $this->input->post('paysheet_value'),
                     'start_date' => $this->input->post('start_date'),
                     'status' => $this->input->post('status'),
-                    'project_type' => $this->input->post('project_type'),
+                    'project_type' => is_array($this->input->post('project_type')) ? implode(',', $this->input->post('project_type')) : $this->input->post('project_type'),
                     'updated_at' => date('Y-m-d H:i:s'),
                 ];
                 $this->Project_model->update_project($id, $data);
@@ -68,7 +68,7 @@ class Project extends CI_Controller {
                 'paysheet_value' => $this->input->post('paysheet_value'),
                 'start_date' => $this->input->post('start_date'),
                 'status' => $this->input->post('status'),
-                'project_type' => $this->input->post('project_type'),
+                'project_type' => is_array($this->input->post('project_type')) ? implode(',', $this->input->post('project_type')) : $this->input->post('project_type'),
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
