@@ -301,6 +301,33 @@ document.querySelector('form').addEventListener('submit', function(e) {
 });
 
 updateTotal();
+
+// Pre-fill and lock fields from URL params when coming from project list
+(function() {
+    var params = new URLSearchParams(window.location.search);
+    var projectName = params.get('project_name');
+    var projectCode = params.get('project_code');
+    var client = params.get('client');
+    var address = params.get('address');
+    if (projectName) {
+        var nameField = document.querySelector('input[name="name"]');
+        var addressField = document.querySelector('input[name="address"]');
+        var codeField = document.querySelector('input[name="project_code"]');
+        if (client && nameField) nameField.value = client;
+        if (address && addressField) addressField.value = address;
+        if (projectCode && codeField) codeField.value = projectCode;
+
+        // Lock the pre-filled fields so they cannot be edited
+        var lockedFields = [nameField, addressField, codeField];
+        lockedFields.forEach(function(field) {
+            if (field) {
+                field.readOnly = true;
+                field.style.backgroundColor = '#e9ecef';
+                field.style.cursor = 'not-allowed';
+            }
+        });
+    }
+})();
 </script>
 
 </body>
