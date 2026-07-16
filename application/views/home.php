@@ -187,10 +187,12 @@
                     <tr>
                         <th>Project</th>
                         <th class="text-end">Total Budget</th>
-                        <th class="text-end">Total Expenses</th>
+                        <th class="text-end">Total Invoices</th>
                         <th class="text-end">Total Income</th>
+                        <th class="text-end">Total Expenses</th>
                         <th class="text-end">Cash in Hand</th>
                         <th class="text-end">Cash In Project</th>
+                        <th class="text-end">Profit / Loss</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -198,11 +200,13 @@
                 <?php if (!empty($report_rows)): ?>
                     <?php foreach ($report_rows as $row):
                         $budget = (float)$row['project_value'];
-                        $expenses = (float)$row['total_expenses'];
+                        $invoices = (float)$row['total_invoices_sum'];
                         $income = (float)$row['total_income'];
+                        $expenses = (float)$row['total_expenses'];
                         $balance_in_hand = (float)$row['cash_in_hand'];
                         $cash_in_project = (float)$row['cash_in_project'];
-                        $row_class = ($balance_in_hand < 0 || $cash_in_project < 0) ? 'table-danger' : '';
+                        $profit_or_loss = (float)$row['profit_or_loss'];
+                        $row_class = ($balance_in_hand < 0 || $cash_in_project < 0 || $profit_or_loss < 0) ? 'table-danger' : '';
                     ?>
                     <tr class="<?php echo $row_class; ?>">
                         <td>
@@ -210,16 +214,18 @@
                             <div class="text-muted small"><?php echo htmlspecialchars($row['project_code']); ?></div>
                         </td>
                         <td class="text-end"><?php echo number_format($budget, 2); ?></td>
-                        <td class="text-end"><?php echo number_format($expenses, 2); ?></td>
+                        <td class="text-end"><?php echo number_format($invoices, 2); ?></td>
                         <td class="text-end"><?php echo number_format($income, 2); ?></td>
+                        <td class="text-end"><?php echo number_format($expenses, 2); ?></td>
                         <td class="text-end"><?php echo number_format($balance_in_hand, 2); ?></td>
                         <td class="text-end"><?php echo number_format($cash_in_project, 2); ?></td>
+                        <td class="text-end text-<?php echo $profit_or_loss >= 0 ? 'success' : 'danger'; ?> fw-semibold"><?php echo number_format($profit_or_loss, 2); ?></td>
                         <td><?php echo htmlspecialchars($row['status'] ?? ''); ?></td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="7" class="text-center text-muted">No projects found.</td>
+                        <td colspan="9" class="text-center text-muted">No projects found.</td>
                     </tr>
                 <?php endif; ?>
                 </tbody>

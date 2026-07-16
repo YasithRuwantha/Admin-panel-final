@@ -51,18 +51,36 @@ class Home extends CI_Controller {
             $project_name = isset($p['name']) ? $p['name'] : (isset($p['project_name']) ? $p['project_name'] : '');
             $project_value = (float)($p['paysheet_value'] ?? 0);
 
-            // Total income: sum of invoice.amount for this project
-            $total_income = 0.0;
+            // Total invoices sum: sum of invoice.amount for this project
+            $total_invoices_sum = 0.0;
             if ($project_code !== '') {
-                $q_income = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                $q_inv = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
                     ->from('invoice')
                     ->where('project_code', $project_code)
                     ->get();
-                $total_income = (float)($q_income->row_array()['total'] ?? 0);
+                $total_invoices_sum = (float)($q_inv->row_array()['total'] ?? 0);
             } else if ($project_name !== '') {
-                $q_income = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                $q_inv = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
                     ->from('invoice')
                     ->where('project_name', $project_name)
+                    ->get();
+                $total_invoices_sum = (float)($q_inv->row_array()['total'] ?? 0);
+            }
+
+            // Total income: sum of received payments for this project
+            $total_income = 0.0;
+            if ($project_code !== '') {
+                $q_income = $this->db->select('COALESCE(SUM(payments.payment_amount),0) AS total', false)
+                    ->from('payments')
+                    ->join('invoice', 'invoice.id = payments.invoice_id', 'inner')
+                    ->where('invoice.project_code', $project_code)
+                    ->get();
+                $total_income = (float)($q_income->row_array()['total'] ?? 0);
+            } else if ($project_name !== '') {
+                $q_income = $this->db->select('COALESCE(SUM(payments.payment_amount),0) AS total', false)
+                    ->from('payments')
+                    ->join('invoice', 'invoice.id = payments.invoice_id', 'inner')
+                    ->where('invoice.project_name', $project_name)
                     ->get();
                 $total_income = (float)($q_income->row_array()['total'] ?? 0);
             }
@@ -86,15 +104,18 @@ class Home extends CI_Controller {
             // Computed fields
             $cash_in_project = $project_value - $total_expenses;
             $cash_in_hand    = $total_income - $total_expenses;
+            $profit_or_loss  = $total_invoices_sum - $total_expenses;
 
             $report_rows[] = [
                 'project_name'   => $project_name,
                 'project_code'   => $project_code,
                 'project_value'  => $project_value,
+                'total_invoices_sum' => $total_invoices_sum,
                 'total_income'   => $total_income,
                 'total_expenses' => $total_expenses,
                 'cash_in_project'=> $cash_in_project,
                 'cash_in_hand'   => $cash_in_hand,
+                'profit_or_loss' => $profit_or_loss,
                 'status'         => $p['status'] ?? '',
             ];
         }
@@ -133,17 +154,34 @@ class Home extends CI_Controller {
             if ($project_code_filter && $project_code !== $project_code_filter) continue;
             $project_name = isset($p['name']) ? $p['name'] : (isset($p['project_name']) ? $p['project_name'] : '');
             $project_value = (float)($p['paysheet_value'] ?? 0);
-            $total_income = 0.0;
+            $total_invoices_sum = 0.0;
             if ($project_code !== '') {
-                $q_income = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                $q_inv = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
                     ->from('invoice')
                     ->where('project_code', $project_code)
                     ->get();
-                $total_income = (float)($q_income->row_array()['total'] ?? 0);
+                $total_invoices_sum = (float)($q_inv->row_array()['total'] ?? 0);
             } else if ($project_name !== '') {
-                $q_income = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                $q_inv = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
                     ->from('invoice')
                     ->where('project_name', $project_name)
+                    ->get();
+                $total_invoices_sum = (float)($q_inv->row_array()['total'] ?? 0);
+            }
+
+            $total_income = 0.0;
+            if ($project_code !== '') {
+                $q_income = $this->db->select('COALESCE(SUM(payments.payment_amount),0) AS total', false)
+                    ->from('payments')
+                    ->join('invoice', 'invoice.id = payments.invoice_id', 'inner')
+                    ->where('invoice.project_code', $project_code)
+                    ->get();
+                $total_income = (float)($q_income->row_array()['total'] ?? 0);
+            } else if ($project_name !== '') {
+                $q_income = $this->db->select('COALESCE(SUM(payments.payment_amount),0) AS total', false)
+                    ->from('payments')
+                    ->join('invoice', 'invoice.id = payments.invoice_id', 'inner')
+                    ->where('invoice.project_name', $project_name)
                     ->get();
                 $total_income = (float)($q_income->row_array()['total'] ?? 0);
             }
@@ -163,14 +201,17 @@ class Home extends CI_Controller {
             }
             $cash_in_project = $project_value - $total_expenses;
             $cash_in_hand    = $total_income - $total_expenses;
+            $profit_or_loss  = $total_invoices_sum - $total_expenses;
             $report_rows[] = [
                 'project_name'   => $project_name,
                 'project_code'   => $project_code,
                 'project_value'  => $project_value,
+                'total_invoices_sum' => $total_invoices_sum,
                 'total_income'   => $total_income,
                 'total_expenses' => $total_expenses,
                 'cash_in_project'=> $cash_in_project,
                 'cash_in_hand'   => $cash_in_hand,
+                'profit_or_loss' => $profit_or_loss,
                 'status'         => $p['status'] ?? '',
             ];
         }
@@ -184,16 +225,16 @@ class Home extends CI_Controller {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         // Title row
-        $sheet->mergeCells('A1:G1');
+        $sheet->mergeCells('A1:J1');
         $sheet->setCellValue('A1', 'All Projects Financial Report');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         // Header row
-        $headers = ['Project', 'Project Code', 'Total Budget', 'Total Expenses', 'Total Income', 'Cash in Hand', 'Cash In Project', 'Status'];
+        $headers = ['Project', 'Project Code', 'Total Budget', 'Total Invoices', 'Total Expenses', 'Total Income', 'Cash in Hand', 'Cash In Project', 'Profit / Loss', 'Status'];
         $sheet->fromArray($headers, null, 'A2');
-        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
-        $sheet->getStyle('A2:H2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
-        foreach (range('A','H') as $col) {
+        $sheet->getStyle('A2:J2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:J2')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD9E1F2');
+        foreach (range('A','J') as $col) {
             $sheet->getStyle($col . '2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
         }
         // Data rows
@@ -206,10 +247,12 @@ class Home extends CI_Controller {
                 $row['project_name'],
                 $row['project_code'],
                 $row['project_value'],
+                $row['total_invoices_sum'],
                 $row['total_expenses'],
                 $row['total_income'],
                 $row['cash_in_hand'],
                 $row['cash_in_project'],
+                $row['profit_or_loss'],
                 $row['status'],
             ], null, 'A' . $rowNum);
             // Set left alignment for Project and Project Code columns
@@ -221,16 +264,18 @@ class Home extends CI_Controller {
             $sheet->getStyle('E' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
             $sheet->getStyle('F' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
             $sheet->getStyle('G' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle('H' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->getStyle('I' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
             // Color the row and keep table grid lines
             $fillColor = $useColor1 ? $groupColor1 : $groupColor2;
-            $style = $sheet->getStyle('A' . $rowNum . ':H' . $rowNum);
+            $style = $sheet->getStyle('A' . $rowNum . ':J' . $rowNum);
             $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($fillColor);
             $style->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF000000'));
             $useColor1 = !$useColor1;
             $rowNum++;
         }
         // Auto-size columns
-        foreach (range('A', 'H') as $col) {
+        foreach (range('A', 'J') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
         // Output as XLSX
