@@ -231,6 +231,19 @@
                     </select>
                 </div>
                 <div class="mb-2">
+                    <label class="fw-semibold me-2 mb-0">Project Type:</label>
+                    <select name="project_type_filter" class="form-select form-select-sm" style="width:auto;min-width:120px;max-width:300px;display:inline-block;" onchange="this.form.submit();">
+                        <option value=""<?php echo (!isset($project_type_filter) || $project_type_filter === '') ? ' selected' : ''; ?>>All</option>
+                        <?php if(!empty($project_types)): ?>
+                            <?php foreach($project_types as $ptype): ?>
+                                <option value="<?php echo htmlspecialchars($ptype['config_value']); ?>"<?php echo (isset($project_type_filter) && $project_type_filter === $ptype['config_value']) ? ' selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($ptype['config_value']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <div class="mb-2">
                     <label for="perPageSelect" class="fw-semibold me-2 mb-0">Number of rows:</label>
                     <select name="per_page" id="perPageSelect" class="form-select form-select-sm" style="width:auto;min-width:100px;max-width:200px;display:inline-block;" onchange="this.form.submit();">
                         <option value="10"<?php echo (!isset($per_page) || $per_page == 10) ? ' selected' : ''; ?>>10</option>
