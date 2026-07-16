@@ -113,7 +113,7 @@ class Invoice_model extends CI_Model {
      * @param string $alpha recent|az|za
      * @return array
      */
-    public function get_invoices_by_date_range_and_search($range = 'all', $search = '', $limit = 1000, $offset = 0, $alpha = 'recent', $status_filter = '') {
+    public function get_invoices_by_date_range_and_search($range = 'all', $search = '', $limit = 1000, $offset = 0, $alpha = 'recent', $status_filter = '', $exact_project_code = '') {
         if ($range === 'today') {
             $this->db->where('DATE(invoice_date)', date('Y-m-d'));
         } elseif ($range === 'last7') {
@@ -130,6 +130,9 @@ class Invoice_model extends CI_Model {
             $this->db->or_like('address', $search);
             $this->db->or_like('project_code', $search);
             $this->db->group_end();
+        }
+        if (!empty($exact_project_code)) {
+            $this->db->where('project_code', $exact_project_code);
         }
             if ($alpha === 'az') {
                 $this->db->order_by('name', 'ASC');
@@ -178,7 +181,7 @@ class Invoice_model extends CI_Model {
      * @param string $search
      * @return int
      */
-    public function count_invoices_by_date_range_and_search($range = 'all', $search = '', $status_filter = '') {
+    public function count_invoices_by_date_range_and_search($range = 'all', $search = '', $status_filter = '', $exact_project_code = '') {
         if ($range === 'today') {
             $this->db->where('DATE(invoice_date)', date('Y-m-d'));
         } elseif ($range === 'last7') {
@@ -195,6 +198,9 @@ class Invoice_model extends CI_Model {
             $this->db->or_like('address', $search);
             $this->db->or_like('project_code', $search);
             $this->db->group_end();
+        }
+        if (!empty($exact_project_code)) {
+            $this->db->where('project_code', $exact_project_code);
         }
         $query = $this->db->get('invoice');
         $results = $query->result_array();

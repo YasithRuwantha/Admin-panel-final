@@ -103,8 +103,12 @@ class Expense extends CI_Controller {
         $paid_to_filter = $this->input->get('paid_to_filter') ?? '';
         $paid_by_filter = $this->input->get('paid_by_filter') ?? '';
 
-        $expenses = $this->Expense_model->get_expenses_by_filters($per_page, $offset, $range, $search, $alpha, $paid_to_filter, $paid_by_filter);
-        $total_expenses = $this->Expense_model->count_expenses_by_filters($range, $search, $paid_to_filter, $paid_by_filter);
+        // Exact Project Code filter
+        $exact_project_code = $this->input->get('exact_project_code', true);
+        $exact_project_code = is_string($exact_project_code) ? trim($exact_project_code) : '';
+
+        $expenses = $this->Expense_model->get_expenses_by_filters($per_page, $offset, $range, $search, $alpha, $paid_to_filter, $paid_by_filter, $exact_project_code);
+        $total_expenses = $this->Expense_model->count_expenses_by_filters($range, $search, $paid_to_filter, $paid_by_filter, $exact_project_code);
         $total_pages = ceil($total_expenses / $per_page);
 
         // Get unique Paid To and Paid By lists for dropdowns

@@ -32,7 +32,7 @@ class Expense_model extends CI_Model {
         }
 
         // Get expenses with filters
-        public function get_expenses_by_filters($limit = 10, $offset = 0, $range = 'all', $search = '', $alpha = 'recent', $paid_to_filter = '', $paid_by_filter = '') {
+        public function get_expenses_by_filters($limit = 10, $offset = 0, $range = 'all', $search = '', $alpha = 'recent', $paid_to_filter = '', $paid_by_filter = '', $exact_project_code = '') {
             if ($range === 'today') {
                 $this->db->where('DATE(expense_date)', date('Y-m-d'));
             } elseif ($range === 'last7') {
@@ -55,6 +55,9 @@ class Expense_model extends CI_Model {
                 $this->db->or_like('status', $search);
                 $this->db->or_like('remark', $search);
                 $this->db->group_end();
+            }
+            if (!empty($exact_project_code)) {
+                $this->db->where('project_code', $exact_project_code);
             }
             if (!empty($paid_to_filter)) {
                 $this->db->where('paid_to', $paid_to_filter);
@@ -74,7 +77,7 @@ class Expense_model extends CI_Model {
         }
 
         // Count expenses with filters
-        public function count_expenses_by_filters($range = 'all', $search = '', $paid_to_filter = '', $paid_by_filter = '') {
+        public function count_expenses_by_filters($range = 'all', $search = '', $paid_to_filter = '', $paid_by_filter = '', $exact_project_code = '') {
             if ($range === 'today') {
                 $this->db->where('DATE(expense_date)', date('Y-m-d'));
             } elseif ($range === 'last7') {
@@ -97,6 +100,9 @@ class Expense_model extends CI_Model {
                 $this->db->or_like('status', $search);
                 $this->db->or_like('remark', $search);
                 $this->db->group_end();
+            }
+            if (!empty($exact_project_code)) {
+                $this->db->where('project_code', $exact_project_code);
             }
             if (!empty($paid_to_filter)) {
                 $this->db->where('paid_to', $paid_to_filter);
