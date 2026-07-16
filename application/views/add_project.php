@@ -80,6 +80,19 @@
                                 <input type="text" class="form-control" id="paysheet_value" name="paysheet_value" placeholder="Enter project value">
                             </div>
                             <div class="mb-3">
+                                <label for="project_type" class="form-label">Project Type</label>
+                                <select class="form-select" id="project_type" name="project_type">
+                                    <option value="">Select Project Type</option>
+                                    <?php if (!empty($project_types)): ?>
+                                        <?php foreach ($project_types as $type): ?>
+                                            <option value="<?php echo htmlspecialchars($type['config_value']); ?>">
+                                                <?php echo htmlspecialchars($type['config_value']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label for="start_date" class="form-label">Project Start Date</label>
                                 <input type="date" class="form-control" id="start_date" name="start_date">
                             </div>

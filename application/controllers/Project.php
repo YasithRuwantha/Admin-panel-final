@@ -21,6 +21,7 @@ class Project extends CI_Controller {
                     'paysheet_value' => $this->input->post('paysheet_value'),
                     'start_date' => $this->input->post('start_date'),
                     'status' => $this->input->post('status'),
+                    'project_type' => $this->input->post('project_type'),
                     'updated_at' => date('Y-m-d H:i:s'),
                 ];
                 $this->Project_model->update_project($id, $data);
@@ -28,7 +29,9 @@ class Project extends CI_Controller {
                 redirect('project/list');
                 return;
             }
-            $this->load->view('edit_project', ['project' => $project]);
+            $data['project'] = $project;
+            $data['project_types'] = $this->Project_model->get_project_types();
+            $this->load->view('edit_project', $data);
         }
     public function __construct() {
         parent::__construct();
@@ -65,6 +68,7 @@ class Project extends CI_Controller {
                 'paysheet_value' => $this->input->post('paysheet_value'),
                 'start_date' => $this->input->post('start_date'),
                 'status' => $this->input->post('status'),
+                'project_type' => $this->input->post('project_type'),
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
@@ -72,7 +76,8 @@ class Project extends CI_Controller {
             $this->session->set_flashdata('success', 'Project added successfully');
             redirect('project/add');
         }
-        $this->load->view('add_project');
+        $data['project_types'] = $this->Project_model->get_project_types();
+        $this->load->view('add_project', $data);
     }
 	    public function list() {
         $per_page = $this->input->get('per_page') ? (int)$this->input->get('per_page') : 10;

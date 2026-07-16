@@ -23,6 +23,11 @@ class Project_model extends CI_Model {
         return $this->db->insert('project', $data);
     }
 
+    public function get_project_types() {
+        $query = $this->db->get_where('config', ['config_type' => 'project_type', 'is_active' => 1]);
+        return $query->result_array();
+    }
+
 
     public function get_projects($limit = 10, $offset = 0) {
         $this->db->order_by('id', 'DESC');

@@ -286,6 +286,7 @@
                     <tr>
                         <th>Project Name</th>
                         <th>Project Code</th>
+                        <th>Project Type</th>
                         <th>Client Name</th>
                         <th>Address</th>
                         <th>Project Value</th>
@@ -300,6 +301,7 @@
                             <tr>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['name']); ?></td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['project_code']); ?></td>
+                                <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['project_type'] ?? '-'); ?></td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['client']); ?></td>
                                 <td style="word-break:break-word;max-width:250px;white-space:pre-line;"><?php echo htmlspecialchars($project['address']); ?></td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars(number_format((float)$project['paysheet_value'], 2)); ?></td>
