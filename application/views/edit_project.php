@@ -81,6 +81,19 @@
                                 <input type="number" step="0.01" class="form-control" id="paysheet_value" name="paysheet_value" value="<?php echo htmlspecialchars($project['paysheet_value']); ?>">
                             </div>
                             <div class="mb-3">
+                                <label for="project_type" class="form-label">Project Type</label>
+                                <select class="form-select" id="project_type" name="project_type">
+                                    <option value="">Select Project Type</option>
+                                    <?php if (!empty($project_types)): ?>
+                                        <?php foreach ($project_types as $type): ?>
+                                            <option value="<?php echo htmlspecialchars($type['config_value']); ?>" <?php if(isset($project['project_type']) && $project['project_type'] == $type['config_value']) echo 'selected'; ?>>
+                                                <?php echo htmlspecialchars($type['config_value']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label for="start_date" class="form-label">Project Start Date</label>
                                 <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($project['start_date']); ?>">
                             </div>

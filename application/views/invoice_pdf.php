@@ -97,11 +97,13 @@
         }
         
         .main-content {
-            margin: 20px 0;
+            margin: 10px 0;
+            page-break-inside: avoid;
         }
         
         .items-section {
-            margin: 20px 0;
+            margin: 10px 0;
+            page-break-inside: avoid;
         }
         
         .items-table {
@@ -161,12 +163,12 @@
         }
         
         .payment-section {
-            margin: 15px 0;
+            margin: 10px 0;
             background-color: #f8f9fa;
-            padding: 12px;
+            padding: 8px;
             left: 5;
-			text-align: left;
-            margin-bottom: 40px;
+            text-align: left;
+            margin-bottom: 15px;
             page-break-inside: avoid;
         }
         
@@ -210,8 +212,8 @@
         }
 
 
-		.signature-section {
-            margin: 15px 0 10px 0;
+        .signature-section {
+            margin: 10px 0 5px 0;
             text-align: right;
             padding-left: 0;
             display: flex;
@@ -366,53 +368,40 @@
         }
     }
     ?>
+    <?php 
+    $show_payment_history = !empty($invoice['payments']);
+    ?>
+    <?php if ($show_payment_history): ?>
     <div class="payment-section">
         <h3>Payment History</h3>
-        <?php if (!empty($invoice['payments'])): ?>
-            <?php foreach ($invoice['payments'] as $payment): ?>
-            <div class="payment-details">
-                <div class="info-row">
-                    <label>Amount:</label>
-                    <span><?php echo number_format($payment['payment_amount'], 2); ?></span>
-                </div>
-                <div class="info-row">
-                    <label>Date:</label>
-                    <span><?php echo date('d/m/Y', strtotime($payment['payment_date'])); ?></span>
-                </div>
-                <div class="info-row">
-                    <label>Method:</label>
-                    <span><?php echo htmlspecialchars($payment['payment_mode']); ?></span>
-                </div>
-                <?php if (!empty($payment['reference_no'])): ?>
-                <div class="info-row">
-                    <label>Reference:</label>
-                    <span><?php echo htmlspecialchars($payment['reference_no']); ?></span>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($payment['remarks'])): ?>
-                <div class="info-row">
-                    <label>Remarks:</label>
-                    <span><?php echo htmlspecialchars($payment['remarks']); ?></span>
-                </div>
-                <?php endif; ?>
+        <?php foreach ($invoice['payments'] as $payment): ?>
+        <div class="payment-details">
+            <div class="info-row">
+                <label>Amount:</label>
+                <span><?php echo number_format($payment['payment_amount'], 2); ?></span>
             </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="payment-details">
-                <div class="info-row">
-                    <label>Status:</label>
-                    <span><span class="status-badge status-pending">Pending</span></span>
-                </div>
-                <div class="info-row">
-                    <label>Total Paid:</label>
-                    <span>Rs. 0.00</span>
-                </div>
-                <div class="info-row">
-                    <label>Balance Due:</label>
-                    <span>Rs. <?php echo number_format($total, 2); ?></span>
-                </div>
+            <div class="info-row">
+                <label>Date:</label>
+                <span><?php echo date('d/m/Y', strtotime($payment['payment_date'])); ?></span>
             </div>
-        <?php endif; ?>
+            <div class="info-row">
+                <label>Method:</label>
+                <span><?php echo htmlspecialchars($payment['payment_mode']); ?></span>
+            </div>
+            <?php if (!empty($payment['reference_no'])): ?>
+            <div class="info-row">
+                <label>Reference:</label>
+                <span><?php echo htmlspecialchars($payment['reference_no']); ?></span>
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($payment['remarks'])): ?>
+            <div class="info-row">
+                <label>Remarks:</label>
+                <span><?php echo htmlspecialchars($payment['remarks']); ?></span>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endforeach; ?>
         <div style="margin-top: 12px; font-size: 12px; margin-bottom: 20px;">
             <strong>Total Paid: Rs. <?php echo number_format($total_paid, 2); ?></strong>
             <br>
@@ -428,13 +417,13 @@
             ?>
             <br>
             Status: <?php echo $status; ?>
-			<br><br>
-            <div class="declaration">
-            <span class="highlight">Beneficiary: CANOPUS PVT LTD | A/C No: 284100190049754 | Bank: People’s Bank (Kannathiddy Branch)<br>
-            Payment Reference:  Please include the Invoice Number as a reference for all bank transfers.</span>
         </div>
     </div>
-	<br><br>
+    <?php endif; ?>
+    <div class="declaration">
+        <span class="highlight">Beneficiary: CANOPUS PVT LTD | A/C No: 284100190049754 | Bank: People’s Bank (Kannathiddy Branch)<br>
+        Payment Reference:  Please include the Invoice Number as a reference for all bank transfers.</span>
+    </div>
     <div class="signature-section">
         <?php 
         // Show signature image if $show_signature is true (set from controller based on tick box)
@@ -452,7 +441,7 @@
         <div class="signature-name">Stamp & Signature</div>
     </div>
 
-    <div class="footer">
+    <div class="footer" style="page-break-inside: avoid;">
         <span class="highlight">CANOPUS (PRIVATE) LIMITED</span> | Company No. PV177771<br>
         Sangaripillai Road, Manipay, Jaffna.<br>
         +94 21 22 6415 | info@canopus.lk | www.canopus.lk

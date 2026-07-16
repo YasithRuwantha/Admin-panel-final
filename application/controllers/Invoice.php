@@ -89,8 +89,12 @@ class Invoice extends CI_Controller {
         $status_filter = $this->input->get('status_filter', true);
         $status_filter = is_string($status_filter) ? trim($status_filter) : '';
 
-        $invoices = $this->Invoice_model->get_invoices_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $status_filter);
-        $total_invoices = $this->Invoice_model->count_invoices_by_date_range_and_search($range, $search, $status_filter);
+        // Exact Project Code filter
+        $exact_project_code = $this->input->get('exact_project_code', true);
+        $exact_project_code = is_string($exact_project_code) ? trim($exact_project_code) : '';
+
+        $invoices = $this->Invoice_model->get_invoices_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $status_filter, $exact_project_code);
+        $total_invoices = $this->Invoice_model->count_invoices_by_date_range_and_search($range, $search, $status_filter, $exact_project_code);
         $total_pages = ceil($total_invoices / $per_page);
         $this->load->model('Payment_model');
         $payment_methods = $this->Invoice_model->get_payment_methods();

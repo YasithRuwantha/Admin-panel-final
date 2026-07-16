@@ -76,8 +76,12 @@ class Quote extends CI_Controller {
             $alpha = 'recent';
         }
 
-        $quotations = $this->Quote_model->get_quotes_by_date_range_and_search($range, $search, $per_page, $offset, $alpha);
-        $total_quotes = $this->Quote_model->count_quotes_by_date_range_and_search($range, $search);
+        // Exact Project Code filter
+        $exact_project_code = $this->input->get('exact_project_code', true);
+        $exact_project_code = is_string($exact_project_code) ? trim($exact_project_code) : '';
+
+        $quotations = $this->Quote_model->get_quotes_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $exact_project_code);
+        $total_quotes = $this->Quote_model->count_quotes_by_date_range_and_search($range, $search, $exact_project_code);
         $total_pages = ceil($total_quotes / $per_page);
         // For each quote, fetch its items
         foreach ($quotations as &$quote) {

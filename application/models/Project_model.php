@@ -23,6 +23,11 @@ class Project_model extends CI_Model {
         return $this->db->insert('project', $data);
     }
 
+    public function get_project_types() {
+        $query = $this->db->get_where('config', ['config_type' => 'project_type', 'is_active' => 1]);
+        return $query->result_array();
+    }
+
 
     public function get_projects($limit = 10, $offset = 0) {
         $this->db->order_by('id', 'DESC');
@@ -92,7 +97,7 @@ class Project_model extends CI_Model {
      * @param int $offset
      * @return array
      */
-    public function get_projects_by_date_range_and_search($range = 'all', $search = '', $limit = 1000, $offset = 0, $alpha = 'az', $status_filter = '') {
+    public function get_projects_by_date_range_and_search($range = 'all', $search = '', $limit = 1000, $offset = 0, $alpha = 'az', $status_filter = '', $project_type_filter = '') {
         if ($range === 'today') {
             $this->db->where('DATE(start_date)', date('Y-m-d'));
         } elseif ($range === 'last7') {
@@ -104,6 +109,9 @@ class Project_model extends CI_Model {
         }
         if (!empty($status_filter)) {
             $this->db->where('status', $status_filter);
+        }
+        if (!empty($project_type_filter)) {
+            $this->db->where('project_type', $project_type_filter);
         }
         if (!empty($search)) {
             $this->db->group_start();
@@ -131,7 +139,7 @@ class Project_model extends CI_Model {
      * @param string $search search string
      * @return int
      */
-    public function count_projects_by_date_range_and_search($range = 'all', $search = '', $status_filter = '') {
+    public function count_projects_by_date_range_and_search($range = 'all', $search = '', $status_filter = '', $project_type_filter = '') {
         if ($range === 'today') {
             $this->db->where('DATE(created_at)', date('Y-m-d'));
         } elseif ($range === 'last7') {
@@ -143,6 +151,9 @@ class Project_model extends CI_Model {
         }
         if (!empty($status_filter)) {
             $this->db->where('status', $status_filter);
+        }
+        if (!empty($project_type_filter)) {
+            $this->db->where('project_type', $project_type_filter);
         }
         if (!empty($search)) {
             $this->db->group_start();

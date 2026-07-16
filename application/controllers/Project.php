@@ -21,6 +21,7 @@ class Project extends CI_Controller {
                     'paysheet_value' => $this->input->post('paysheet_value'),
                     'start_date' => $this->input->post('start_date'),
                     'status' => $this->input->post('status'),
+                    'project_type' => $this->input->post('project_type'),
                     'updated_at' => date('Y-m-d H:i:s'),
                 ];
                 $this->Project_model->update_project($id, $data);
@@ -28,7 +29,9 @@ class Project extends CI_Controller {
                 redirect('project/list');
                 return;
             }
-            $this->load->view('edit_project', ['project' => $project]);
+            $data['project'] = $project;
+            $data['project_types'] = $this->Project_model->get_project_types();
+            $this->load->view('edit_project', $data);
         }
     public function __construct() {
         parent::__construct();
@@ -65,6 +68,7 @@ class Project extends CI_Controller {
                 'paysheet_value' => $this->input->post('paysheet_value'),
                 'start_date' => $this->input->post('start_date'),
                 'status' => $this->input->post('status'),
+                'project_type' => $this->input->post('project_type'),
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
@@ -72,7 +76,8 @@ class Project extends CI_Controller {
             $this->session->set_flashdata('success', 'Project added successfully');
             redirect('project/add');
         }
-        $this->load->view('add_project');
+        $data['project_types'] = $this->Project_model->get_project_types();
+        $this->load->view('add_project', $data);
     }
 	    public function list() {
         $per_page = $this->input->get('per_page') ? (int)$this->input->get('per_page') : 10;
@@ -111,10 +116,20 @@ class Project extends CI_Controller {
             $status_filter = 'Ongoing';
         }
 
-        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $status_filter);
+        // Project Type filter
+        if (isset($_GET['project_type_filter'])) {
+            $project_type_filter = $this->input->get('project_type_filter', true);
+        } else {
+            $project_type_filter = '';
+        }
+
+        $projects = $this->Project_model->get_projects_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $status_filter, $project_type_filter);
         // For pagination, count total projects in range and search
-        $total_projects = $this->Project_model->count_projects_by_date_range_and_search($range, $search, $status_filter);
+        $total_projects = $this->Project_model->count_projects_by_date_range_and_search($range, $search, $status_filter, $project_type_filter);
         $total_pages = ceil($total_projects / $per_page);
+        
+        $project_types = $this->Project_model->get_project_types();
+        
         $this->load->view('list_projects', [
             'projects' => $projects,
             'current_page' => $page,
@@ -123,7 +138,9 @@ class Project extends CI_Controller {
             'search' => $search,
             'alpha' => $alpha,
             'per_page' => $per_page,
-            'status_filter' => $status_filter
+            'status_filter' => $status_filter,
+            'project_type_filter' => $project_type_filter,
+            'project_types' => $project_types
         ]);
     }
 

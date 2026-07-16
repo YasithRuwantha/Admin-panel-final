@@ -89,26 +89,77 @@
             }
         }
 
-        /* Enhance visibility of Manage dropdown (unchanged) */
+        /* Manage dropdown — compact & responsive */
+        .manage-btn {
+            font-size: 1rem;
+            padding: 0.3rem 0.7rem;
+            white-space: nowrap;
+        }
         .dropdown-menu {
-            font-size: 1.1rem;
-            padding: 0.5rem 0;
+            font-size: 1rem;
+            padding: 0.35rem 0;
             box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-            min-width: 180px;
+            min-width: 160px;
         }
         .dropdown-menu .dropdown-item {
-            padding: 0.75rem 1.5rem;
+            padding: 0.4rem 1rem;
             font-weight: 500;
-            transition: box-shadow 0.2s, background 0.2s;
+            transition: box-shadow 0.15s, background 0.15s;
         }
         .dropdown-menu .dropdown-item:hover, .dropdown-menu .dropdown-item:focus {
             background: #f5f5f7;
-            box-shadow: 0 4px 18px 0 rgba(100,100,100,0.25), 0 1.5px 4px 0 rgba(0,0,0,0.10);
+            box-shadow: 0 2px 10px 0 rgba(100,100,100,0.18);
             z-index: 2;
         }
         .dropdown-menu .dropdown-item i {
-            margin-right: 8px;
-            font-size: 1.2em;
+            margin-right: 6px;
+            font-size: 1em;
+        }
+        @media (max-width: 768px) {
+            .manage-btn { width: 100%; }
+        }
+
+        /* Allow dropdown to escape the table-responsive container on desktop */
+        @media (min-width: 769px) {
+            .table-responsive {
+                overflow: visible !important;
+            }
+        }
+
+        /* 2-column grid panel inside dropdown */
+        .manage-dropdown-panel {
+            min-width: 330px;
+            padding: 0.5rem 0.25rem;
+        }
+        .manage-dropdown-panel .panel-top-row {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+        .manage-dropdown-panel .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        .manage-dropdown-panel .panel-col-header {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.3rem 1rem 0.1rem;
+        }
+        .manage-dropdown-panel .panel-col:first-child {
+            border-right: 1px solid #e9ecef;
+        }
+        .manage-dropdown-panel .panel-admin-row {
+            border-top: 1px solid #e9ecef;
+            margin-top: 0.25rem;
+            padding-top: 0.25rem;
+            display: flex;
+            flex-direction: column;
         }
 
         .nowrap { white-space: nowrap; }
@@ -180,6 +231,19 @@
                     </select>
                 </div>
                 <div class="mb-2">
+                    <label class="fw-semibold me-2 mb-0">Project Type:</label>
+                    <select name="project_type_filter" class="form-select form-select-sm" style="width:auto;min-width:120px;max-width:300px;display:inline-block;" onchange="this.form.submit();">
+                        <option value=""<?php echo (!isset($project_type_filter) || $project_type_filter === '') ? ' selected' : ''; ?>>All</option>
+                        <?php if(!empty($project_types)): ?>
+                            <?php foreach($project_types as $ptype): ?>
+                                <option value="<?php echo htmlspecialchars($ptype['config_value']); ?>"<?php echo (isset($project_type_filter) && $project_type_filter === $ptype['config_value']) ? ' selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($ptype['config_value']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <div class="mb-2">
                     <label for="perPageSelect" class="fw-semibold me-2 mb-0">Number of rows:</label>
                     <select name="per_page" id="perPageSelect" class="form-select form-select-sm" style="width:auto;min-width:100px;max-width:200px;display:inline-block;" onchange="this.form.submit();">
                         <option value="10"<?php echo (!isset($per_page) || $per_page == 10) ? ' selected' : ''; ?>>10</option>
@@ -235,12 +299,13 @@
                     <tr>
                         <th>Project Name</th>
                         <th>Project Code</th>
+                        <th>Project Type</th>
                         <th>Client Name</th>
                         <th>Address</th>
                         <th>Project Value</th>
                         <th>Start Date</th>
                         <th>Status</th>
-                        <th style="width:160px;">Actions</th>                   
+                        <th style="width:110px;">Actions</th>                   
                     </tr>
                 </thead>
                 <tbody>
@@ -249,6 +314,7 @@
                             <tr>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['name']); ?></td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['project_code']); ?></td>
+                                <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['project_type'] ?? '-'); ?></td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['client']); ?></td>
                                 <td style="word-break:break-word;max-width:250px;white-space:pre-line;"><?php echo htmlspecialchars($project['address']); ?></td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars(number_format((float)$project['paysheet_value'], 2)); ?></td>
@@ -256,15 +322,36 @@
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['status']); ?></td>
                                 <td>
                                     <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle w-100" type="button" id="manageDropdown<?php echo $project['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <button class="btn btn-primary dropdown-toggle manage-btn" type="button" id="manageDropdown<?php echo $project['id']; ?>" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-flip="true" aria-expanded="false">
                                             <i class="bi bi-gear"></i> Manage
                                         </button>
-                                        <ul class="dropdown-menu" aria-labelledby="manageDropdown<?php echo $project['id']; ?>">
-                                            <li><a class="dropdown-item" href="<?php echo site_url('project/view/' . $project['id']); ?>"><i class="bi bi-eye"></i> View</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="showUploadModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-upload"></i> Upload Documents</a></li>
+                                        <ul class="dropdown-menu manage-dropdown-panel" aria-labelledby="manageDropdown<?php echo $project['id']; ?>">
+                                            <!-- Top row: View + Upload -->
+                                            <div class="panel-top-row">
+                                                <a class="dropdown-item" href="<?php echo site_url('project/view/' . $project['id']); ?>"><i class="bi bi-eye"></i> View Project</a>
+                                                <a class="dropdown-item" href="#" onclick="showUploadModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-upload"></i> Upload Docs</a>
+                                            </div>
+                                            <!-- 2-column grid: Add | List -->
+                                            <div class="panel-grid">
+                                                <div class="panel-col">
+                                                    <div class="panel-col-header">Add</div>
+                                                    <a class="dropdown-item" href="<?php echo site_url('invoice/add_invoice') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']) . '&client=' . urlencode($project['client']) . '&address=' . urlencode($project['address']); ?>"><i class="bi bi-file-earmark-plus"></i> Invoice</a>
+                                                    <a class="dropdown-item" href="<?php echo site_url('quote/add') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']) . '&client=' . urlencode($project['client']) . '&address=' . urlencode($project['address']); ?>"><i class="bi bi-file-earmark-text"></i> Quotation</a>
+                                                    <a class="dropdown-item" href="<?php echo site_url('expense/add') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-cash-coin"></i> Expense</a>
+                                                </div>
+                                                <div class="panel-col">
+                                                    <div class="panel-col-header">View List</div>
+                                                    <a class="dropdown-item" href="<?php echo site_url('invoice/list') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Invoices</a>
+                                                    <a class="dropdown-item" href="<?php echo site_url('quote/list') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Quotations</a>
+                                                    <a class="dropdown-item" href="<?php echo site_url('expense/list_expenses') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Expenses</a>
+                                                </div>
+                                            </div>
+                                            <!-- Admin row: Edit + Delete -->
                                             <?php if (function_exists('is_admin') && is_admin()): ?>
-                                                <li><a class="dropdown-item" href="<?php echo site_url('project/edit/' . $project['id']); ?>"><i class="bi bi-pencil-square"></i> Edit</a></li>
-                                                <li><a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-trash"></i> Delete</a></li>
+                                            <div class="panel-admin-row">
+                                                <a class="dropdown-item" href="<?php echo site_url('project/edit/' . $project['id']); ?>"><i class="bi bi-pencil-square"></i> Edit</a>
+                                                <a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-trash"></i> Delete</a>
+                                            </div>
                                             <?php endif; ?>
                                         </ul>
                                     </div>

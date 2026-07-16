@@ -92,6 +92,9 @@
                             <dt class="col-sm-3 col-12">Project Code</dt>
                             <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($project['project_code']); ?></dd>
                             
+                            <dt class="col-sm-3 col-12">Project Type</dt>
+                            <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($project['project_type'] ?? '-'); ?></dd>
+                            
                             <dt class="col-sm-3 col-12">Client Name</dt>
                             <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($project['client']); ?></dd>
                             

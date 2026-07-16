@@ -116,9 +116,11 @@
                                         <option value="">Select Project</option>
                                         <?php if (!empty($projects)): ?>
                                             <?php foreach ($projects as $project): ?>
-                                                <option value="<?php echo htmlspecialchars($project['name']); ?>" data-code="<?php echo htmlspecialchars($project['project_code']); ?>">
-                                                    <?php echo htmlspecialchars($project['name']); ?>
-                                                </option>
+                                                <?php if (isset($project['status']) && strtolower($project['status']) === 'ongoing'): ?>
+                                                    <option value="<?php echo htmlspecialchars($project['name']); ?>" data-code="<?php echo htmlspecialchars($project['project_code']); ?>">
+                                                        <?php echo htmlspecialchars($project['name']); ?>
+                                                    </option>
+                                                <?php endif; ?>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
@@ -269,6 +271,42 @@ function setProjectCode() {
     var code = selected.getAttribute('data-code') || '';
     document.getElementById('project_code').value = code;
 }
+
+// Pre-fill and lock fields from URL params when coming from project list
+(function() {
+    var params = new URLSearchParams(window.location.search);
+    var projectName = params.get('project_name');
+    var projectCode = params.get('project_code');
+    if (projectName) {
+        var select = document.getElementById('project_name');
+        for (var i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === projectName) {
+                select.selectedIndex = i;
+                break;
+            }
+        }
+        // Fill project code directly for accuracy
+        if (projectCode) document.getElementById('project_code').value = projectCode;
+
+        // Lock the project dropdown — disable visually and add hidden input so it still submits
+        select.disabled = true;
+        select.style.backgroundColor = '#e9ecef';
+        select.style.cursor = 'not-allowed';
+        var hiddenName = document.createElement('input');
+        hiddenName.type = 'hidden';
+        hiddenName.name = 'project_name';
+        hiddenName.value = projectName;
+        select.parentNode.appendChild(hiddenName);
+
+        // Lock the project code input
+        var codeInput = document.getElementById('project_code');
+        if (codeInput) {
+            codeInput.readOnly = true;
+            codeInput.style.backgroundColor = '#e9ecef';
+            codeInput.style.cursor = 'not-allowed';
+        }
+    }
+})();
 
 // Thousand separator for Amount field
 function formatWithCommas(val) {
