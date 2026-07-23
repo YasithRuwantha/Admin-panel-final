@@ -114,6 +114,21 @@
             margin-bottom: 0;
             margin-top: 0.35rem;
         }
+
+        /* Sticky table header */
+        .table-sticky-head {
+            max-height: calc(100vh - 280px);
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .table-sticky-head thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #fff;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.08);
+        }
     </style>
 </head>
 <body>
@@ -181,7 +196,7 @@
             <input type="text" id="liveSearchInput" class="form-control" placeholder="Live search projects by name, code, or status...">
         </div>
 
-        <div class="table-responsive bg-white rounded shadow-sm p-4" style="min-height:500px;">
+        <div class="table-responsive table-sticky-head bg-white rounded shadow-sm p-4" style="min-height:500px;">
             <table class="table table-bordered table-striped align-middle mb-0">
                 <thead>
                     <tr>
