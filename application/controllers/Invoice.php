@@ -95,6 +95,7 @@ class Invoice extends CI_Controller {
 
         $invoices = $this->Invoice_model->get_invoices_by_date_range_and_search($range, $search, $per_page, $offset, $alpha, $status_filter, $exact_project_code);
         $total_invoices = $this->Invoice_model->count_invoices_by_date_range_and_search($range, $search, $status_filter, $exact_project_code);
+        $summary_stats = $this->Invoice_model->get_invoice_summary_stats($range, $search, $exact_project_code);
         $total_pages = ceil($total_invoices / $per_page);
         $this->load->model('Payment_model');
         $payment_methods = $this->Invoice_model->get_payment_methods();
@@ -105,6 +106,7 @@ class Invoice extends CI_Controller {
         }
         $this->load->view('list_invoice', [
             'invoices' => $invoices,
+            'summary_stats' => $summary_stats,
             'payment_methods' => $payment_methods,
             'current_page' => $page,
             'total_pages' => $total_pages,

@@ -37,6 +37,7 @@ class Invoice_model extends CI_Model {
         $this->db->where('id', $invoice_id)->update('invoice', ['amount' => $total]);
         return $invoice_id;
     }
+
     public function get_invoice_items($invoice_id) {
         return $this->db->get_where('invoice_items', ['invoice_id' => $invoice_id])->result_array();
     }
@@ -234,12 +235,77 @@ class Invoice_model extends CI_Model {
         return count($results);
     }
 
+    // Get service descriptions from config table
+    public function get_service_descriptions() {
+        $query = $this->db->get_where('config', ['config_type' => 'service description', 'is_active' => 1]);
+        return $query->result_array();
+    }
 
-	// Get service descriptions from config table
-        public function get_service_descriptions() {
-            $query = $this->db->get_where('config', ['config_type' => 'service description', 'is_active' => 1]);
-            return $query->result_array();
+    /**
+     * Get summary statistics (paid, partially paid, unpaid totals) for invoices
+     */
+    public function get_invoice_summary_stats($range = 'all', $search = '', $exact_project_code = '') {
+        $this->db->select('i.id, i.amount AS invoice_total, COALESCE(SUM(p.payment_amount), 0) AS total_paid');
+        $this->db->from('invoice i');
+        $this->db->join('payments p', 'i.id = p.invoice_id', 'left');
+
+        if ($range === 'today') {
+            $this->db->where('DATE(i.invoice_date)', date('Y-m-d'));
+        } elseif ($range === 'last7') {
+            $this->db->where('i.invoice_date >=', date('Y-m-d', strtotime('-6 days')));
+            $this->db->where('i.invoice_date <=', date('Y-m-d'));
+        } elseif ($range === 'month') {
+            $this->db->where('MONTH(i.invoice_date)', date('m'));
+            $this->db->where('YEAR(i.invoice_date)', date('Y'));
         }
 
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('i.name', $search);
+            $this->db->or_like('i.invoice_no', $search);
+            $this->db->or_like('i.address', $search);
+            $this->db->or_like('i.project_code', $search);
+            $this->db->group_end();
+        }
 
+        if (!empty($exact_project_code)) {
+            $this->db->where('i.project_code', $exact_project_code);
+        }
+
+        $this->db->group_by(['i.id', 'i.amount']);
+        $query = $this->db->get();
+        $results = $query->result_array();
+
+        $summary = [
+            'total_count'              => count($results),
+            'total_amount'             => 0.0,
+            'paid_count'               => 0,
+            'paid_total'               => 0.0,
+            'partially_paid_count'     => 0,
+            'partially_paid_received'  => 0.0,
+            'partially_paid_remaining' => 0.0,
+            'unpaid_count'             => 0,
+            'unpaid_total'             => 0.0,
+        ];
+
+        foreach ($results as $row) {
+            $inv_total = (float)$row['invoice_total'];
+            $paid      = (float)$row['total_paid'];
+            $summary['total_amount'] += $inv_total;
+
+            if ($paid == 0) {
+                $summary['unpaid_count']++;
+                $summary['unpaid_total'] += $inv_total;
+            } elseif ($paid < $inv_total) {
+                $summary['partially_paid_count']++;
+                $summary['partially_paid_received'] += $paid;
+                $summary['partially_paid_remaining'] += ($inv_total - $paid);
+            } else {
+                $summary['paid_count']++;
+                $summary['paid_total'] += $paid;
+            }
+        }
+
+        return $summary;
+    }
 }
