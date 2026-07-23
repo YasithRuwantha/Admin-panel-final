@@ -111,6 +111,47 @@
                             <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($project['status']); ?></dd>
                         </dl>
 
+                        <!-- Financial Summary -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="bi bi-bar-chart-line"></i> Financial Summary</h5>
+                        <?php
+                            $total_budget    = (float)($project['paysheet_value'] ?? 0);
+                            $total_invoices  = (float)($total_invoices ?? 0);
+                            $total_income    = (float)($total_income   ?? 0);
+                            $total_expenses  = (float)($total_expenses ?? 0);
+                            $cash_in_hand    = (float)($cash_in_hand   ?? 0);
+                            $cash_in_project = (float)($cash_in_project?? 0);
+                            $profit_loss     = (float)($profit_loss    ?? ($total_invoices - $total_expenses));
+                        ?>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Total Budget</th>
+                                        <th>Total Invoices</th>
+                                        <th>Total Income</th>
+                                        <th>Total Expenses</th>
+                                        <th>Cash in Hand</th>
+                                        <th>Cash In Project</th>
+                                        <th>Profit / Loss</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><?php echo number_format($total_budget, 2); ?></td>
+                                        <td><?php echo number_format($total_invoices, 2); ?></td>
+                                        <td><?php echo number_format($total_income, 2); ?></td>
+                                        <td><?php echo number_format($total_expenses, 2); ?></td>
+                                        <td><?php echo number_format($cash_in_hand, 2); ?></td>
+                                        <td><?php echo number_format($cash_in_project, 2); ?></td>
+                                        <td class="<?php echo $profit_loss >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold'; ?>">
+                                            <?php echo number_format($profit_loss, 2); ?>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         <!-- Documents Section -->
                         <hr class="my-4">
                         <h5 class="mb-3"><i class="bi bi-paperclip"></i> Project Documents</h5>

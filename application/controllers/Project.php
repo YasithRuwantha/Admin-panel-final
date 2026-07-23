@@ -150,9 +150,70 @@ class Project extends CI_Controller {
             show_404();
             return;
         }
+
         // Fetch documents for this project
         $documents = $this->db->get_where('project_documents', ['project_id' => $id])->result_array();
-        $this->load->view('view_project', ['project' => $project, 'documents' => $documents]);
+
+        // --- Financial Summary (same logic as Home.php) ---
+        $project_code  = $project['project_code'] ?? '';
+        $project_name  = $project['name'] ?? '';
+        $project_value = (float)($project['paysheet_value'] ?? 0);
+
+        // Total Invoices: sum of invoice.amount for this project
+        $total_invoices = 0.0;
+        if ($project_code !== '') {
+            $q = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                ->from('invoice')->where('project_code', $project_code)->get();
+            $total_invoices = (float)($q->row_array()['total'] ?? 0);
+        } elseif ($project_name !== '') {
+            $q = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                ->from('invoice')->where('project_name', $project_name)->get();
+            $total_invoices = (float)($q->row_array()['total'] ?? 0);
+        }
+
+        // Total Income: sum of payments received for this project's invoices
+        $total_income = 0.0;
+        if ($project_code !== '') {
+            $q = $this->db->select('COALESCE(SUM(payments.payment_amount),0) AS total', false)
+                ->from('payments')
+                ->join('invoice', 'invoice.id = payments.invoice_id', 'inner')
+                ->where('invoice.project_code', $project_code)->get();
+            $total_income = (float)($q->row_array()['total'] ?? 0);
+        } elseif ($project_name !== '') {
+            $q = $this->db->select('COALESCE(SUM(payments.payment_amount),0) AS total', false)
+                ->from('payments')
+                ->join('invoice', 'invoice.id = payments.invoice_id', 'inner')
+                ->where('invoice.project_name', $project_name)->get();
+            $total_income = (float)($q->row_array()['total'] ?? 0);
+        }
+
+        // Total Expenses: sum of expense.amount for this project
+        $total_expenses = 0.0;
+        if ($project_code !== '') {
+            $q = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                ->from('expense')->where('project_code', $project_code)->get();
+            $total_expenses = (float)($q->row_array()['total'] ?? 0);
+        } elseif ($project_name !== '') {
+            $q = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                ->from('expense')->where('project_name', $project_name)->get();
+            $total_expenses = (float)($q->row_array()['total'] ?? 0);
+        }
+
+        // Computed fields
+        $cash_in_hand    = $total_income - $total_expenses;
+        $cash_in_project = $project_value - $total_expenses;
+        $profit_loss     = $total_invoices - $total_expenses;
+
+        $this->load->view('view_project', [
+            'project'         => $project,
+            'documents'       => $documents,
+            'total_invoices'  => $total_invoices,
+            'total_income'    => $total_income,
+            'total_expenses'  => $total_expenses,
+            'cash_in_hand'    => $cash_in_hand,
+            'cash_in_project' => $cash_in_project,
+            'profit_loss'     => $profit_loss,
+        ]);
     }
 
 	public function delete($id) {
