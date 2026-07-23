@@ -136,6 +136,15 @@
             background: #f5f5f7;
             box-shadow: 0 4px 18px 0 rgba(100,100,100,0.25), 0 1.5px 4px 0 rgba(0,0,0,0.10);
         }
+
+        /* Widget Summary Cards */
+        .widget-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .widget-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08) !important;
+        }
     </style>
 </head>
 <body>
@@ -163,6 +172,73 @@
             }
         }
         </style>
+
+        <!-- Invoice Summary Widget Cards -->
+        <div class="row g-3 mb-4 mt-1">
+            <!-- Paid Invoices Card -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-3 h-100 widget-card">
+                    <div class="card-body p-3">
+                        <div class="mb-2">
+                            <span class="text-muted fw-semibold small text-uppercase">Paid Invoices</span>
+                        </div>
+                        <h4 class="mb-1 fw-bold text-dark"><?php echo number_format($summary_stats['paid_total'] ?? 0, 2); ?></h4>
+                        <div class="d-flex align-items-center justify-content-between text-muted small mt-2 pt-2 border-top">
+                            <span><?php echo number_format($summary_stats['paid_count'] ?? 0); ?> Invoices</span>
+                            <span class="badge bg-success bg-opacity-10 text-success fw-semibold">Paid</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partially Paid Invoices Card -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-3 h-100 widget-card">
+                    <div class="card-body p-3">
+                        <div class="mb-2">
+                            <span class="text-muted fw-semibold small text-uppercase">Partially Paid</span>
+                        </div>
+                        <h4 class="mb-1 fw-bold text-dark"><?php echo number_format($summary_stats['partially_paid_received'] ?? 0, 2); ?></h4>
+                        <div class="d-flex align-items-center justify-content-between text-muted small mt-2 pt-2 border-top">
+                            
+                            <span>Due: <b class="text-danger"><?php echo number_format($summary_stats['partially_paid_remaining'] ?? 0, 2); ?></b></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unpaid Invoices Card -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-3 h-100 widget-card">
+                    <div class="card-body p-3">
+                        <div class="mb-2">
+                            <span class="text-muted fw-semibold small text-uppercase">Unpaid / Pending</span>
+                        </div>
+                        <h4 class="mb-1 fw-bold text-dark"><?php echo number_format($summary_stats['unpaid_total'] ?? 0, 2); ?></h4>
+                        <div class="d-flex align-items-center justify-content-between text-muted small mt-2 pt-2 border-top">
+                            <span><?php echo number_format($summary_stats['unpaid_count'] ?? 0); ?> Invoices</span>
+                            <span class="badge bg-warning bg-opacity-10 text-dark fw-semibold">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Invoices Card -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-3 h-100 widget-card">
+                    <div class="card-body p-3">
+                        <div class="mb-2">
+                            <span class="text-muted fw-semibold small text-uppercase">Total Invoices</span>
+                        </div>
+                        <h4 class="mb-1 fw-bold text-dark"><?php echo number_format($summary_stats['total_amount'] ?? 0, 2); ?></h4>
+                        <div class="d-flex align-items-center justify-content-between text-muted small mt-2 pt-2 border-top">
+                            <span><?php echo number_format($summary_stats['total_count'] ?? 0); ?> Invoices</span>
+                            <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold">Total</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Date Range Filter Buttons - same style as Home -->
         <form id="dateRangeForm" method="get" class="mb-4 d-flex flex-column flex-sm-row flex-wrap align-items-start gap-3">
@@ -254,10 +330,29 @@
                 width: 100%;
                 margin-top: 0.5rem;
             }
+            #dateRangeForm .btn {
+                width: auto;
+                min-width: 100px;
+            }
+        }
+
+        /* Sticky table header */
+        .table-sticky-head {
+            max-height: calc(100vh - 280px);
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .table-sticky-head thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #fff;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.08);
         }
         </style>
 
-        <div class="table-responsive bg-white rounded shadow-sm p-4" style="min-height:500px;">
+        <div class="table-responsive table-sticky-head bg-white rounded shadow-sm p-4" style="min-height:500px;">
             <table class="table table-bordered table-striped align-middle">
                 <thead>
                     <tr>

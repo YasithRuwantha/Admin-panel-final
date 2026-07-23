@@ -7,30 +7,34 @@ class Project extends CI_Controller {
         public function edit($id) {
             // Only admin can edit projects
             if (function_exists('require_admin')) { require_admin(); }
+            $this->load->model('Quote_model');
             $project = $this->Project_model->get_project_by_id($id);
             if (!$project) {
                 show_404();
                 return;
             }
             if ($this->input->post()) {
+                $quotation_id_raw = $this->input->post('quotation_id');
                 $data = [
-                    'name' => $this->input->post('name'),
-                    'project_code' => $this->input->post('project_code'),
-                    'client' => $this->input->post('client'),
-                    'address' => $this->input->post('address'),
-                    'paysheet_value' => $this->input->post('paysheet_value'),
-                    'start_date' => $this->input->post('start_date'),
-                    'status' => $this->input->post('status'),
-                    'project_type' => is_array($this->input->post('project_type')) ? implode(',', $this->input->post('project_type')) : $this->input->post('project_type'),
-                    'updated_at' => date('Y-m-d H:i:s'),
+                    'name'          => $this->input->post('name'),
+                    'project_code'  => $this->input->post('project_code'),
+                    'client'        => $this->input->post('client'),
+                    'address'       => $this->input->post('address'),
+                    'paysheet_value'=> $this->input->post('paysheet_value'),
+                    'start_date'    => $this->input->post('start_date'),
+                    'status'        => $this->input->post('status'),
+                    'project_type'  => is_array($this->input->post('project_type')) ? implode(',', $this->input->post('project_type')) : $this->input->post('project_type'),
+                    'quotation_id'  => (!empty($quotation_id_raw) ? (int)$quotation_id_raw : null),
+                    'updated_at'    => date('Y-m-d H:i:s'),
                 ];
                 $this->Project_model->update_project($id, $data);
                 $this->session->set_flashdata('success', 'Project updated successfully');
                 redirect('project/list');
                 return;
             }
-            $data['project'] = $project;
+            $data['project']       = $project;
             $data['project_types'] = $this->Project_model->get_project_types();
+            $data['quotes']        = $this->Quote_model->get_quotes(1000, 0);
             $this->load->view('edit_project', $data);
         }
     public function __construct() {
@@ -46,6 +50,7 @@ class Project extends CI_Controller {
     }
 
     public function add() {
+        $this->load->model('Quote_model');
         if ($this->input->post()) {
             $project_code = $this->input->post('project_code');
             $project_name = trim($this->input->post('name'));
@@ -60,23 +65,26 @@ class Project extends CI_Controller {
                 redirect('project/add');
                 return;
             }
+            $quotation_id_raw = $this->input->post('quotation_id');
             $data = [
-                'name' => $project_name,
-                'project_code' => $project_code,
-                'client' => $this->input->post('client'),
-                'address' => $this->input->post('address'),
-                'paysheet_value' => $this->input->post('paysheet_value'),
-                'start_date' => $this->input->post('start_date'),
-                'status' => $this->input->post('status'),
-                'project_type' => is_array($this->input->post('project_type')) ? implode(',', $this->input->post('project_type')) : $this->input->post('project_type'),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
+                'name'          => $project_name,
+                'project_code'  => $project_code,
+                'client'        => $this->input->post('client'),
+                'address'       => $this->input->post('address'),
+                'paysheet_value'=> $this->input->post('paysheet_value'),
+                'start_date'    => $this->input->post('start_date'),
+                'status'        => $this->input->post('status'),
+                'project_type'  => is_array($this->input->post('project_type')) ? implode(',', $this->input->post('project_type')) : $this->input->post('project_type'),
+                'quotation_id'  => (!empty($quotation_id_raw) ? (int)$quotation_id_raw : null),
+                'created_at'    => date('Y-m-d H:i:s'),
+                'updated_at'    => date('Y-m-d H:i:s'),
             ];
             $this->Project_model->add_project($data);
             $this->session->set_flashdata('success', 'Project added successfully');
             redirect('project/add');
         }
         $data['project_types'] = $this->Project_model->get_project_types();
+        $data['quotes']        = $this->Quote_model->get_quotes(1000, 0);
         $this->load->view('add_project', $data);
     }
 	    public function list() {
@@ -145,14 +153,88 @@ class Project extends CI_Controller {
     }
 
     public function view($id) {
+        $this->load->model('Quote_model');
         $project = $this->Project_model->get_project_by_id($id);
         if (!$project) {
             show_404();
             return;
         }
+
         // Fetch documents for this project
         $documents = $this->db->get_where('project_documents', ['project_id' => $id])->result_array();
-        $this->load->view('view_project', ['project' => $project, 'documents' => $documents]);
+
+        // Fetch linked quotation if any
+        $linked_quotation       = null;
+        $linked_quotation_items = [];
+        if (!empty($project['quotation_id'])) {
+            $linked_quotation = $this->Quote_model->get_quote_by_id($project['quotation_id']);
+            if ($linked_quotation) {
+                $linked_quotation_items = $this->Quote_model->get_quote_items($project['quotation_id']);
+            }
+        }
+
+        // --- Financial Summary (same logic as Home.php) ---
+        $project_code  = $project['project_code'] ?? '';
+        $project_name  = $project['name'] ?? '';
+        $project_value = (float)($project['paysheet_value'] ?? 0);
+
+        // Total Invoices: sum of invoice.amount for this project
+        $total_invoices = 0.0;
+        if ($project_code !== '') {
+            $q = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                ->from('invoice')->where('project_code', $project_code)->get();
+            $total_invoices = (float)($q->row_array()['total'] ?? 0);
+        } elseif ($project_name !== '') {
+            $q = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                ->from('invoice')->where('project_name', $project_name)->get();
+            $total_invoices = (float)($q->row_array()['total'] ?? 0);
+        }
+
+        // Total Income: sum of payments received for this project's invoices
+        $total_income = 0.0;
+        if ($project_code !== '') {
+            $q = $this->db->select('COALESCE(SUM(payments.payment_amount),0) AS total', false)
+                ->from('payments')
+                ->join('invoice', 'invoice.id = payments.invoice_id', 'inner')
+                ->where('invoice.project_code', $project_code)->get();
+            $total_income = (float)($q->row_array()['total'] ?? 0);
+        } elseif ($project_name !== '') {
+            $q = $this->db->select('COALESCE(SUM(payments.payment_amount),0) AS total', false)
+                ->from('payments')
+                ->join('invoice', 'invoice.id = payments.invoice_id', 'inner')
+                ->where('invoice.project_name', $project_name)->get();
+            $total_income = (float)($q->row_array()['total'] ?? 0);
+        }
+
+        // Total Expenses: sum of expense.amount for this project
+        $total_expenses = 0.0;
+        if ($project_code !== '') {
+            $q = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                ->from('expense')->where('project_code', $project_code)->get();
+            $total_expenses = (float)($q->row_array()['total'] ?? 0);
+        } elseif ($project_name !== '') {
+            $q = $this->db->select('COALESCE(SUM(amount),0) AS total', false)
+                ->from('expense')->where('project_name', $project_name)->get();
+            $total_expenses = (float)($q->row_array()['total'] ?? 0);
+        }
+
+        // Computed fields
+        $cash_in_hand    = $total_income - $total_expenses;
+        $cash_in_project = $project_value - $total_expenses;
+        $profit_loss     = $total_invoices - $total_expenses;
+
+        $this->load->view('view_project', [
+            'project'                => $project,
+            'documents'              => $documents,
+            'linked_quotation'       => $linked_quotation,
+            'linked_quotation_items' => $linked_quotation_items,
+            'total_invoices'         => $total_invoices,
+            'total_income'           => $total_income,
+            'total_expenses'         => $total_expenses,
+            'cash_in_hand'           => $cash_in_hand,
+            'cash_in_project'        => $cash_in_project,
+            'profit_loss'            => $profit_loss,
+        ]);
     }
 
 	public function delete($id) {

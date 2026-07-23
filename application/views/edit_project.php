@@ -99,6 +99,25 @@
                                 <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($project['start_date']); ?>">
                             </div>
                             <div class="mb-3">
+                                <label for="quotation_id" class="form-label">
+                                    Linked Quotation <span class="text-muted small">(Optional)</span>
+                                </label>
+                                <select class="form-select" id="quotation_id" name="quotation_id">
+                                    <option value="">-- None --</option>
+                                    <?php if (!empty($quotes)): ?>
+                                        <?php foreach ($quotes as $q): ?>
+                                            <option value="<?php echo $q['id']; ?>"
+                                                <?php if (!empty($project['quotation_id']) && $project['quotation_id'] == $q['id']) echo 'selected'; ?>>
+                                                #<?php echo htmlspecialchars($q['quotation_no'] ?? $q['id']); ?>
+                                                — <?php echo htmlspecialchars($q['name'] ?? ''); ?>
+                                                (<?php echo number_format((float)$q['amount'], 2); ?>)
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <div class="form-text">Select a quotation that this project is based on.</div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-select" id="status" name="status">
                                     <option value="Planned" <?php if($project['status']=='Planned') echo 'selected'; ?>>Planned</option>
@@ -150,6 +169,10 @@
 $(document).ready(function() {
     $('#project_type').select2({
         placeholder: "Select Project Type(s)",
+        allowClear: true
+    });
+    $('#quotation_id').select2({
+        placeholder: "-- None (Optional) --",
         allowClear: true
     });
 });

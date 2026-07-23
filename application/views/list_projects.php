@@ -119,11 +119,19 @@
             .manage-btn { width: 100%; }
         }
 
-        /* Allow dropdown to escape the table-responsive container on desktop */
-        @media (min-width: 769px) {
-            .table-responsive {
-                overflow: visible !important;
-            }
+        /* Sticky table header */
+        .table-sticky-head {
+            max-height: calc(100vh - 280px);
+            overflow-y: auto !important;
+            overflow-x: auto !important;
+        }
+
+        .table-sticky-head thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #fff;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.08);
         }
 
         /* 2-column grid panel inside dropdown */
@@ -293,7 +301,7 @@
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
 
-        <div class="table-responsive bg-white rounded shadow-sm p-4" style="min-height:500px;">
+        <div class="table-responsive table-sticky-head bg-white rounded shadow-sm p-4" style="min-height:500px;">
             <table class="table table-bordered table-striped align-middle mb-0">
                 <thead>
                     <tr>

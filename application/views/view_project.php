@@ -111,6 +111,88 @@
                             <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($project['status']); ?></dd>
                         </dl>
 
+                        <!-- Linked Quotation Section -->
+                        <?php if (!empty($linked_quotation)): ?>
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="bi bi-file-earmark-text"></i> Linked Quotation</h5>
+                        <dl class="row mb-2">
+                            <dt class="col-sm-3 col-12">Quotation No</dt>
+                            <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($linked_quotation['quotation_no'] ?? '-'); ?></dd>
+
+                            <dt class="col-sm-3 col-12">Client Name</dt>
+                            <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($linked_quotation['name'] ?? '-'); ?></dd>
+
+                            <dt class="col-sm-3 col-12">Quotation Date</dt>
+                            <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($linked_quotation['quote_date'] ?? '-'); ?></dd>
+
+                            <dt class="col-sm-3 col-12">Total Amount</dt>
+                            <dd class="col-sm-9 col-12"><strong><?php echo number_format((float)($linked_quotation['amount'] ?? 0), 2); ?></strong></dd>
+                        </dl>
+                        <?php if (!empty($linked_quotation_items)): ?>
+                        <div class="table-responsive mt-2">
+                            <table class="table table-sm table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($linked_quotation_items as $i => $item): ?>
+                                    <tr>
+                                        <td><?php echo $i + 1; ?></td>
+                                        <td><?php echo htmlspecialchars($item['description']); ?></td>
+                                        <td class="text-end"><?php echo number_format((float)$item['amount'], 2); ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <?php endif; ?>
+                        <?php endif; ?>
+
+                        <!-- Financial Summary -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="bi bi-bar-chart-line"></i> Financial Summary</h5>
+                        <?php
+                            $total_budget    = (float)($project['paysheet_value'] ?? 0);
+                            $total_invoices  = (float)($total_invoices ?? 0);
+                            $total_income    = (float)($total_income   ?? 0);
+                            $total_expenses  = (float)($total_expenses ?? 0);
+                            $cash_in_hand    = (float)($cash_in_hand   ?? 0);
+                            $cash_in_project = (float)($cash_in_project?? 0);
+                            $profit_loss     = (float)($profit_loss    ?? ($total_invoices - $total_expenses));
+                        ?>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Total Budget</th>
+                                        <th>Total Invoices</th>
+                                        <th>Total Income</th>
+                                        <th>Total Expenses</th>
+                                        <th>Cash in Hand</th>
+                                        <th>Cash In Project</th>
+                                        <th>Profit / Loss</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><?php echo number_format($total_budget, 2); ?></td>
+                                        <td><?php echo number_format($total_invoices, 2); ?></td>
+                                        <td><?php echo number_format($total_income, 2); ?></td>
+                                        <td><?php echo number_format($total_expenses, 2); ?></td>
+                                        <td><?php echo number_format($cash_in_hand, 2); ?></td>
+                                        <td><?php echo number_format($cash_in_project, 2); ?></td>
+                                        <td class="<?php echo $profit_loss >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold'; ?>">
+                                            <?php echo number_format($profit_loss, 2); ?>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         <!-- Documents Section -->
                         <hr class="my-4">
                         <h5 class="mb-3"><i class="bi bi-paperclip"></i> Project Documents</h5>
