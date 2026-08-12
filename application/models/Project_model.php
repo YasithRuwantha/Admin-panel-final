@@ -28,6 +28,25 @@ class Project_model extends CI_Model {
         return $query->result_array();
     }
 
+    public function get_referred_by_options() {
+        $query = $this->db->get_where('config', ['config_type' => 'referred_by', 'is_active' => 1]);
+        return $query->result_array();
+    }
+
+    // Insert a new 'referred_by' option into the config table
+    public function insert_referred_by_config($name) {
+        $data = [
+            'config_type'  => 'referred_by',
+            'config_key'   => $name,
+            'config_value' => $name,
+            'sort_order'   => 0,
+            'is_active'    => 1,
+            'created_at'   => date('Y-m-d H:i:s'),
+            'updated_at'   => date('Y-m-d H:i:s'),
+        ];
+        return $this->db->insert('config', $data);
+    }
+
 
     public function get_projects($limit = 10, $offset = 0) {
         $this->db->order_by('id', 'DESC');

@@ -89,32 +89,77 @@
             }
         }
 
-        /* Manage dropdown — compact & responsive */
+        /* Manage popup — edge-guarded, no scroll */
         .manage-btn {
             font-size: 1rem;
             padding: 0.3rem 0.7rem;
             white-space: nowrap;
         }
-        .dropdown-menu {
-            font-size: 1rem;
-            padding: 0.35rem 0;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-            min-width: 160px;
+
+        /* The floating popup panel */
+        .manage-popup {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+            min-width: 330px;
+            padding: 0.5rem 0.25rem;
         }
-        .dropdown-menu .dropdown-item {
+        .manage-popup.open {
+            display: block;
+        }
+        .manage-popup .panel-top-row {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+        .manage-popup .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        .manage-popup .panel-col:first-child {
+            border-right: 1px solid #e9ecef;
+        }
+        .manage-popup .panel-col-header {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.3rem 1rem 0.1rem;
+        }
+        .manage-popup .panel-admin-row {
+            border-top: 1px solid #e9ecef;
+            margin-top: 0.25rem;
+            padding-top: 0.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .manage-popup .popup-item {
+            display: block;
             padding: 0.4rem 1rem;
+            font-size: 1rem;
             font-weight: 500;
-            transition: box-shadow 0.15s, background 0.15s;
+            color: #212529;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background 0.13s;
         }
-        .dropdown-menu .dropdown-item:hover, .dropdown-menu .dropdown-item:focus {
+        .manage-popup .popup-item:hover {
             background: #f5f5f7;
-            box-shadow: 0 2px 10px 0 rgba(100,100,100,0.18);
-            z-index: 2;
         }
-        .dropdown-menu .dropdown-item i {
+        .manage-popup .popup-item i {
             margin-right: 6px;
-            font-size: 1em;
         }
+        .manage-popup .popup-item.text-danger { color: #dc3545 !important; }
+
+        .nowrap { white-space: nowrap; }
         @media (max-width: 768px) {
             .manage-btn { width: 100%; }
         }
@@ -134,43 +179,6 @@
             box-shadow: 0 2px 3px rgba(0,0,0,0.08);
         }
 
-        /* 2-column grid panel inside dropdown */
-        .manage-dropdown-panel {
-            min-width: 330px;
-            padding: 0.5rem 0.25rem;
-        }
-        .manage-dropdown-panel .panel-top-row {
-            display: flex;
-            flex-direction: column;
-            border-bottom: 1px solid #e9ecef;
-            margin-bottom: 0.25rem;
-            padding-bottom: 0.25rem;
-        }
-        .manage-dropdown-panel .panel-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-        }
-        .manage-dropdown-panel .panel-col-header {
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.3rem 1rem 0.1rem;
-        }
-        .manage-dropdown-panel .panel-col:first-child {
-            border-right: 1px solid #e9ecef;
-        }
-        .manage-dropdown-panel .panel-admin-row {
-            border-top: 1px solid #e9ecef;
-            margin-top: 0.25rem;
-            padding-top: 0.25rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .nowrap { white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -329,40 +337,44 @@
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['start_date']); ?></td>
                                 <td style="word-break:break-word;max-width:180px;white-space:pre-line;"><?php echo htmlspecialchars($project['status']); ?></td>
                                 <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle manage-btn" type="button" id="manageDropdown<?php echo $project['id']; ?>" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-flip="true" aria-expanded="false">
-                                            <i class="bi bi-gear"></i> Manage
-                                        </button>
-                                        <ul class="dropdown-menu manage-dropdown-panel" aria-labelledby="manageDropdown<?php echo $project['id']; ?>">
-                                            <!-- Top row: View + Upload -->
-                                            <div class="panel-top-row">
-                                                <a class="dropdown-item" href="<?php echo site_url('project/view/' . $project['id']); ?>"><i class="bi bi-eye"></i> View Project</a>
-                                                <a class="dropdown-item" href="#" onclick="showUploadModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-upload"></i> Upload Docs</a>
-                                            </div>
-                                            <!-- 2-column grid: Add | List -->
-                                            <div class="panel-grid">
-                                                <div class="panel-col">
-                                                    <div class="panel-col-header">Add</div>
-                                                    <a class="dropdown-item" href="<?php echo site_url('invoice/add_invoice') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']) . '&client=' . urlencode($project['client']) . '&address=' . urlencode($project['address']); ?>"><i class="bi bi-file-earmark-plus"></i> Invoice</a>
-                                                    <a class="dropdown-item" href="<?php echo site_url('quote/add') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']) . '&client=' . urlencode($project['client']) . '&address=' . urlencode($project['address']); ?>"><i class="bi bi-file-earmark-text"></i> Quotation</a>
-                                                    <a class="dropdown-item" href="<?php echo site_url('expense/add') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-cash-coin"></i> Expense</a>
-                                                </div>
-                                                <div class="panel-col">
-                                                    <div class="panel-col-header">View List</div>
-                                                    <a class="dropdown-item" href="<?php echo site_url('invoice/list') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Invoices</a>
-                                                    <a class="dropdown-item" href="<?php echo site_url('quote/list') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Quotations</a>
-                                                    <a class="dropdown-item" href="<?php echo site_url('expense/list_expenses') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Expenses</a>
-                                                </div>
-                                            </div>
-                                            <!-- Admin row: Edit + Delete -->
-                                            <?php if (function_exists('is_admin') && is_admin()): ?>
-                                            <div class="panel-admin-row">
-                                                <a class="dropdown-item" href="<?php echo site_url('project/edit/' . $project['id']); ?>"><i class="bi bi-pencil-square"></i> Edit</a>
-                                                <a class="dropdown-item text-danger" href="#" onclick="showDeleteModal(<?php echo $project['id']; ?>); return false;"><i class="bi bi-trash"></i> Delete</a>
-                                            </div>
-                                            <?php endif; ?>
-                                        </ul>
-                                    </div>
+                                     <!-- Manage button — custom edge-guarded popup -->
+                                     <button
+                                         class="btn btn-primary manage-btn"
+                                         type="button"
+                                         onclick="toggleManagePopup(event, 'mgp-<?php echo $project['id']; ?>')"
+                                     >
+                                         <i class="bi bi-gear"></i> Manage
+                                     </button>
+
+                                     <div class="manage-popup" id="mgp-<?php echo $project['id']; ?>">
+                                         <!-- Top row: View + Upload -->
+                                         <div class="panel-top-row">
+                                             <a class="popup-item" href="<?php echo site_url('project/view/' . $project['id']); ?>"><i class="bi bi-eye"></i> View Project</a>
+                                             <a class="popup-item" href="#" onclick="showUploadModal(<?php echo $project['id']; ?>); closeAllPopups(); return false;"><i class="bi bi-upload"></i> Upload Docs</a>
+                                         </div>
+                                         <!-- 2-column grid: Add | List -->
+                                         <div class="panel-grid">
+                                             <div class="panel-col">
+                                                 <div class="panel-col-header">Add</div>
+                                                 <a class="popup-item" href="<?php echo site_url('invoice/add_invoice') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']) . '&client=' . urlencode($project['client']) . '&address=' . urlencode($project['address']); ?>"><i class="bi bi-file-earmark-plus"></i> Invoice</a>
+                                                 <a class="popup-item" href="<?php echo site_url('quote/add') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']) . '&client=' . urlencode($project['client']) . '&address=' . urlencode($project['address']); ?>"><i class="bi bi-file-earmark-text"></i> Quotation</a>
+                                                 <a class="popup-item" href="<?php echo site_url('expense/add') . '?project_name=' . urlencode($project['name']) . '&project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-cash-coin"></i> Expense</a>
+                                             </div>
+                                             <div class="panel-col">
+                                                 <div class="panel-col-header">View List</div>
+                                                 <a class="popup-item" href="<?php echo site_url('invoice/list') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Invoices</a>
+                                                 <a class="popup-item" href="<?php echo site_url('quote/list') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Quotations</a>
+                                                 <a class="popup-item" href="<?php echo site_url('expense/list_expenses') . '?exact_project_code=' . urlencode($project['project_code']); ?>"><i class="bi bi-list-ul"></i> Expenses</a>
+                                             </div>
+                                         </div>
+                                         <!-- Admin row: Edit + Delete -->
+                                         <?php if (function_exists('is_admin') && is_admin()): ?>
+                                         <div class="panel-admin-row">
+                                             <a class="popup-item" href="<?php echo site_url('project/edit/' . $project['id']); ?>"><i class="bi bi-pencil-square"></i> Edit</a>
+                                             <a class="popup-item text-danger" href="#" onclick="showDeleteModal(<?php echo $project['id']; ?>); closeAllPopups(); return false;"><i class="bi bi-trash"></i> Delete</a>
+                                         </div>
+                                         <?php endif; ?>
+                                     </div>
                                     <!-- Upload Documents Modal -->
                                     <div class="modal fade" id="uploadModal<?php echo $project['id']; ?>" tabindex="-1" aria-labelledby="uploadModalLabel<?php echo $project['id']; ?>" aria-hidden="true">
                                         <div class="modal-dialog">
@@ -471,11 +483,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Date range filter: submit form on button click, preserving search
+// Date range filter
 document.querySelectorAll('.filter-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
         const range = btn.getAttribute('data-range');
-        // Submit the search form if it exists (to preserve search term)
         const searchForm = document.getElementById('searchForm');
         if (searchForm) {
             searchForm.querySelector('input[name="range"]').value = range;
@@ -486,6 +497,72 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
         }
     });
 });
+
+// ── Edge-guarded popup ──────────────────────────────────────────────────
+const MARGIN = 8; // min gap from viewport edge (px)
+
+function closeAllPopups() {
+    document.querySelectorAll('.manage-popup.open').forEach(function(p) {
+        p.classList.remove('open');
+    });
+}
+
+function positionPopup(btn, popup) {
+    // Temporarily show off-screen to measure its dimensions
+    popup.style.visibility = 'hidden';
+    popup.classList.add('open');
+
+    const pw = popup.offsetWidth;
+    const ph = popup.offsetHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const rect = btn.getBoundingClientRect();
+
+    // --- Vertical: prefer below, flip above if not enough room ---
+    let top;
+    const spaceBelow = vh - rect.bottom;
+    const spaceAbove = rect.top;
+    if (spaceBelow >= ph + MARGIN || spaceBelow >= spaceAbove) {
+        top = rect.bottom + MARGIN;
+    } else {
+        top = rect.top - ph - MARGIN;
+    }
+    // Clamp vertically
+    top = Math.max(MARGIN, Math.min(top, vh - ph - MARGIN));
+
+    // --- Horizontal: align left edge of popup to left edge of btn, flip left if overflowing ---
+    let left = rect.left;
+    if (left + pw + MARGIN > vw) {
+        left = rect.right - pw; // align right edges
+    }
+    // Clamp horizontally
+    left = Math.max(MARGIN, Math.min(left, vw - pw - MARGIN));
+
+    popup.style.top  = top  + 'px';
+    popup.style.left = left + 'px';
+    popup.style.visibility = '';
+}
+
+function toggleManagePopup(event, id) {
+    event.stopPropagation();
+    const popup = document.getElementById(id);
+    const isOpen = popup.classList.contains('open');
+    closeAllPopups();
+    if (!isOpen) {
+        positionPopup(event.currentTarget, popup);
+    }
+}
+
+// Close on outside click
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.manage-popup') && !e.target.closest('.manage-btn')) {
+        closeAllPopups();
+    }
+});
+
+// Re-position on scroll/resize so it stays aligned
+window.addEventListener('scroll', closeAllPopups, true);
+window.addEventListener('resize', closeAllPopups);
 </script>
 </body>
 </html>
