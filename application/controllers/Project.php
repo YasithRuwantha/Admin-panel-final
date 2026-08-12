@@ -25,6 +25,7 @@ class Project extends CI_Controller {
                     'status'        => $this->input->post('status'),
                     'project_type'  => is_array($this->input->post('project_type')) ? implode(',', $this->input->post('project_type')) : $this->input->post('project_type'),
                     'quotation_id'  => (!empty($quotation_id_raw) ? (int)$quotation_id_raw : null),
+                    'referred_by'   => $this->input->post('referred_by'),
                     'updated_at'    => date('Y-m-d H:i:s'),
                 ];
                 $this->Project_model->update_project($id, $data);
@@ -32,9 +33,10 @@ class Project extends CI_Controller {
                 redirect('project/list');
                 return;
             }
-            $data['project']       = $project;
-            $data['project_types'] = $this->Project_model->get_project_types();
-            $data['quotes']        = $this->Quote_model->get_quotes(1000, 0);
+            $data['project']             = $project;
+            $data['project_types']       = $this->Project_model->get_project_types();
+            $data['quotes']              = $this->Quote_model->get_quotes(1000, 0);
+            $data['referred_by_options'] = $this->Project_model->get_referred_by_options();
             $this->load->view('edit_project', $data);
         }
     public function __construct() {
@@ -76,6 +78,7 @@ class Project extends CI_Controller {
                 'status'        => $this->input->post('status'),
                 'project_type'  => is_array($this->input->post('project_type')) ? implode(',', $this->input->post('project_type')) : $this->input->post('project_type'),
                 'quotation_id'  => (!empty($quotation_id_raw) ? (int)$quotation_id_raw : null),
+                'referred_by'   => $this->input->post('referred_by'),
                 'created_at'    => date('Y-m-d H:i:s'),
                 'updated_at'    => date('Y-m-d H:i:s'),
             ];
@@ -83,8 +86,9 @@ class Project extends CI_Controller {
             $this->session->set_flashdata('success', 'Project added successfully');
             redirect('project/add');
         }
-        $data['project_types'] = $this->Project_model->get_project_types();
-        $data['quotes']        = $this->Quote_model->get_quotes(1000, 0);
+        $data['project_types']      = $this->Project_model->get_project_types();
+        $data['quotes']             = $this->Quote_model->get_quotes(1000, 0);
+        $data['referred_by_options']= $this->Project_model->get_referred_by_options();
         $this->load->view('add_project', $data);
     }
 	    public function list() {
@@ -317,5 +321,20 @@ class Project extends CI_Controller {
             redirect('project/list');
         }
 
+
+    // AJAX endpoint to add a new 'Referred By' option to the config table
+    public function add_referred_by_config() {
+        $name = trim($this->input->post('name'));
+        if (!$name) {
+            echo json_encode(['success' => false, 'message' => 'Name is required.']);
+            return;
+        }
+        $result = $this->Project_model->insert_referred_by_config($name);
+        if ($result) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to add referrer.']);
+        }
+    }
 
 }

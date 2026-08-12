@@ -109,6 +109,9 @@
                             
                             <dt class="col-sm-3 col-12">Status</dt>
                             <dd class="col-sm-9 col-12"><?php echo htmlspecialchars($project['status']); ?></dd>
+
+                            <dt class="col-sm-3 col-12">Referred By</dt>
+                            <dd class="col-sm-9 col-12"><?php echo !empty($project['referred_by']) ? htmlspecialchars($project['referred_by']) : '<span class="text-muted">—</span>'; ?></dd>
                         </dl>
 
                         <!-- Linked Quotation Section -->

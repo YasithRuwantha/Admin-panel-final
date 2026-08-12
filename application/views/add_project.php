@@ -5,6 +5,7 @@
     <title>Add Project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         body {
@@ -34,9 +35,29 @@
                 padding: 1.5rem !important;
             }
 
-            .btn {
-                width: 100%;
+            .row.mb-3 > .col,
+            .row.mb-3 > .col-md-6 {
+                margin-bottom: 1rem;
             }
+
+            .input-group .btn {
+                flex-shrink: 0;
+            }
+        }
+
+        .card {
+            border-radius: 0.75rem;
+            background: #fff;
+        }
+
+        .card-header {
+            background: #fff !important;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .card-header h4 {
+            color: #222;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -47,10 +68,10 @@
     <div class="container-fluid main-content">
         <div class="row justify-content-center">
             <div class="col-xl-8 col-lg-10 col-md-11 col-12">
-                <div class="card shadow-sm border-0" style="background:#fff; min-height:730px;">
-                    <div class="card-header d-flex align-items-center border-bottom" style="border-radius:0.5rem 0.5rem 0 0; background:#fff;">
+                <div class="card shadow-sm border-0" style="min-height:730px;">
+                    <div class="card-header d-flex align-items-center border-bottom">
                         <i class="bi bi-folder-plus" style="font-size:1.5rem;margin-right:10px;color:#0d6efd;"></i>
-                        <h4 class="mb-0" style="color:#222;font-weight:600;">Add New Project</h4>
+                        <h4 class="mb-0">Add New Project</h4>
                     </div>
                     <div class="card-body p-4">
                         <?php if($this->session->flashdata('success')): ?>
@@ -113,6 +134,24 @@
                                     <?php endif; ?>
                                 </select>
                             </div>
+                            <!-- Referred By — same layout as "Paid To" in add_expense.php -->
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label>Referred By</label>
+                                    <div class="input-group">
+                                        <select name="referred_by" id="referred_by_select" class="form-select">
+                                            <option value="">Select</option>
+                                            <?php if (!empty($referred_by_options)) : ?>
+                                                <?php foreach ($referred_by_options as $opt): ?>
+                                                    <option value="<?php echo htmlspecialchars($opt['config_value']); ?>"><?php echo htmlspecialchars($opt['config_value']); ?></option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-primary" id="addReferredByBtn" title="Add New"><i class="bi bi-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-select" id="status" name="status">
@@ -134,16 +173,39 @@
     </div>
 </div>
 
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<!-- Modal: Add Referred By — same as "Add User" modal in add_expense.php -->
+<div class="modal fade" id="addReferredByModal" tabindex="-1" aria-labelledby="addReferredByModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReferredByModalLabel">Add Referred By</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newReferredByName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="newReferredByName" placeholder="Enter name">
+                </div>
+                <div id="referredByModalAlert" class="alert alert-danger d-none" role="alert">Please enter a name.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveReferredByBtn">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+// Thousand separator for Project Value
 const paysheetInput = document.getElementById('paysheet_value');
 if (paysheetInput) {
-    let lastRawValue = '';
-    paysheetInput.addEventListener('input', function(e) {
+    paysheetInput.addEventListener('input', function() {
         let value = this.value.replace(/,/g, '');
-        lastRawValue = value;
         if (!isNaN(value) && value.length > 0) {
             let parts = value.split('.');
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -153,9 +215,7 @@ if (paysheetInput) {
         }
     });
     paysheetInput.addEventListener('focus', function() {
-        if (this.value) {
-            this.value = this.value.replace(/,/g, '');
-        }
+        if (this.value) this.value = this.value.replace(/,/g, '');
     });
     paysheetInput.addEventListener('blur', function() {
         let value = this.value.replace(/,/g, '');
@@ -169,20 +229,13 @@ if (paysheetInput) {
     });
     let parentForm = paysheetInput.form;
     if (parentForm) {
-        parentForm.addEventListener('submit', function(e) {
-            if (paysheetInput.value) {
-                paysheetInput.value = paysheetInput.value.replace(/,/g, '');
-            }
+        parentForm.addEventListener('submit', function() {
+            if (paysheetInput.value) paysheetInput.value = paysheetInput.value.replace(/,/g, '');
         });
     }
 }
-</script>
 
-</script>
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>
+// Select2 init
 $(document).ready(function() {
     $('#project_type').select2({
         placeholder: "Select Project Type(s)",
@@ -192,6 +245,59 @@ $(document).ready(function() {
         placeholder: "-- None (Optional) --",
         allowClear: true
     });
+});
+
+// Referred By modal logic — same pattern as add_expense.php
+let addReferredByModal = new bootstrap.Modal(document.getElementById('addReferredByModal'));
+let addReferredByBtn   = document.getElementById('addReferredByBtn');
+let saveReferredByBtn  = document.getElementById('saveReferredByBtn');
+let newReferredByName  = document.getElementById('newReferredByName');
+let referredByAlert    = document.getElementById('referredByModalAlert');
+
+addReferredByBtn.addEventListener('click', function() {
+    newReferredByName.value = '';
+    referredByAlert.classList.add('d-none');
+    addReferredByModal.show();
+});
+
+saveReferredByBtn.addEventListener('click', function() {
+    let name = newReferredByName.value.trim();
+    if (!name) {
+        referredByAlert.textContent = 'Please enter a name.';
+        referredByAlert.classList.remove('d-none');
+        newReferredByName.focus();
+        return;
+    }
+    saveReferredByBtn.disabled = true;
+    fetch('<?php echo base_url("index.php/project/add_referred_by_config"); ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'name=' + encodeURIComponent(name)
+    })
+    .then(r => r.json())
+    .then(data => {
+        saveReferredByBtn.disabled = false;
+        if (data.success) {
+            let option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            option.selected = true;
+            document.getElementById('referred_by_select').appendChild(option);
+            addReferredByModal.hide();
+        } else {
+            referredByAlert.textContent = data.message || 'Failed to add.';
+            referredByAlert.classList.remove('d-none');
+        }
+    })
+    .catch(() => {
+        saveReferredByBtn.disabled = false;
+        referredByAlert.textContent = 'Server error. Please try again.';
+        referredByAlert.classList.remove('d-none');
+    });
+});
+
+document.getElementById('addReferredByModal').addEventListener('shown.bs.modal', function () {
+    newReferredByName.focus();
 });
 </script>
 
