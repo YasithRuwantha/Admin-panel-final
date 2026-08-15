@@ -126,7 +126,8 @@ class Expense extends CI_Controller {
             'paid_by_filter' => $paid_by_filter,
             'paid_to_list' => $paid_to_list,
             'paid_by_list' => $paid_by_list,
-            'per_page' => $per_page
+            'per_page' => $per_page,
+            'exact_project_code' => $exact_project_code
         ]);
     }
 
