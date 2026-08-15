@@ -114,7 +114,8 @@ class Invoice extends CI_Controller {
             'search' => $search,
             'alpha' => $alpha,
             'status_filter' => $status_filter,
-            'per_page' => $per_page
+            'per_page' => $per_page,
+            'exact_project_code' => $exact_project_code
         ]);
     }
 
