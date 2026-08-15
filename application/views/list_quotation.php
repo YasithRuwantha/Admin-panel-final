@@ -120,9 +120,15 @@
     <?php $this->load->view('sidebar'); ?>
     <div class="container-fluid mt-4 px-4 main-content">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap header-row">
-            <h2 class="mb-0">List Quotation</h2>
+            <h2 class="mb-0">List Quotation<?php if (!empty($exact_project_code)): ?> <span class="text-muted fs-5 fw-normal">— <?php echo htmlspecialchars($exact_project_code); ?></span><?php endif; ?></h2>
             <a href="<?php echo site_url('quote/add'); ?>" class="btn btn-primary add-quotation-btn">+ Add Quotation</a>
         </div>
+        <?php if (!empty($exact_project_code)): ?>
+        <div class="alert alert-info d-flex align-items-center justify-content-between py-2 mb-2" role="alert">
+            <span><i class="bi bi-funnel-fill me-2"></i>Showing quotations for project: <strong><?php echo htmlspecialchars($exact_project_code); ?></strong></span>
+            <a href="<?php echo site_url('quote/list'); ?>" class="btn btn-sm btn-outline-secondary ms-3">× Clear filter</a>
+        </div>
+        <?php endif; ?>
         <style>
         @media (max-width: 768px) {
             .header-row {
@@ -144,6 +150,7 @@
             <label class="fw-semibold nowrap me-3">Filter by date:</label>
             <input type="hidden" name="range" id="rangeInput" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
             <input type="hidden" name="alpha" id="alphaInput" value="<?php echo htmlspecialchars($alpha ?? 'recent'); ?>">
+            <input type="hidden" name="exact_project_code" value="<?php echo htmlspecialchars($exact_project_code ?? ''); ?>">
             <div class="date-btn-group">
                 <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'today' ? ' active' : ''; ?>" data-range="today">Today</button>
                 <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'last7' ? ' active' : ''; ?>" data-range="last7">Last 7 days</button>
@@ -226,6 +233,7 @@
             </div>
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
+            <input type="hidden" name="exact_project_code" value="<?php echo htmlspecialchars($exact_project_code ?? ''); ?>">
         </form>
         <style>
         @media (min-width: 769px) {
@@ -265,6 +273,7 @@
         <!-- Search Bar (List Projects style) -->
         <form id="searchForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
+            <input type="hidden" name="exact_project_code" value="<?php echo htmlspecialchars($exact_project_code ?? ''); ?>">
             <input type="text" name="search" id="quotationSearch" class="form-control" style="max-width:1250px;" placeholder="Search by name, quotation no, address, project code, or total..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
             <button type="submit" class="btn btn-primary" style="min-width:120px; font-weight:500; font-size:1.05rem;">Search</button>
         </form>
@@ -380,7 +389,8 @@
                     'range' => htmlspecialchars($selected_range ?? 'all'),
                     'search' => htmlspecialchars($search ?? ''),
                     'alpha' => htmlspecialchars($alpha ?? 'recent'),
-                    'per_page' => htmlspecialchars($per_page ?? 10)
+                    'per_page' => htmlspecialchars($per_page ?? 10),
+                    'exact_project_code' => htmlspecialchars($exact_project_code ?? '')
                 ];
                 $base_query = http_build_query($query_params);
                 ?>

@@ -94,7 +94,8 @@ class Quote extends CI_Controller {
             'selected_range' => $range,
             'search' => $search,
             'alpha' => $alpha,
-            'per_page' => $per_page
+            'per_page' => $per_page,
+            'exact_project_code' => $exact_project_code
         ]);
     }
 
