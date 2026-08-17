@@ -29,11 +29,16 @@ class Quote extends CI_Controller {
                     ];
                 }
             }
+            $quotation_no_post = trim($this->input->post('quotation_no'));
+            $quote_date_post = $this->input->post('quote_date');
+            if (empty($quotation_no_post)) {
+                $quotation_no_post = $this->Quote_model->generate_next_quote_no($quote_date_post);
+            }
             $quote_data = [
                 'name'          => $this->input->post('name'),
-                'quotation_no'  => $this->input->post('quotation_no'),
+                'quotation_no'  => $quotation_no_post,
                 'address'       => $this->input->post('address'),
-                'quote_date'    => $this->input->post('quote_date'),
+                'quote_date'    => $quote_date_post,
                 'project_code'  => $this->input->post('project_code'),
                 // 'description' will be set in the model
                 // 'amount' will be set after items are added
@@ -46,9 +51,17 @@ class Quote extends CI_Controller {
         }
         $this->load->model('Invoice_model');
         $service_descriptions = $this->Invoice_model->get_service_descriptions();
+        $auto_quote_no = $this->Quote_model->generate_next_quote_no(date('Y-m-d'));
         $this->load->view('add_quotation', [
-            'service_descriptions' => $service_descriptions
+            'service_descriptions' => $service_descriptions,
+            'auto_quote_no' => $auto_quote_no
         ]);
+    }
+
+    public function get_next_quote_no_ajax() {
+        $date = $this->input->get('date', true);
+        $next_no = $this->Quote_model->generate_next_quote_no($date);
+        echo json_encode(['success' => true, 'quotation_no' => $next_no]);
     }
 
 	    public function list() {

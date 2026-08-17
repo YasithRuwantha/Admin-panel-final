@@ -140,7 +140,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Quotation No</label>
-                                    <input type="text" name="quotation_no" class="form-control" required placeholder="Enter quotation number">
+                                    <input type="text" name="quotation_no" id="quotation_no" class="form-control" required value="<?php echo htmlspecialchars($auto_quote_no ?? ''); ?>" placeholder="Auto-generated">
                                 </div>
                             </div>
 
@@ -151,7 +151,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Date</label>
-                                    <input type="date" name="quote_date" class="form-control" required>
+                                    <input type="date" name="quote_date" id="quote_date" class="form-control" required value="<?php echo date('Y-m-d'); ?>">
                                 </div>
                             </div>
 
@@ -375,6 +375,25 @@ updateTotal();
         });
     }
 })();
+
+// Auto-generate quotation number when quote date changes
+var quoteDateElem = document.getElementById('quote_date');
+var quotationNoElem = document.getElementById('quotation_no');
+if (quoteDateElem && quotationNoElem) {
+    quoteDateElem.addEventListener('change', function() {
+        var selectedDate = this.value;
+        if (selectedDate) {
+            fetch('<?php echo site_url("quote/get_next_quote_no_ajax"); ?>?date=' + encodeURIComponent(selectedDate))
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success && data.quotation_no) {
+                        quotationNoElem.value = data.quotation_no;
+                    }
+                })
+                .catch(function(err) { console.error(err); });
+        }
+    });
+}
 </script>
 
 </body>
