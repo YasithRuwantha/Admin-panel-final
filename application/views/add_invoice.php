@@ -171,11 +171,11 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Invoice No</label>
-                                    <input type="text" name="invoice_no" class="form-control" required placeholder="Enter invoice number">
+                                    <input type="text" name="invoice_no" id="invoice_no" class="form-control" required value="<?php echo htmlspecialchars($auto_invoice_no ?? ''); ?>" placeholder="Auto-generated">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Date</label>
-                                    <input type="date" name="invoice_date" class="form-control" required>
+                                    <input type="date" name="invoice_date" id="invoice_date" class="form-control" required value="<?php echo date('Y-m-d'); ?>">
                                 </div>
                             </div>
 
@@ -488,6 +488,25 @@ document.querySelector('form').addEventListener('submit', function(e) {
 });
 
 updateTotal();
+
+// Auto-generate invoice number when invoice date changes
+var invoiceDateElem = document.getElementById('invoice_date');
+var invoiceNoElem = document.getElementById('invoice_no');
+if (invoiceDateElem && invoiceNoElem) {
+    invoiceDateElem.addEventListener('change', function() {
+        var selectedDate = this.value;
+        if (selectedDate) {
+            fetch('<?php echo site_url("invoice/get_next_invoice_no_ajax"); ?>?date=' + encodeURIComponent(selectedDate))
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success && data.invoice_no) {
+                        invoiceNoElem.value = data.invoice_no;
+                    }
+                })
+                .catch(function(err) { console.error(err); });
+        }
+    });
+}
 </script>
 
 </body>

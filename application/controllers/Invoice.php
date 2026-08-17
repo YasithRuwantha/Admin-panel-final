@@ -35,11 +35,16 @@ class Invoice extends CI_Controller {
                     ];
                 }
             }
+            $invoice_no_post = trim($this->input->post('invoice_no'));
+            $invoice_date_post = $this->input->post('invoice_date');
+            if (empty($invoice_no_post)) {
+                $invoice_no_post = $this->Invoice_model->generate_next_invoice_no($invoice_date_post);
+            }
             $invoice_data = [
                 'name'        => $this->input->post('name'),
-                'invoice_no'  => $this->input->post('invoice_no'),
+                'invoice_no'  => $invoice_no_post,
                 'address'     => $this->input->post('address'),
-                'invoice_date'=> $this->input->post('invoice_date'),
+                'invoice_date'=> $invoice_date_post,
                 'project_code'=> $this->input->post('project_code'),
                 'project_name' => $this->input->post('project_name'),
                 // 'description' will be set in the model
@@ -48,12 +53,20 @@ class Invoice extends CI_Controller {
             $this->Invoice_model->add_invoice_with_items($invoice_data, $items);
             redirect('invoice/list');
         } else {
+            $auto_invoice_no = $this->Invoice_model->generate_next_invoice_no(date('Y-m-d'));
             $this->load->view('add_invoice', [
                 'payment_methods' => $payment_methods,
                 'projects' => $projects,
-                'service_descriptions' => $service_descriptions
+                'service_descriptions' => $service_descriptions,
+                'auto_invoice_no' => $auto_invoice_no
             ]);
         }
+    }
+
+    public function get_next_invoice_no_ajax() {
+        $date = $this->input->get('date', true);
+        $next_no = $this->Invoice_model->generate_next_invoice_no($date);
+        echo json_encode(['success' => true, 'invoice_no' => $next_no]);
     }
 
 	    public function list() {
