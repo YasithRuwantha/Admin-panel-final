@@ -196,6 +196,67 @@
                             </table>
                         </div>
 
+                        <!-- Expenses by Category -->
+                        <?php if (!empty($expense_by_category)): ?>
+                        <h6 class="mt-4 mb-2 text-muted fw-semibold"><i class="bi bi-tags"></i> Expenses by Category</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Category</th>
+                                        <th class="text-end">Amount</th>
+                                        <th style="min-width:140px;">Share</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                        $cat_grand_total = array_sum(array_column($expense_by_category, 'total'));
+                                        // Pre-compute all percentages rounded to 1 decimal
+                                        $cat_pcts = [];
+                                        $pct_sum  = 0;
+                                        $last_idx = count($expense_by_category) - 1;
+                                        foreach ($expense_by_category as $ci => $cat) {
+                                            if ($ci === $last_idx) {
+                                                // Assign remainder to the last row so total is always 100%
+                                                $cat_pcts[$ci] = round(100 - $pct_sum, 1);
+                                            } else {
+                                                $p = $cat_grand_total > 0 ? round(($cat['total'] / $cat_grand_total) * 100, 1) : 0;
+                                                $cat_pcts[$ci] = $p;
+                                                $pct_sum += $p;
+                                            }
+                                        }
+                                        foreach ($expense_by_category as $ci => $cat):
+                                            $pct = $cat_pcts[$ci];
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $ci + 1; ?></td>
+                                        <td><?php echo htmlspecialchars($cat['category'] ?: '(Uncategorised)'); ?></td>
+                                        <td class="text-end fw-semibold"><?php echo number_format((float)$cat['total'], 2); ?></td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="progress flex-grow-1" style="height:8px;">
+                                                    <div class="progress-bar bg-danger" role="progressbar" style="width:<?php echo $pct; ?>%;" aria-valuenow="<?php echo $pct; ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <small class="text-muted" style="min-width:38px;"><?php echo $pct; ?>%</small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <td colspan="2" class="fw-bold">Total</td>
+                                        <td class="text-end fw-bold"><?php echo number_format((float)$cat_grand_total, 2); ?></td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <?php else: ?>
+                        <p class="text-muted mt-3 mb-0"><i class="bi bi-tags"></i> No expenses recorded for this project yet.</p>
+                        <?php endif; ?>
+
                         <!-- Documents Section -->
                         <hr class="my-4">
                         <h5 class="mb-3"><i class="bi bi-paperclip"></i> Project Documents</h5>

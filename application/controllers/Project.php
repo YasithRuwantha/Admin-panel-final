@@ -227,6 +227,26 @@ class Project extends CI_Controller {
         $cash_in_project = $project_value - $total_expenses;
         $profit_loss     = $total_invoices - $total_expenses;
 
+        // Expenses broken down by category for this project
+        $expense_by_category = [];
+        if ($project_code !== '') {
+            $q = $this->db->select('category, COALESCE(SUM(amount),0) AS total', false)
+                ->from('expense')
+                ->where('project_code', $project_code)
+                ->group_by('category')
+                ->order_by('total', 'DESC')
+                ->get();
+            $expense_by_category = $q->result_array();
+        } elseif ($project_name !== '') {
+            $q = $this->db->select('category, COALESCE(SUM(amount),0) AS total', false)
+                ->from('expense')
+                ->where('project_name', $project_name)
+                ->group_by('category')
+                ->order_by('total', 'DESC')
+                ->get();
+            $expense_by_category = $q->result_array();
+        }
+
         $this->load->view('view_project', [
             'project'                => $project,
             'documents'              => $documents,
@@ -238,6 +258,7 @@ class Project extends CI_Controller {
             'cash_in_hand'           => $cash_in_hand,
             'cash_in_project'        => $cash_in_project,
             'profit_loss'            => $profit_loss,
+            'expense_by_category'    => $expense_by_category,
         ]);
     }
 
