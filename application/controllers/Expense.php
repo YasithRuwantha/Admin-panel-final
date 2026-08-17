@@ -115,6 +115,12 @@ class Expense extends CI_Controller {
         $paid_to_list = $this->Expense_model->get_unique_paid_to();
         $paid_by_list = $this->Expense_model->get_unique_paid_by();
 
+        // Look up the full project record when filtering by code, so the Add button can pre-fill the form
+        $filter_project = null;
+        if (!empty($exact_project_code)) {
+            $this->load->model('Project_model');
+            $filter_project = $this->Project_model->get_project_by_code($exact_project_code);
+        }
         $this->load->view('list_expenses', [
             'expenses' => $expenses,
             'current_page' => $page,
@@ -127,7 +133,8 @@ class Expense extends CI_Controller {
             'paid_to_list' => $paid_to_list,
             'paid_by_list' => $paid_by_list,
             'per_page' => $per_page,
-            'exact_project_code' => $exact_project_code
+            'exact_project_code' => $exact_project_code,
+            'filter_project' => $filter_project
         ]);
     }
 

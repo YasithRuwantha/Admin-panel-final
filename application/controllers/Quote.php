@@ -87,6 +87,12 @@ class Quote extends CI_Controller {
         foreach ($quotations as &$quote) {
             $quote['items'] = $this->Quote_model->get_quote_items($quote['id']);
         }
+        // Look up the full project record when filtering by code, so the Add button can pre-fill the form
+        $filter_project = null;
+        if (!empty($exact_project_code)) {
+            $this->load->model('Project_model');
+            $filter_project = $this->Project_model->get_project_by_code($exact_project_code);
+        }
         $this->load->view('list_quotation', [
             'quotations' => $quotations,
             'current_page' => $page,
@@ -95,7 +101,8 @@ class Quote extends CI_Controller {
             'search' => $search,
             'alpha' => $alpha,
             'per_page' => $per_page,
-            'exact_project_code' => $exact_project_code
+            'exact_project_code' => $exact_project_code,
+            'filter_project' => $filter_project
         ]);
     }
 

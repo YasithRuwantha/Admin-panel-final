@@ -125,7 +125,14 @@
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap flex-md-nowrap flex-column flex-md-row">
             <div class="d-flex flex-column flex-md-row w-100 align-items-md-center justify-content-between">
                 <h2 class="mb-2 mb-md-0">List Expenses<?php if (!empty($exact_project_code)): ?> <span class="text-muted fs-5 fw-normal">— <?php echo htmlspecialchars($exact_project_code); ?></span><?php endif; ?></h2>
-                <a href="<?php echo site_url('expense/add'); ?>" class="btn btn-primary add-expense-btn mt-2 mt-md-0 ms-0 ms-md-3" style="min-width:150px; font-weight:500; font-size:1.1rem;">+ Add Expense</a>
+                <?php
+                    $add_expense_url = site_url('expense/add');
+                    if (!empty($filter_project)) {
+                        $add_expense_url .= '?project_name=' . urlencode($filter_project['name'])
+                            . '&project_code=' . urlencode($filter_project['project_code']);
+                    }
+                ?>
+                <a href="<?php echo $add_expense_url; ?>" class="btn btn-primary add-expense-btn mt-2 mt-md-0 ms-0 ms-md-3" style="min-width:150px; font-weight:500; font-size:1.1rem;">+ Add Expense</a>
             </div>
         </div>
         <?php if (!empty($exact_project_code)): ?>

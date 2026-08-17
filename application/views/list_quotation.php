@@ -121,7 +121,16 @@
     <div class="container-fluid mt-4 px-4 main-content">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap header-row">
             <h2 class="mb-0">List Quotation<?php if (!empty($exact_project_code)): ?> <span class="text-muted fs-5 fw-normal">— <?php echo htmlspecialchars($exact_project_code); ?></span><?php endif; ?></h2>
-            <a href="<?php echo site_url('quote/add'); ?>" class="btn btn-primary add-quotation-btn">+ Add Quotation</a>
+            <?php
+                $add_quote_url = site_url('quote/add');
+                if (!empty($filter_project)) {
+                    $add_quote_url .= '?project_name=' . urlencode($filter_project['name'])
+                        . '&project_code=' . urlencode($filter_project['project_code'])
+                        . '&client=' . urlencode($filter_project['client'] ?? '')
+                        . '&address=' . urlencode($filter_project['address'] ?? '');
+                }
+            ?>
+            <a href="<?php echo $add_quote_url; ?>" class="btn btn-primary add-quotation-btn">+ Add Quotation</a>
         </div>
         <?php if (!empty($exact_project_code)): ?>
         <div class="alert alert-info d-flex align-items-center justify-content-between py-2 mb-2" role="alert">

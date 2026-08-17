@@ -12,6 +12,11 @@ class Project_model extends CI_Model {
                 $this->db->where('id', $id);
                 return $this->db->update('project', $data);
             }
+
+            public function get_project_by_code($code) {
+                return $this->db->get_where('project', ['project_code' => $code])->row_array();
+            }
+
         public function project_code_exists($project_code) {
             return $this->db->where('project_code', $project_code)->count_all_results('project') > 0;
         }

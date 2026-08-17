@@ -104,6 +104,12 @@ class Invoice extends CI_Controller {
             $invoice['items'] = $this->Invoice_model->get_invoice_items($invoice['id']);
             $invoice['payments'] = $this->Invoice_model->get_payments_by_invoice($invoice['id']);
         }
+        // Look up the full project record when filtering by code, so the Add button can pre-fill the form
+        $filter_project = null;
+        if (!empty($exact_project_code)) {
+            $this->load->model('Project_model');
+            $filter_project = $this->Project_model->get_project_by_code($exact_project_code);
+        }
         $this->load->view('list_invoice', [
             'invoices' => $invoices,
             'summary_stats' => $summary_stats,
@@ -115,7 +121,8 @@ class Invoice extends CI_Controller {
             'alpha' => $alpha,
             'status_filter' => $status_filter,
             'per_page' => $per_page,
-            'exact_project_code' => $exact_project_code
+            'exact_project_code' => $exact_project_code,
+            'filter_project' => $filter_project
         ]);
     }
 

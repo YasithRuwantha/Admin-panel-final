@@ -155,7 +155,16 @@
         <!-- Updated header with + Add Invoice button exactly like List Projects -->
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap header-row">
             <h2 class="mb-0">List Invoice<?php if (!empty($exact_project_code)): ?> <span class="text-muted fs-5 fw-normal">— <?php echo htmlspecialchars($exact_project_code); ?></span><?php endif; ?></h2>
-            <a href="<?php echo site_url('invoice/add_invoice'); ?>" class="btn btn-primary add-invoice-btn">+ Add Invoice</a>
+            <?php
+                $add_invoice_url = site_url('invoice/add_invoice');
+                if (!empty($filter_project)) {
+                    $add_invoice_url .= '?project_name=' . urlencode($filter_project['name'])
+                        . '&project_code=' . urlencode($filter_project['project_code'])
+                        . '&client=' . urlencode($filter_project['client'] ?? '')
+                        . '&address=' . urlencode($filter_project['address'] ?? '');
+                }
+            ?>
+            <a href="<?php echo $add_invoice_url; ?>" class="btn btn-primary add-invoice-btn">+ Add Invoice</a>
         </div>
         <?php if (!empty($exact_project_code)): ?>
         <div class="alert alert-info d-flex align-items-center justify-content-between py-2 mb-2" role="alert">
