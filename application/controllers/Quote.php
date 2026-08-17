@@ -44,7 +44,11 @@ class Quote extends CI_Controller {
             $this->session->set_flashdata('success', 'Quotation added successfully');
             redirect('quote/add');
         }
-        $this->load->view('add_quotation');
+        $this->load->model('Invoice_model');
+        $service_descriptions = $this->Invoice_model->get_service_descriptions();
+        $this->load->view('add_quotation', [
+            'service_descriptions' => $service_descriptions
+        ]);
     }
 
 	    public function list() {
@@ -147,7 +151,12 @@ class Quote extends CI_Controller {
             $this->session->set_flashdata('success', 'Quotation updated successfully');
             redirect('quote/list');
         }
-        $this->load->view('edit_quotation', ['quote' => $quote]);
+        $this->load->model('Invoice_model');
+        $service_descriptions = $this->Invoice_model->get_service_descriptions();
+        $this->load->view('edit_quotation', [
+            'quote' => $quote,
+            'service_descriptions' => $service_descriptions
+        ]);
     }
 
     public function pdf($id) {
