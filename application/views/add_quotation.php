@@ -140,7 +140,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Quotation No</label>
-                                    <input type="text" name="quotation_no" class="form-control" required placeholder="Enter quotation number">
+                                    <input type="text" name="quotation_no" id="quotation_no" class="form-control" required value="<?php echo htmlspecialchars($auto_quote_no ?? ''); ?>" placeholder="Auto-generated">
                                 </div>
                             </div>
 
@@ -151,7 +151,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Date</label>
-                                    <input type="date" name="quote_date" class="form-control" required>
+                                    <input type="date" name="quote_date" id="quote_date" class="form-control" required value="<?php echo date('Y-m-d'); ?>">
                                 </div>
                             </div>
 
@@ -171,7 +171,19 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><input type="text" name="description[]" class="form-control" required placeholder="Enter service description"></td>
+                                            <td>
+                                                <select name="description_select[]" class="form-select service-desc-dropdown" onchange="handleServiceDescChange(this)">
+                                                    <option value="">Select from list...</option>
+                                                    <?php 
+                                                    if (isset($service_descriptions) && is_array($service_descriptions)) {
+                                                        foreach ($service_descriptions as $desc) {
+                                                            echo '<option value="'.htmlspecialchars($desc['config_value']).'">'.htmlspecialchars($desc['config_value']).'</option>';
+                                                        }
+                                                    }
+                                                    ?>
+                                                </select>
+                                                <input type="text" name="description[]" class="form-control mt-2 service-desc-input" placeholder="Type service description" style="display:block;" />
+                                            </td>
                                             <td><input type="text" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>
                                             <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
                                         </tr>
@@ -258,9 +270,23 @@ function updateTotal() {
 document.getElementById('add-row').addEventListener('click', function() {
     let tbody = document.querySelector('#services-table tbody');
     let row = document.createElement('tr');
-    row.innerHTML = '<td><input type="text" name="description[]" class="form-control" required placeholder="Enter service description"></td>' +
-                    '<td><input type="text" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>' +
-                    '<td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>';
+    row.innerHTML = `
+        <td>
+            <select name="description_select[]" class="form-select service-desc-dropdown" onchange="handleServiceDescChange(this)">
+                <option value="">Select from list...</option>
+                <?php 
+                if (isset($service_descriptions) && is_array($service_descriptions)) {
+                    foreach ($service_descriptions as $desc) {
+                        echo '<option value="'.htmlspecialchars($desc['config_value']).'">'.htmlspecialchars($desc['config_value']).'</option>';
+                    }
+                }
+                ?>
+            </select>
+            <input type="text" name="description[]" class="form-control mt-2 service-desc-input" placeholder="Type service description" style="display:block;" />
+        </td>
+        <td><input type="text" step="0.01" name="amount[]" class="form-control amount-input" required placeholder="0.00"></td>
+        <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
+    `;
     tbody.appendChild(row);
 
     // Attach formatting to new amount input
@@ -274,6 +300,27 @@ document.getElementById('add-row').addEventListener('click', function() {
         });
     }, 100);
 });
+
+// Service description dropdown logic
+function handleServiceDescChange(select) {
+    var input = select.parentElement.querySelector('.service-desc-input');
+    if (select.value === '__custom__') {
+        input.style.display = '';
+        input.required = true;
+        input.value = '';
+        input.focus();
+        select.value = '';
+    } else if (select.value) {
+        input.style.display = '';
+        input.required = false;
+        input.value = select.value;
+        select.value = '';
+    } else {
+        input.style.display = 'none';
+        input.required = false;
+        input.value = '';
+    }
+}
 
 document.querySelector('#services-table').addEventListener('input', function(e) {
     if (e.target.classList.contains('amount-input')) {
@@ -328,6 +375,25 @@ updateTotal();
         });
     }
 })();
+
+// Auto-generate quotation number when quote date changes
+var quoteDateElem = document.getElementById('quote_date');
+var quotationNoElem = document.getElementById('quotation_no');
+if (quoteDateElem && quotationNoElem) {
+    quoteDateElem.addEventListener('change', function() {
+        var selectedDate = this.value;
+        if (selectedDate) {
+            fetch('<?php echo site_url("quote/get_next_quote_no_ajax"); ?>?date=' + encodeURIComponent(selectedDate))
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success && data.quotation_no) {
+                        quotationNoElem.value = data.quotation_no;
+                    }
+                })
+                .catch(function(err) { console.error(err); });
+        }
+    });
+}
 </script>
 
 </body>

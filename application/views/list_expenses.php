@@ -124,10 +124,23 @@
     <div class="container-fluid mt-4 px-4 main-content">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap flex-md-nowrap flex-column flex-md-row">
             <div class="d-flex flex-column flex-md-row w-100 align-items-md-center justify-content-between">
-                <h2 class="mb-2 mb-md-0">List Expenses</h2>
-                <a href="<?php echo site_url('expense/add'); ?>" class="btn btn-primary add-expense-btn mt-2 mt-md-0 ms-0 ms-md-3" style="min-width:150px; font-weight:500; font-size:1.1rem;">+ Add Expense</a>
+                <h2 class="mb-2 mb-md-0">List Expenses<?php if (!empty($exact_project_code)): ?> <span class="text-muted fs-5 fw-normal">— <?php echo htmlspecialchars($exact_project_code); ?></span><?php endif; ?></h2>
+                <?php
+                    $add_expense_url = site_url('expense/add');
+                    if (!empty($filter_project)) {
+                        $add_expense_url .= '?project_name=' . urlencode($filter_project['name'])
+                            . '&project_code=' . urlencode($filter_project['project_code']);
+                    }
+                ?>
+                <a href="<?php echo $add_expense_url; ?>" class="btn btn-primary add-expense-btn mt-2 mt-md-0 ms-0 ms-md-3" style="min-width:150px; font-weight:500; font-size:1.1rem;">+ Add Expense</a>
             </div>
         </div>
+        <?php if (!empty($exact_project_code)): ?>
+        <div class="alert alert-info d-flex align-items-center justify-content-between py-2 mb-2" role="alert">
+            <span><i class="bi bi-funnel-fill me-2"></i>Showing expenses for project: <strong><?php echo htmlspecialchars($exact_project_code); ?></strong></span>
+            <a href="<?php echo site_url('expense/list_expenses'); ?>" class="btn btn-sm btn-outline-secondary ms-3">× Clear filter</a>
+        </div>
+        <?php endif; ?>
         <style>
         /* Responsive Add Expense Button */
         @media (max-width: 768px) {
@@ -148,6 +161,7 @@
             <label class="fw-semibold nowrap me-3">Filter by date:</label>
             <input type="hidden" name="range" id="rangeInput" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
             <input type="hidden" name="alpha" id="alphaInput" value="<?php echo htmlspecialchars($alpha ?? 'recent'); ?>">
+            <input type="hidden" name="exact_project_code" value="<?php echo htmlspecialchars($exact_project_code ?? ''); ?>">
             <div class="date-btn-group">
                 <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'today' ? ' active' : ''; ?>" data-range="today">Today</button>
                 <button type="button" class="btn btn-outline-primary btn-sm filter-btn<?php echo ($selected_range ?? 'all') === 'last7' ? ' active' : ''; ?>" data-range="last7">Last 7 days</button>
@@ -190,6 +204,7 @@
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
             <input type="hidden" name="alpha" value="<?php echo htmlspecialchars($alpha ?? 'recent'); ?>">
             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
+            <input type="hidden" name="exact_project_code" value="<?php echo htmlspecialchars($exact_project_code ?? ''); ?>">
             <label class="fw-semibold me-2">Filter by:</label>
             <select name="paid_to_filter" class="form-select form-select-sm" style="width:auto;" onchange="document.getElementById('paidFilterForm').submit();">
                 <option value="">Paid To (All)</option>
@@ -259,6 +274,7 @@
             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>">
             <input type="hidden" name="paid_to_filter" value="<?php echo htmlspecialchars($paid_to_filter ?? ''); ?>">
             <input type="hidden" name="paid_by_filter" value="<?php echo htmlspecialchars($paid_by_filter ?? ''); ?>">
+            <input type="hidden" name="exact_project_code" value="<?php echo htmlspecialchars($exact_project_code ?? ''); ?>">
         </form>
         <style>
         .filters-upper-row {
@@ -288,6 +304,7 @@
         <!-- Search Bar (List Projects style) -->
         <form id="searchForm" method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2">
             <input type="hidden" name="range" value="<?php echo htmlspecialchars($selected_range ?? 'all'); ?>">
+            <input type="hidden" name="exact_project_code" value="<?php echo htmlspecialchars($exact_project_code ?? ''); ?>">
             <input type="text" name="search" id="expenseSearch" class="form-control" style="max-width:1250px;" placeholder="Search by project name, code, date, category, description, paid to, paid by, payment method, status, or remark..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
             <button type="submit" class="btn btn-primary" style="min-width:120px; font-weight:500; font-size:1.05rem;">Search</button>
         </form>
@@ -418,7 +435,8 @@
                     'alpha' => htmlspecialchars($alpha ?? 'recent'),
                     'paid_to_filter' => htmlspecialchars($paid_to_filter ?? ''),
                     'paid_by_filter' => htmlspecialchars($paid_by_filter ?? ''),
-                    'per_page' => htmlspecialchars($per_page ?? 10)
+                    'per_page' => htmlspecialchars($per_page ?? 10),
+                    'exact_project_code' => htmlspecialchars($exact_project_code ?? '')
                 ];
                 $base_query = http_build_query($query_params);
                 ?>

@@ -308,4 +308,54 @@ class Invoice_model extends CI_Model {
 
         return $summary;
     }
+
+    /**
+     * Auto-generate next invoice number.
+     * Starts at I2026/500 for year 2026.
+     * For future years (2027+), starts at I{YEAR}/001.
+     */
+    public function generate_next_invoice_no($year_or_date = null) {
+        if (empty($year_or_date)) {
+            $year = date('Y');
+        } else {
+            if (strlen($year_or_date) > 4) {
+                $year = date('Y', strtotime($year_or_date));
+            } else {
+                $year = $year_or_date;
+            }
+        }
+        if (!$year || !is_numeric($year)) {
+            $year = date('Y');
+        }
+
+        $prefix = 'I' . $year . '/';
+        $this->db->select('invoice_no');
+        $this->db->like('invoice_no', $prefix, 'after');
+        $query = $this->db->get('invoice');
+        $results = $query->result_array();
+
+        $max_num = 0;
+        foreach ($results as $row) {
+            $parts = explode('/', $row['invoice_no']);
+            if (count($parts) == 2 && is_numeric($parts[1])) {
+                $num = (int)$parts[1];
+                if ($num > $max_num) {
+                    $max_num = $num;
+                }
+            }
+        }
+
+        if ($max_num > 0) {
+            $next_num = $max_num + 1;
+        } else {
+            // First invoice of the year
+            if ($year == '2026') {
+                $next_num = 500;
+            } else {
+                $next_num = 1;
+            }
+        }
+
+        return $prefix . sprintf('%03d', $next_num);
+    }
 }

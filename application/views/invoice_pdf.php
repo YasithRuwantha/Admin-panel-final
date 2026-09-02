@@ -314,10 +314,6 @@
                 <span class="detail-label">DATE OF ISSUE:</span>
                 <?php echo date('jS F Y', strtotime($invoice['invoice_date'])); ?>
             </div>
-            <div class="detail-row">
-                <span class="detail-label">PROJECT CODE:</span>
-                <?php echo htmlspecialchars($invoice['project_code']); ?>
-            </div>
         </div>
     </div>
 
@@ -392,12 +388,6 @@
             <div class="info-row">
                 <label>Reference:</label>
                 <span><?php echo htmlspecialchars($payment['reference_no']); ?></span>
-            </div>
-            <?php endif; ?>
-            <?php if (!empty($payment['remarks'])): ?>
-            <div class="info-row">
-                <label>Remarks:</label>
-                <span><?php echo htmlspecialchars($payment['remarks']); ?></span>
             </div>
             <?php endif; ?>
         </div>

@@ -158,5 +158,53 @@ class Quote_model extends CI_Model {
         return $this->db->count_all_results('quote');
     }
 
+    /**
+     * Auto-generate next quotation number.
+     * Starts at Q2026/500 for year 2026.
+     * For future years (2027+), starts at Q{YEAR}/001.
+     */
+    public function generate_next_quote_no($year_or_date = null) {
+        if (empty($year_or_date)) {
+            $year = date('Y');
+        } else {
+            if (strlen($year_or_date) > 4) {
+                $year = date('Y', strtotime($year_or_date));
+            } else {
+                $year = $year_or_date;
+            }
+        }
+        if (!$year || !is_numeric($year)) {
+            $year = date('Y');
+        }
 
+        $prefix = 'Q' . $year . '/';
+        $this->db->select('quotation_no');
+        $this->db->like('quotation_no', $prefix, 'after');
+        $query = $this->db->get('quote');
+        $results = $query->result_array();
+
+        $max_num = 0;
+        foreach ($results as $row) {
+            $parts = explode('/', $row['quotation_no']);
+            if (count($parts) == 2 && is_numeric($parts[1])) {
+                $num = (int)$parts[1];
+                if ($num > $max_num) {
+                    $max_num = $num;
+                }
+            }
+        }
+
+        if ($max_num > 0) {
+            $next_num = $max_num + 1;
+        } else {
+            // First quotation of the year
+            if ($year == '2026') {
+                $next_num = 500;
+            } else {
+                $next_num = 1;
+            }
+        }
+
+        return $prefix . sprintf('%03d', $next_num);
+    }
 }

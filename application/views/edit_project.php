@@ -117,6 +117,23 @@
                                 </select>
                                 <div class="form-text">Select a quotation that this project is based on.</div>
                             </div>
+                            <!-- Referred By -->
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label>Referred By</label>
+                                    <div class="input-group">
+                                        <select name="referred_by" id="referred_by_select" class="form-select">
+                                            <option value="">Select</option>
+                                            <?php if (!empty($referred_by_options)) : ?>
+                                                <?php foreach ($referred_by_options as $opt): ?>
+                                                    <option value="<?php echo htmlspecialchars($opt['config_value']); ?>" <?php if (!empty($project['referred_by']) && $project['referred_by'] === $opt['config_value']) echo 'selected'; ?>><?php echo htmlspecialchars($opt['config_value']); ?></option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-primary" id="addReferredByBtn" title="Add New"><i class="bi bi-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="mb-3">
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-select" id="status" name="status">
@@ -159,6 +176,29 @@
     </div>
 </div>
 
+<!-- Modal: Add Referred By -->
+<div class="modal fade" id="addReferredByModal" tabindex="-1" aria-labelledby="addReferredByModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReferredByModalLabel">Add Referred By</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newReferredByName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="newReferredByName" placeholder="Enter name">
+                </div>
+                <div id="referredByModalAlert" class="alert alert-danger d-none" role="alert">Please enter a name.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveReferredByBtn">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -175,6 +215,59 @@ $(document).ready(function() {
         placeholder: "-- None (Optional) --",
         allowClear: true
     });
+});
+
+// Referred By modal logic
+let addReferredByModal = new bootstrap.Modal(document.getElementById('addReferredByModal'));
+let addReferredByBtn   = document.getElementById('addReferredByBtn');
+let saveReferredByBtn  = document.getElementById('saveReferredByBtn');
+let newReferredByName  = document.getElementById('newReferredByName');
+let referredByAlert    = document.getElementById('referredByModalAlert');
+
+addReferredByBtn.addEventListener('click', function() {
+    newReferredByName.value = '';
+    referredByAlert.classList.add('d-none');
+    addReferredByModal.show();
+});
+
+saveReferredByBtn.addEventListener('click', function() {
+    let name = newReferredByName.value.trim();
+    if (!name) {
+        referredByAlert.textContent = 'Please enter a name.';
+        referredByAlert.classList.remove('d-none');
+        newReferredByName.focus();
+        return;
+    }
+    saveReferredByBtn.disabled = true;
+    fetch('<?php echo base_url("index.php/project/add_referred_by_config"); ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'name=' + encodeURIComponent(name)
+    })
+    .then(r => r.json())
+    .then(data => {
+        saveReferredByBtn.disabled = false;
+        if (data.success) {
+            let option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            option.selected = true;
+            document.getElementById('referred_by_select').appendChild(option);
+            addReferredByModal.hide();
+        } else {
+            referredByAlert.textContent = data.message || 'Failed to add.';
+            referredByAlert.classList.remove('d-none');
+        }
+    })
+    .catch(() => {
+        saveReferredByBtn.disabled = false;
+        referredByAlert.textContent = 'Server error. Please try again.';
+        referredByAlert.classList.remove('d-none');
+    });
+});
+
+document.getElementById('addReferredByModal').addEventListener('shown.bs.modal', function () {
+    newReferredByName.focus();
 });
 </script>
 

@@ -173,14 +173,39 @@
                                         <?php if (!empty($quote['items'])): ?>
                                             <?php foreach ($quote['items'] as $item): ?>
                                                 <tr>
-                                                    <td><input type="text" name="description[]" class="form-control" required value="<?php echo htmlspecialchars($item['description']); ?>"></td>
+                                                    <td>
+                                                        <select name="description_select[]" class="form-select service-desc-dropdown" onchange="handleServiceDescChange(this)">
+                                                            <option value="">Select from list...</option>
+                                                            <?php 
+                                                            if (isset($service_descriptions) && is_array($service_descriptions)) {
+                                                                foreach ($service_descriptions as $desc) {
+                                                                    $selected = ($desc['config_value'] === $item['description']) ? ' selected' : '';
+                                                                    echo '<option value="'.htmlspecialchars($desc['config_value']).'"'.$selected.'>'.htmlspecialchars($desc['config_value']).'</option>';
+                                                                }
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                        <input type="text" name="description[]" class="form-control mt-2 service-desc-input" required value="<?php echo htmlspecialchars($item['description']); ?>" style="display:block;" />
+                                                    </td>
                                                     <td><input type="number" step="0.01" name="amount[]" class="form-control amount-input" required value="<?php echo htmlspecialchars($item['amount']); ?>"></td>
                                                     <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <tr>
-                                                <td><input type="text" name="description[]" class="form-control" required></td>
+                                                <td>
+                                                    <select name="description_select[]" class="form-select service-desc-dropdown" onchange="handleServiceDescChange(this)">
+                                                        <option value="">Select from list...</option>
+                                                        <?php 
+                                                        if (isset($service_descriptions) && is_array($service_descriptions)) {
+                                                            foreach ($service_descriptions as $desc) {
+                                                                echo '<option value="'.htmlspecialchars($desc['config_value']).'">'.htmlspecialchars($desc['config_value']).'</option>';
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                    <input type="text" name="description[]" class="form-control mt-2 service-desc-input" required style="display:block;" />
+                                                </td>
                                                 <td><input type="number" step="0.01" name="amount[]" class="form-control amount-input" required></td>
                                                 <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
                                             </tr>
@@ -247,12 +272,46 @@
         document.getElementById('total').value = total.toFixed(2);
     }
 
+    function handleServiceDescChange(select) {
+        var input = select.parentElement.querySelector('.service-desc-input');
+        if (select.value === '__custom__') {
+            input.style.display = '';
+            input.required = true;
+            input.value = '';
+            input.focus();
+            select.value = '';
+        } else if (select.value) {
+            input.style.display = '';
+            input.required = false;
+            input.value = select.value;
+            select.value = '';
+        } else {
+            input.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
+    }
+
     document.getElementById('add-row').addEventListener('click', function() {
         let tbody = document.querySelector('#services-table tbody');
         let row = document.createElement('tr');
-        row.innerHTML = '<td><input type="text" name="description[]" class="form-control" required></td>' +
-                        '<td><input type="number" step="0.01" name="amount[]" class="form-control amount-input" required></td>' +
-                        '<td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>';
+        row.innerHTML = `
+            <td>
+                <select name="description_select[]" class="form-select service-desc-dropdown" onchange="handleServiceDescChange(this)">
+                    <option value="">Select from list...</option>
+                    <?php 
+                    if (isset($service_descriptions) && is_array($service_descriptions)) {
+                        foreach ($service_descriptions as $desc) {
+                            echo '<option value="'.htmlspecialchars($desc['config_value']).'">'.htmlspecialchars($desc['config_value']).'</option>';
+                        }
+                    }
+                    ?>
+                </select>
+                <input type="text" name="description[]" class="form-control mt-2 service-desc-input" placeholder="Type service description" style="display:block;" />
+            </td>
+            <td><input type="number" step="0.01" name="amount[]" class="form-control amount-input" required></td>
+            <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
+        `;
         tbody.appendChild(row);
     });
 
